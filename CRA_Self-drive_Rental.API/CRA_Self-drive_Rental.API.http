@@ -1,0 +1,6 @@
+@CRA_Self_drive_Rental.API_HostAddress = http://localhost:5017
+
+GET {{CRA_Self_drive_Rental.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

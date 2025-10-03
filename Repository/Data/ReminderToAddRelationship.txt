@@ -1,0 +1,45 @@
+﻿- add the proper relationship to all related object
+- then go into DbContext to explicitly declare relationships
+example: comment 1-n post then comment has singular object Post and post has collection object Comments
+then in DbContext:
+builder.Entity<Post>()
+                .HasMany(p => p.Comments) // 1 post to N comments (object p here is Post type)
+                .WithOne(p => p.Post) // 1 comment to 1 post (object p here is Comment type)
+                .HasForeignKey(p => p.PostId) //declare foreign key (object p here is Comment type)
+                .OnDelete(DeleteBehavior.NoAction); // Prevent cascade delete
+
+Singular object (1 to): public <T> Related1Object;
++ This must also have a foreign key column with it and use [ForeignKey("")] annotation
+E.g: 
+public T Related1ObjectFK { get; set; }
+[ForeignKey("Related1ObjectFK")]
+public <T> Related1Object
+Collection object (n to): public virtual ICollection<T> RelatedManyObjects;
+
+adding virtual to a relationship is just for lazy loading (look up eager loading vs lazy loading)
+
+Fluent API vs Data Annotation
+DA for simple cases, Fluent for more complex database
+Can do Composite key, delete action (cascade) and name constraint among others
+Do one or the other, no need for redundancy
+When config relationship, you can do from one end and back in one line
+
+E.g:
+builder.Entity<Post>()
+    .HasOne(p => p.Author)
+    .WithMany()
+    .HasForeignKey(p => p.UserId)
+    .OnDelete(DeleteBehavior.Restrict); // Optional
+
+builder.Entity<Comment>()
+    .HasOne(c => c.Author)
+    .WithMany()
+    .HasForeignKey(c => c.UserId)
+    .OnDelete(DeleteBehavior.Restrict); // Optional
+
+These two config the same relationship, no need, choose one to keep
+
+[Route("api/[controller]")]
+    [ApiController]
+    [Authorize(Roles = "Admin")]
+    [EnableCors("AllowSpecificOrigins")]
