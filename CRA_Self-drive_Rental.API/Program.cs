@@ -4,9 +4,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Service;
+using Repository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
+using Repository.Base;
+using Repository.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CRA_Self_drive_Rental.API
 {
@@ -131,6 +136,9 @@ namespace CRA_Self_drive_Rental.API
             builder.Services
                 .AddServices(builder.Configuration)
                 .AddRepositories(builder.Configuration);
+
+            builder.Services.AddDbContext<CRA_DbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 

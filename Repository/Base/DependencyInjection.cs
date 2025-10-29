@@ -31,8 +31,8 @@ namespace Repository.Base
 
         public static IServiceCollection AddRepositories(this IServiceCollection service, IConfiguration configuration)
         {
-            service.AddDbContext<CRA_DbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            //service.AddDbContext<CRA_DbContext>(options =>
+                //options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             //Disable if not in use (for debugging)
             /*
