@@ -427,3 +427,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/CRA_Self-drive_Rental.API/appsettings.json
