@@ -12,6 +12,10 @@ using System.Text;
 using Repository.Base;
 using Repository.Data;
 using Microsoft.EntityFrameworkCore;
+using Repository.Interfaces;
+using Repository.Repositories;
+using Service.Services;
+using Service.Services.Implementation;
 
 namespace CRA_Self_drive_Rental.API
 {
@@ -22,7 +26,9 @@ namespace CRA_Self_drive_Rental.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddScoped<UnitOfWork>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IJWTService, JWTService>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

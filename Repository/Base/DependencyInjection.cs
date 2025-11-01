@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository.Data;
+using Repository.Interfaces;
+using Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +48,7 @@ namespace Repository.Base
             //Inject dependency below
 
             //service.AddScoped<IAuthenRepository, AuthenRepository>();
-
+            service.AddScoped<IUserRepository, UserRepository>();
             return service;
         }
     }
