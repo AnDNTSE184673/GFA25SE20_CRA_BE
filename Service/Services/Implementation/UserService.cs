@@ -29,6 +29,44 @@ namespace Service.Services.Implementation
             return null!;
         }
 
+        public async Task<User> CreateOwner(RegisterOwnerRequest request)
+        {
+            _unitOfWork.BeginTransaction();
+            try
+            {
+                var knownUser = _unitOfWork._userRepo.GetByEmail(request.Email);
+                if (knownUser != null)
+                {
+                    throw new Exception("Email already in use");
+                }
+                User newUser = new User()
+                {
+                    Username = request.Username,
+                    Password = request.Password,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    Fullname = request.Fullname,
+                    Address = request.Address,
+                    ImageAvatar = request.ImageAvatar,
+                    IsCarOwner = request.IsCarOwner,
+                    Rating = request.Rating,
+                    Status = request.Status,
+                    RoleId = request.RoleId
+                };
+                await _unitOfWork._userRepo.CreateAsync(newUser);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                User newOnwer = _unitOfWork._userRepo.GetByEmail(newUser.Email);
+                return newOnwer;
+            }
+            catch
+            {
+                _unitOfWork.RollbackTransaction();
+                return null!;
+            }
+        }
+
+
         public async Task<LoginResponse?> RegisterCustomer(RegisterRequest request)
         {
             var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(u => u.Email == request.Email);

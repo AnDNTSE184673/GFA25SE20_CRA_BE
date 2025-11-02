@@ -1,4 +1,5 @@
-﻿using Repository.DTO.RequestDTO;
+﻿using Repository.Data.Entities;
+using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,6 @@ namespace Service.Services
     {
         Task<LoginResponse> AuthenticateAsync(string email, string password);
         Task<LoginResponse?> RegisterCustomer(RegisterRequest request);
+        Task<User> CreateOwner(RegisterOwnerRequest request);
     }
 }

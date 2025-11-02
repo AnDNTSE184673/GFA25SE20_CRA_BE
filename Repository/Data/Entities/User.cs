@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Repository.Data.Entities
@@ -33,6 +34,7 @@ namespace Repository.Data.Entities
         public int Gender { get; set; }
 
         [ForeignKey("RoleId")]
+        [JsonIgnore]
         public virtual Role Role { get; set; }
 
         public virtual ICollection<Car>? Cars { get; set; } = new List<Car>();

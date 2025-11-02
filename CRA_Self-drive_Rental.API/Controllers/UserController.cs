@@ -45,5 +45,21 @@ namespace CRA_Self_drive_Rental.API.Controllers
             // Implementation for user sign-up goes here
             return Ok(response);
         }
+
+        [HttpPost("RegisterOwner")]
+        public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerRequest register)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid registration data",
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+            var response = await _userService.CreateOwner(register);
+            // Implementation for owner registration goes here
+            return Ok(response);
+        }
     }
 }
