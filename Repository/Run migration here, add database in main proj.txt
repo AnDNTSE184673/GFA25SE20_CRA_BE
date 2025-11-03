@@ -1,0 +1,22 @@
+﻿//Run this in Repository project
+dotnet ef migrations add <What has changed in this migration> --project .\Repository\ --startup-project .\CRA_Self-drive_Rental.API\
+
+//Run this in YuuZone project to uppdate database after pulling with new migrations
+dotnet ef database update
+
+//Or run this in the current project
+dotnet ef database update --project .\Repository\ --startup-project .\CRA_Self-drive_Rental.API\
+
+//To remove previous migration
+dotnet ef migrations remove --project .\Repository\ --startup-project .\CRA_Self-drive_Rental.API\
+
+//If all else fails, backup all data in database via Rclick/Tasks/Export Data, then delete the db and remigrate
+//Delete all migration and migrate like new if needed
+
+
+dotnet add package Microsoft.EntityFrameworkCore --version 8.0.11
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.5
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.5
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.5
+dotnet add package Microsoft.Extensions.Configuration --version 8.0.0
+dotnet add package Microsoft.Extensions.Configuration.Json --version 8.0.0

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using Repositories.DTO;
+using Repository.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

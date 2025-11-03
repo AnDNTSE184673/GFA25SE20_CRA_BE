@@ -17,7 +17,7 @@ namespace Service
         {
             service.Configure<SMTPSettings>(configuration.GetSection("SMTPSettings"));
             service.AddScoped<JWTTokenProvider>();
-            service.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+            //service.AddAutoMapper(typeof(AutoMapperProfile));
 
             //service.AddScoped<IAuthenService, AuthenService>();
             return service;

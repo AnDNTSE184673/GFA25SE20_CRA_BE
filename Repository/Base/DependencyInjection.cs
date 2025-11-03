@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository.Data;
+using Repository.Interfaces;
+using Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +33,8 @@ namespace Repository.Base
 
         public static IServiceCollection AddRepositories(this IServiceCollection service, IConfiguration configuration)
         {
-            service.AddDbContext<CRA_DbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            //service.AddDbContext<CRA_DbContext>(options =>
+                //options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             //Disable if not in use (for debugging)
             /*
@@ -46,7 +48,7 @@ namespace Repository.Base
             //Inject dependency below
 
             //service.AddScoped<IAuthenRepository, AuthenRepository>();
-
+            service.AddScoped<IUserRepository, UserRepository>();
             return service;
         }
     }

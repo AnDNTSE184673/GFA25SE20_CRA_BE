@@ -4,9 +4,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Service;
+using Repository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
+using Repository.Base;
+using Repository.Data;
+using Microsoft.EntityFrameworkCore;
+using Repository.Interfaces;
+using Repository.Repositories;
+using Service.Services;
+using Service.Services.Implementation;
 
 namespace CRA_Self_drive_Rental.API
 {
@@ -17,7 +26,9 @@ namespace CRA_Self_drive_Rental.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddScoped<UnitOfWork>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IJWTService, JWTService>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -131,6 +142,9 @@ namespace CRA_Self_drive_Rental.API
             builder.Services
                 .AddServices(builder.Configuration)
                 .AddRepositories(builder.Configuration);
+
+            builder.Services.AddDbContext<CRA_DbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 

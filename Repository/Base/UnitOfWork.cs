@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Repository.Data;
+using Repository.Interfaces;
+using Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +17,16 @@ namespace Repository.Base
         private IDbContextTransaction? _transaction = null;
 
         //only allow external code to consume, not change
-        //public IUserRepository _userRepo { get; }
+        public IUserRepository _userRepo { get; }
 
         //no need to construct _transaction
 
-
+        public UnitOfWork(CRA_DbContext context,
+           IUserRepository userRepo)
+        {
+            _context = context;
+            _userRepo = userRepo;
+        }
 
         #region How to construct Unit of Work:
         /*

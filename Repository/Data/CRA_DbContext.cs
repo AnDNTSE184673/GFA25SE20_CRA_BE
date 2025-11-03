@@ -20,13 +20,22 @@ namespace Repository.Data
 
         //New Table here
         public DbSet<User> Users { get; set; }
-        public DbSet<Gender> Genders { get; set; }
+
         public DbSet<Role> Roles { get; set; }
-        public DbSet<Status> Status { get; set; }
         public DbSet<Car> Cars { get; set; }
-        public DbSet<Currency> Currencies { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
-        public DbSet<Feedback> Feedback { get; set; }
+        public DbSet<InvoiceItem> InvoiceItems { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Schedules> Schedules { get; set; }
+        public DbSet<PersistNotif> PersistNotifs { get; set; }
+        public DbSet<PaymentHistory> PaymentHistories { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<Booking> BookingHistories { get; set; }
+        public DbSet<CarRegistration> CarRegistrations { get; set; }
+        public DbSet<Contract> Contracts { get; set; }
+        public DbSet<Inquiry> Inquiries { get; set; }
+        public DbSet<ParkingLot> ParkingLots { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,20 +48,6 @@ namespace Repository.Data
                 new Role { Id = 1, Title = "Customer" }
             );
 
-            // Seeding Genders
-            modelBuilder.Entity<Gender>().HasData(
-                new Gender { Id = 1, GenderTitle = "Male" },
-                new Gender { Id = 2, GenderTitle = "Female" },
-                new Gender { Id = 3, GenderTitle = "Other" }
-            );
-
-            // Seeding Statuses
-            modelBuilder.Entity<Status>().HasData(
-                new Status { Id = 1, StatusName = "Active" },
-                new Status { Id = 2, StatusName = "Inactive" },
-                new Status { Id = 3, StatusName = "Pending" }
-            );
-
             //New relationships here
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
@@ -60,23 +55,53 @@ namespace Repository.Data
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Gender)
-                .WithMany()
-                .HasForeignKey(u => u.GenderId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Status)
-                .WithMany()
-                .HasForeignKey(u => u.StatusId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Car>()
                 .HasOne(u => u.Owner)
                 .WithMany(u => u.Cars)
                 .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Car>()
+                .HasOne(u => u.PreferredLot)
+                .WithMany(u => u.Cars)
+                .HasForeignKey(u => u.PrefLotId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Customer)
+                .WithMany(u => u.InvoicesAsCustomer)
+                .HasForeignKey(i => i.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Vendor)
+                .WithMany(u => u.InvoicesAsVendor)
+                .HasForeignKey(i => i.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Contract>()
+                .HasOne(c => c.PartyA)
+                .WithMany() //.WithMany(u => u.ContractsAsPartyA) 
+                .HasForeignKey(c => c.PartyAId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Contract>()
+                .HasOne(c => c.PartyB)
+                .WithMany() //.WithMany(u => u.ContractsAsPartyB)
+                .HasForeignKey(c => c.PartyBId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Contract>()
+                .HasOne(c => c.Invoice)
+                .WithMany() //assuming one contract per invoice
+                .HasForeignKey(c => c.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
