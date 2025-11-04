@@ -1,4 +1,5 @@
-﻿using Repository.Base;
+﻿using AutoMapper;
+using Repository.Base;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
@@ -66,6 +67,15 @@ namespace Service.Services.Implementation
             }
         }
 
+        public async Task<List<User>> GetAllUsers()
+        {
+            return (List<User>)await _unitOfWork._userRepo.GetAllAsync();
+        }
+
+        public async Task<User?> GetUserById(Guid userId)
+        {
+            return await _unitOfWork._userRepo.GetByIdAsync(userId);
+        }
 
         public async Task<LoginResponse?> RegisterCustomer(RegisterRequest request)
         {
@@ -102,6 +112,67 @@ namespace Service.Services.Implementation
             }
             User newlyCtUser = _unitOfWork._userRepo.GetByEmail(newUser.Email);
             return _jwtService.GenerateToken(newlyCtUser);
+        }
+
+        public async Task<User?> UpdateToCarOwner(Guid userId)
+        {
+            var user = _unitOfWork._userRepo.GetById(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+            _unitOfWork.BeginTransaction();
+            user.IsCarOwner = true;
+            try
+            {
+                await _unitOfWork._userRepo.UpdateAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                return user;
+            }
+            catch
+            {
+                _unitOfWork.RollbackTransaction();
+                return null;
+            }
+        }
+
+        public async Task<User?> UpdateUserInfo(UserUpdateRequest request)
+        {
+            var user = await _unitOfWork._userRepo.GetByIdAsync(request.Id);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+            _unitOfWork.BeginTransaction();
+            try
+            {
+                user.Fullname = request.Fullname;
+                user.Password = request.Password;
+                user.PhoneNumber = request.PhoneNumber;
+                user.Address = request.Address;
+                user.ImageAvatar = request.ImageAvatar;
+                user.Status = request.Status;
+                user.Gender = request.Gender;
+                user.Username = request.Username;
+                await _unitOfWork._userRepo.UpdateAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+                var result = await _unitOfWork._userRepo.GetByIdAsync(request.Id);
+                if (result != null)
+                {
+                    await _unitOfWork.CommitTransactionAsync();
+                    return result;
+                }
+                else
+                {
+                    throw new Exception("Update failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception("Update failed: " + ex.Message);
+            }
         }
     }
 }
