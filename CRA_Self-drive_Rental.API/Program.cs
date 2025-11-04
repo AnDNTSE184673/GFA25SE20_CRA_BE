@@ -1,21 +1,23 @@
-﻿
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Repository;
+using Repository.Base;
+using Repository.Data;
+using Repository.Extension.AutoMapper;
+using Repository.Interfaces;
+using Repository.Repositories;
 using Serilog;
 using Service;
-using Repository;
+using Service.Services;
+using Service.Services.Implementation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
-using Repository.Base;
-using Repository.Data;
-using Microsoft.EntityFrameworkCore;
-using Repository.Interfaces;
-using Repository.Repositories;
-using Service.Services;
-using Service.Services.Implementation;
 
 namespace CRA_Self_drive_Rental.API
 {
