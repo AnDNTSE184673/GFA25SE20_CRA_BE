@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Repository.Data;
-using Repository.Interfaces;
 using Repository.Repositories;
+using Repository.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

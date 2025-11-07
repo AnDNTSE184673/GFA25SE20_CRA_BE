@@ -2,7 +2,7 @@
 using Repository.Base;
 using Repository.Data;
 using Repository.Data.Entities;
-using Repository.Interfaces;
+using Repository.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

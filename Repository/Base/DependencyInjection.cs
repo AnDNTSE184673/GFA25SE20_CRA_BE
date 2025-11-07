@@ -1,14 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Repository.Data;
-using Repository.Interfaces;
 using Repository.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Repository.Repositories.Interfaces;
 
 namespace Repository.Base
 {
@@ -34,7 +27,7 @@ namespace Repository.Base
         public static IServiceCollection AddRepositories(this IServiceCollection service, IConfiguration configuration)
         {
             //service.AddDbContext<CRA_DbContext>(options =>
-                //options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            //options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             //Disable if not in use (for debugging)
             /*
