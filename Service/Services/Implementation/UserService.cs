@@ -1,3 +1,6 @@
+﻿using Newtonsoft.Json.Linq;
+using Repository.Base;
+using Repository.CustomFunctions.TokenHandler;
 ﻿using AutoMapper;
 using Repository.Base;
 using Repository.Data.Entities;
@@ -5,6 +8,7 @@ using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,8 +18,8 @@ namespace Service.Services.Implementation
     public class UserService : IUserService
     {
         private readonly UnitOfWork _unitOfWork;
-        private IJWTService _jwtService;
-        public UserService(UnitOfWork unitOfWork, IJWTService jwtService)
+        private JWTTokenProvider _jwtService;
+        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
@@ -25,7 +29,12 @@ namespace Service.Services.Implementation
             var user = await _unitOfWork._userRepo.Authentication(email, password);
             if (user != null)
             {
-                return _jwtService.GenerateToken(user);
+                var result = _jwtService.GenerateAccessToken(user);
+                return new LoginResponse
+                {
+                    Token = result.token,
+                    Expiration = result.expire
+                };
             }
             return null!;
         }
@@ -111,7 +120,12 @@ namespace Service.Services.Implementation
                 return null;
             }
             User newlyCtUser = _unitOfWork._userRepo.GetByEmail(newUser.Email);
-            return _jwtService.GenerateToken(newlyCtUser);
+            var result = _jwtService.GenerateAccessToken(newlyCtUser);
+            return new LoginResponse
+            {
+                Token = result.token,
+                Expiration = result.expire
+            };
         }
 
         public async Task<User?> UpdateToCarOwner(Guid userId)

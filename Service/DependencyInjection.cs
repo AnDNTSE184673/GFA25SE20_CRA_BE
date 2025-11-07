@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Repository.CustomFunctions.TokenHandler;
 using Repository.DTO;
 using Repository.Extension.AutoMapper;
+using Service.Services.Implementation;
+using Service.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,10 @@ namespace Service
             //service.AddAutoMapper(typeof(AutoMapperProfile));
 
             //service.AddScoped<IAuthenService, AuthenService>();
+            service.AddScoped<IUserService, UserService>();
+            service.AddScoped<IJWTService, JWTService>();
+            //service.AddScoped<ICarService, CarService>();
+            //service.AddScoped<IParkingLotService, ParkingLotService>();
             return service;
         }
     }

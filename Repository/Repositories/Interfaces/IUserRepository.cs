@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Interfaces
+namespace Repository.Repositories.Interfaces
 {
     public interface IUserRepository : IGenericRepository<User>
     {
