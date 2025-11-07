@@ -40,12 +40,13 @@ namespace Repository.CustomFunctions.TokenHandler
         /// <summary>
         /// .Include() Role in the User object sent to this
         /// </summary>
-        public string GenerateAccessToken(User user)
+        public (string token, DateTime expire) GenerateAccessToken(User user)
         {
             if(user == null)
             {
                 throw new ArgumentException("User is null");
             }
+            var expire = DateTime.UtcNow.AddMinutes(config.GetValue<int>("JWT:ExpirationTimeMinutes"));
             //get secret authkey in the config
             string secretKey = config["JWT:Secret"];
             //encode the secret key
@@ -64,7 +65,7 @@ namespace Repository.CustomFunctions.TokenHandler
                         //new Claim("RoleName", user.Role.Name)
                         //new Claim("email_verified",)
                     ]),
-                Expires = DateTime.UtcNow.AddMinutes(config.GetValue<int>("JWT:ExpirationTimeMinutes")),
+                Expires = expire,
                 SigningCredentials = credentials,
                 Issuer = config["JWT:Issuer"],
                 Audience = config["JWT:Audience"]
@@ -89,7 +90,7 @@ namespace Repository.CustomFunctions.TokenHandler
 
             var token = handler.CreateToken(tokenDescriptor);
 
-            return token;
+            return (token, expire);
         }
 
         //Implement Refresh TOken here
@@ -108,7 +109,7 @@ namespace Repository.CustomFunctions.TokenHandler
 
             return new RefreshTokensResponse
             {
-                AccessToken = newAccessToken,
+                AccessToken = newAccessToken.token,
                 RefreshToken = newRefreshToken
             };
         }
