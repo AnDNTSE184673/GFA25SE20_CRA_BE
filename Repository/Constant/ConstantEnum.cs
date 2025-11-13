@@ -42,6 +42,8 @@ namespace Repository.Constant
             public const string PAYMENT_PENDING = "Waiting for Payment";
             public const string REFUNDED = "Refunded";
             public const string RESERVED = "Reserved";
+            public const string APPROVED = "Approved";
+            public const string DENIED = "Denied";
         }
 
         public static class SupabaseBucket
@@ -92,7 +94,9 @@ namespace Repository.Constant
             [EnumMember(Value ="Waiting for Payment")]
             PaymentPending,
             Refunded,
-            Reserved
+            Reserved,
+            Approved,
+            Denied
         }
     }
 }
