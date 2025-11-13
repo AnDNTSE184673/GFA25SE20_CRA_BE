@@ -39,7 +39,9 @@ namespace Repository.Extension.AutoMapper
             CreateMap<ParkingLot, ParkingLotView>()
                 .ForMember(dest => dest.ManagerId, opt => opt.MapFrom(src => src.UserId));
             CreateMap<PostParkingLotForm, ParkingLot>()
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.ManagerId)); ;
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.ManagerId));
+
+            CreateMap<CarRegistration,CarRegView>();
 
             CreateMap<User, UserView>();
 
