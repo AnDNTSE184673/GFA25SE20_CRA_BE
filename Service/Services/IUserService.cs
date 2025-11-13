@@ -1,6 +1,7 @@
 ﻿using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
+using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;

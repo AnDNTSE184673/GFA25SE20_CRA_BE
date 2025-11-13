@@ -11,6 +11,8 @@ namespace Repository.Repositories.Interfaces
     public interface IUserRepository : IGenericRepository<User>
     {
         Task<User?> Authentication(string email, string password);
+        Task<List<User>> GetAllUserAsync();
         User? GetByEmail(string email);
+        Task<User?> GetUserByUsernameAsync(string managerName);
     }
 }

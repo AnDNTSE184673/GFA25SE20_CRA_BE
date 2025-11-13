@@ -27,8 +27,16 @@ namespace CRA_Self_drive_Rental.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Initialize Serilog first
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                //.WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            builder.Host.UseSerilog(); // Attach Serilog to the host
+
             // Add services to the container.
-            
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -77,6 +85,7 @@ namespace CRA_Self_drive_Rental.API
                     }
                 });
             });
+            Log.Information("Added Swagger");
 
             builder.Services.AddAuthentication(options => {
                 // A Google focused approach
@@ -126,7 +135,7 @@ namespace CRA_Self_drive_Rental.API
                 .AddCookie();
 
             builder.Services.AddAuthorization();
-
+            Log.Information("Added Author/Authen");
             // Add CORS policy to allow specific origins (e.g., localhost for development)
             builder.Services.AddCors(options =>
             {
@@ -145,6 +154,7 @@ namespace CRA_Self_drive_Rental.API
 
             builder.Services.AddDbContext<CRA_DbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            Log.Information("Added database {server}", builder.Configuration["ConnectionStrings:DefaultConnection"].Substring(0, Math.Min(15, builder.Configuration["ConnectionStrings:DefaultConnection"].Length)));
 
             var app = builder.Build();
 
