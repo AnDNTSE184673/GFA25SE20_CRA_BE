@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    partial class CRA_DbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113041111_Changes")]
+    partial class Changes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

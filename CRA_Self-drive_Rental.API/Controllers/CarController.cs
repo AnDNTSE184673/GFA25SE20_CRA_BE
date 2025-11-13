@@ -4,6 +4,7 @@ using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
+using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.Repositories.Interfaces;
 using Service.Services;
 using Service.Services.Implementation;
@@ -75,15 +76,53 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("carRegDoc")]
-        public async Task<IActionResult> GetCarRegistration(GetCarRegForm form)
+        ///<summary>"Also send a flag indicating whether to search using path or user/car id"</summary>
+        public async Task<IActionResult> GetCarRegistration([FromQuery]GetCarRegForm form, bool flagId, bool flagPath)
         {
             try
             {
-                var result = await _carRegServ.GetCarRegDoc(form);
+                (string url, CarRegView view) result = ("", new CarRegView());
+
+                if (!form.IsValid().valid)
+                    throw new InvalidOperationException("Fill either complete pairs of data");
+
+                if (!flagId && !flagPath)
+                    throw new InvalidOperationException("Choose between search by ids or path");
+
+                // case 1: prioritize ID
+                if (flagId && form.IsValid().isId)
+                {
+                    result = await _carRegServ.GetCarRegDocById(form);
+                }
+                // case 2: use path only if ID is not prioritized
+                else if (flagPath && !flagId && !form.IsValid().isId)
+                {
+                    result = await _carRegServ.GetCarRegDocByPath(form);
+                }
+
+                else
+                {
+                    throw new InvalidOperationException("No valid combination of flags and filled pairs found");
+                }
+
+
+                return result.view == null
+                    ? StatusCode(404, new
+                    {
+                        Message = "No data found, check log"
+                    })
+                    : Ok(new
+                        {
+                            Url = result.url,
+                            View = result.view
+                        });
             }
             catch(Exception ex)
             {
-
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
             }
         }
     }

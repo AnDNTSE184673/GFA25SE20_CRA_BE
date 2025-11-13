@@ -31,34 +31,41 @@ namespace Service.Services.Implementation
 
         public async Task<(string signedUrl, CarRegView view)> GetCarRegDocById(GetCarRegForm form)
         {
-            var url = await _file.CreateSignedUrlAsync(form.)
+            var row = await _unitOfWork._carRegRepo.FindCarRegById(form.CarId, form.UserId);
+            var url = await _file.CreateSignedUrlAsync(row.Bucket, row.FilePath, expirationTimeSec);
+            return (url, _mapper.Map<CarRegView>(row));
         }
 
         public async Task<(string signedUrl, CarRegView view)> GetCarRegDocByPath(GetCarRegForm form)
         {
-            var url = await _file.CreateSignedUrlAsync(form.)
+            var row = await _unitOfWork._carRegRepo.FindCarRegByPath(form.FilePath, form.Bucket);
+            var url = await _file.CreateSignedUrlAsync(form.Bucket, form.FilePath, expirationTimeSec);
+            return (url, _mapper.Map<CarRegView>(row));
         }
 
         public async Task<(string status, CarRegView regDoc)> SubmitRegisterDocument(IFormFile file, CarRegForm form)
         {
+            var bucket = ConstantEnum.SupabaseBucket.CarRegistration;
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                string uploadDate = DateTime.Now.ToString("ddMMyyyy");
+                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
 
                 string originalExt = Path.GetExtension(file.FileName);
                 var fileName = $"{form.CarId}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png
                 var imagePath = $"{form.UserId.ToString()}/{fileName}"; //userid/carid_date.ext
 
-                var url = await _file.UploadImageAsync(file, fileName, imagePath, "CarRegistrationDocs", expirationTimeSec);
+                var url = await _file.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec);
 
                 //add upload checking logic here
 
                 var mapped = _mapper.Map<CarRegistration>(form);
 
                 mapped.FilePath = imagePath;
-                mapped.CreateDate = DateTime.Now;
+                mapped.FileName = fileName;
+                mapped.Bucket = bucket;
+                mapped.CreateDate = DateTime.UtcNow;
                 mapped.UrlExpiration = mapped.CreateDate.AddSeconds(expirationTimeSec);
                 mapped.Status = ConstantEnum.Statuses.PENDING;
 
