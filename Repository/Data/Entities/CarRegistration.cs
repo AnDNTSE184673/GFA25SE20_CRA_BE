@@ -10,9 +10,10 @@ namespace Repository.Data.Entities
     public class CarRegistration
     {
         public int Id { get; set; }
-        public string DocUrl { get; set; }
+        public string FilePath { get; set; }
+        public string Bucket { get; set; }
+        public DateTime UrlExpiration { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime UpdateDate { get; set; }
 
         public string Status { get; set; }
 

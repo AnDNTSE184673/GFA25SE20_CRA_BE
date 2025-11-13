@@ -20,7 +20,6 @@ namespace Repository.Data
 
         //New Table here
         public DbSet<User> Users { get; set; }
-
         public DbSet<Role> Roles { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
@@ -36,6 +35,7 @@ namespace Repository.Data
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<Inquiry> Inquiries { get; set; }
         public DbSet<ParkingLot> ParkingLots { get; set; }
+        public DbSet<DriverLicense> DriverLicenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,7 +45,8 @@ namespace Repository.Data
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1001, Title = "Admin" },
                 new Role { Id = 1002, Title = "Staff" },
-                new Role { Id = 1, Title = "Customer" }
+                new Role { Id = 1, Title = "Customer" },
+                new Role { Id = 2, Title = "Car Owner" }
             );
 
             //New relationships here

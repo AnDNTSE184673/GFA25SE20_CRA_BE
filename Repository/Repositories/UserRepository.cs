@@ -27,12 +27,28 @@ namespace Repository.Repositories
             return user;
         }
 
+        public async Task<List<User>> GetAllUserAsync()
+        {
+            return await _dbContext.Users
+                .Include(u => u.Role)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public User? GetByEmail(string email)
         {
             var user = _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefault(u => u.Email == email);
             return user;
+        }
+
+        public async Task<User?> GetUserByUsernameAsync(string managerName)
+        {
+            return await _dbContext.Users
+                .Include(u => u.Role)
+                .Where(u => u.Username.Equals(managerName))
+                .FirstOrDefaultAsync();
         }
     }
 }

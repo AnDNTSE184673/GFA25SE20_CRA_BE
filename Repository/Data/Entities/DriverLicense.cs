@@ -7,21 +7,19 @@ using System.Threading.Tasks;
 
 namespace Repository.Data.Entities
 {
-    public class Booking
+    public class DriverLicense
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
+        public string FilePath { get; set; }
+        public string Bucket { get; set; }
+        public DateTime UrlExpiration { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime UpdateDate { get; set; }
+
         public string Status { get; set; }
+
         public Guid UserId { get; set; }
-        public Guid CarId { get; set; }
-        public Guid InvoiceId { get; set; }
 
         [ForeignKey("UserId")]
-        public User User { get; set; }
-        [ForeignKey("InvoiceId")]
-        public Invoice Invoice { get; set; }
-        [ForeignKey("CarId")]
-        public Car Car { get; set; }
+        public virtual User Owner { get; set; }
     }
 }
