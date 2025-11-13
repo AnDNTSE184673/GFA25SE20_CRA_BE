@@ -1,5 +1,6 @@
 ﻿using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
+using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace Service.Services
     {
         Task<LoginResponse> AuthenticateAsync(string email, string password);
         Task<LoginResponse?> RegisterCustomer(RegisterRequest request);
+        Task<UserView> GetUser();
+        Task<List<UserView>> GetAllUser();
     }
 }

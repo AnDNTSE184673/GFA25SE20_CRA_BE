@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using AutoMapper;
+using Newtonsoft.Json.Linq;
 using Repository.Base;
 using Repository.CustomFunctions.TokenHandler;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
+using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,11 +19,15 @@ namespace Service.Services.Implementation
     {
         private readonly UnitOfWork _unitOfWork;
         private JWTTokenProvider _jwtService;
-        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService)
+        private readonly IMapper _mapper;
+
+        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
+            _mapper = mapper;
         }
+
         public async Task<LoginResponse> AuthenticateAsync(string email, string password)
         {
             var user = await _unitOfWork._userRepo.Authentication(email, password);
@@ -35,6 +41,17 @@ namespace Service.Services.Implementation
                 };
             }
             return null!;
+        }
+
+        public async Task<List<UserView>> GetAllUser()
+        {
+            var result = await _unitOfWork._userRepo.GetAllUserAsync();
+            return _mapper.Map<List<UserView>>(result);
+        }
+
+        public Task<UserView> GetUser()
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<LoginResponse?> RegisterCustomer(RegisterRequest request)
@@ -78,5 +95,6 @@ namespace Service.Services.Implementation
                 Expiration = result.expire
             };
         }
+
     }
 }

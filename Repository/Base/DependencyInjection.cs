@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Repository.Repositories;
 using Repository.Repositories.Interfaces;
+using Serilog;
 
 namespace Repository.Base
 {
@@ -26,6 +27,7 @@ namespace Repository.Base
 
         public static IServiceCollection AddRepositories(this IServiceCollection service, IConfiguration configuration)
         {
+            Log.Information("DI AddRepositories");
             //service.AddDbContext<CRA_DbContext>(options =>
             //options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
@@ -42,6 +44,9 @@ namespace Repository.Base
 
             //service.AddScoped<IAuthenRepository, AuthenRepository>();
             service.AddScoped<IUserRepository, UserRepository>();
+            service.AddScoped<IParkingLotRepository, ParkingLotRepository>();
+            service.AddScoped<ICarRepository, CarRepository>();
+            service.AddScoped<ICarRegRepository, CarRegRepository>();
             return service;
         }
     }

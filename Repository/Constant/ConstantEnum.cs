@@ -24,6 +24,7 @@ namespace Repository.Constant
         public static class Roles
         {
             public const string ADMIN = "Admin";
+            public const string STAFF = "Staff";
             public const string CUSTOMER = "Customer";
         }
         
@@ -32,14 +33,19 @@ namespace Repository.Constant
             public const string ACTIVE = "Active";
             public const string PENDING = "Pending";
             public const string INACTIVE = "Inactive";
-            public const string PUBLIC = "Public";
-            public const string PRIVATE = "Private";
+        }
+
+        public static class SupabaseBucket
+        {
+            public const string CarRegistration = "CarRegistrationDocs";
+            public const string DriverLicense = "DriverLicenseDocs";
         }
 
         public enum RoleID
         {
-            ADMIN = 1,
-            CUSTOMER = 2
+            ADMIN = 1001,
+            STAFF = 1002,
+            CUSTOMER = 1
         }
 
         public enum GenderID
@@ -59,11 +65,9 @@ namespace Repository.Constant
         {
             ACTIVE = 1,
             INACTIVE = 2,
-            PENDING = 3,
+            PENDING = 3
             //1. SQL Server Identity Jump Behavior (Post-SQL Server 2012)
             //Starting from SQL Server 2012, the IDENTITY column may auto-increment in steps of 1000 under certain conditions due to performance optimization.
-            PUBLIC = 1001,
-            PRIVATE = 1002
         }
     }
 }
