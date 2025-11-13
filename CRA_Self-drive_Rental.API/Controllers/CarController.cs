@@ -25,6 +25,51 @@ namespace CRA_Self_drive_Rental.API.Controllers
             _carRegServ = carRegServ;
         }
 
+        [HttpPatch("regDoc/approve")]
+        public async Task<IActionResult> ApproveDocument(CarRegForm form, bool isApproved)
+        {
+            try
+            {
+                var result = await _carRegServ.ApproveDocumentsAsync(form, isApproved);
+                return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(500, new
+                    {
+                        Message = "Data edit error, check log and form"
+                    })
+                    : Ok(result.view);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+            
+        [HttpGet("regDoc/all")]
+        public async Task<IActionResult> GetAllDocuments()
+        {
+            try
+            {
+                var result = await _carRegServ.GetAllDocumentsAsync();
+                return result.Count <= 0
+                    ? StatusCode(500, new
+                    {
+                        Message = "Data fetch error, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+
+        }
+
         [HttpPost("registerCar/carInfo")]
         public async Task<IActionResult> AddCarInfo(CarInfoForm form)
         {
@@ -75,7 +120,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("carRegDoc")]
+        [HttpGet("regDoc")]
         ///<summary>"Also send a flag indicating whether to search using path or user/car id"</summary>
         public async Task<IActionResult> GetCarRegistration([FromQuery]GetCarRegForm form, bool flagId, bool flagPath)
         {

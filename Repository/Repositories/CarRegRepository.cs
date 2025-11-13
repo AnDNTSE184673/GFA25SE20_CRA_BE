@@ -21,6 +21,13 @@ namespace Repository.Repositories
         {
         }
 
+        public async Task<List<CarRegistration>> GetCarRegsAsync()
+        {
+            return await _dbContext.CarRegistrations
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<CarRegistration> FindCarRegById(Guid? carId, Guid? userId)
         {
             return await _dbContext.CarRegistrations
@@ -47,6 +54,20 @@ namespace Repository.Repositories
                     return (ConstantEnum.RepoStatus.SUCCESS, data);
                 else
                     return (ConstantEnum.RepoStatus.FAILURE, null);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<CarRegistration> UpdateCarReg(CarRegistration reg)
+        {
+            try
+            {
+                var result = await UpdateAsync(reg);
+
+                return await GetByIdAsync(reg.Id);
             }
             catch (Exception ex)
             {
