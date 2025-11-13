@@ -11,6 +11,7 @@ namespace Repository.Data.Entities
     {
         public int Id { get; set; }
         public string FilePath { get; set; }
+        public string FileName { get; set; }
         public string Bucket { get; set; }
         public DateTime UrlExpiration { get; set; }
         public DateTime CreateDate { get; set; }

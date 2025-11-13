@@ -11,5 +11,7 @@ namespace Repository.Repositories.Interfaces
     public interface ICarRegRepository
     {
         Task<(string status, CarRegistration regData)> UploadCarRegistration(CarRegistration data);
+        Task<CarRegistration> FindCarRegById(Guid? carId, Guid? userId);
+        Task<CarRegistration> FindCarRegByPath(string? filePath, string? bucket);
     }
 }
