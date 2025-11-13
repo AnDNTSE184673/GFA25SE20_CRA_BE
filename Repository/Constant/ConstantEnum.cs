@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +34,14 @@ namespace Repository.Constant
             public const string ACTIVE = "Active";
             public const string PENDING = "Pending";
             public const string INACTIVE = "Inactive";
+            public const string PUBLIC = "Public";
+            public const string PRIVATE = "Private";
+            public const string COMPLETED = "Completed";
+            public const string CANCELLED = "Cancelled";
+            public const string ONGOING = "Ongoing";
+            public const string PAYMENT_PENDING = "Waiting for Payment";
+            public const string REFUNDED = "Refunded";
+            public const string RESERVED = "Reserved";
         }
 
         public static class SupabaseBucket
@@ -68,6 +77,22 @@ namespace Repository.Constant
             PENDING = 3
             //1. SQL Server Identity Jump Behavior (Post-SQL Server 2012)
             //Starting from SQL Server 2012, the IDENTITY column may auto-increment in steps of 1000 under certain conditions due to performance optimization.
+        }
+
+        public enum Status
+        {
+            Active,
+            Inactive,
+            Pending,
+            Public,
+            Private,
+            Completed,
+            Cancelled,
+            Ongoing,
+            [EnumMember(Value ="Waiting for Payment")]
+            PaymentPending,
+            Refunded,
+            Reserved
         }
     }
 }

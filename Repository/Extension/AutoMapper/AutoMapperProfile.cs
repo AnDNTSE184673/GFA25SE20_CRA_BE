@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Repository.Data.Entities;
+using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.RequestDTO.ParkingLot;
@@ -47,6 +48,16 @@ namespace Repository.Extension.AutoMapper
 
             CreateMap<CarRegForm, CarRegistration>();
             CreateMap<CarRegistration, CarRegView>();
+            CreateMap<UserUpdateRequest, User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Username, opt => opt.Condition(src => src.Username != null))
+                .ForMember(dest => dest.Password, opt => opt.Condition(src => src.Password != null))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.Condition(src => src.PhoneNumber != null))
+                .ForMember(dest => dest.Fullname, opt => opt.Condition(src => src.Fullname != null))
+                .ForMember(dest => dest.Address, opt => opt.Condition(src => src.Address != null))
+                .ForMember(dest => dest.ImageAvatar, opt => opt.Condition(src => src.ImageAvatar != null))
+                .ForMember(dest => dest.Status, opt => opt.Condition(src => src.Status != null))
+                .ForMember(dest => dest.Gender, opt => opt.Condition(src => src.Gender != 0));
         }
     }
 }
