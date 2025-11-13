@@ -112,17 +112,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     : Ok(result.regDoc);
             }
             catch (Exception ex)
-            { 
-                return StatusCode(StatusCodes.Status500InternalServerError, new 
-                { 
-                    message = ex.Message 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
                 });
             }
         }
 
         [HttpGet("regDoc")]
         ///<summary>"Also send a flag indicating whether to search using path or user/car id"</summary>
-        public async Task<IActionResult> GetCarRegistration([FromQuery]GetCarRegForm form, bool flagId, bool flagPath)
+        public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, bool flagId, bool flagPath)
         {
             try
             {
@@ -157,16 +157,57 @@ namespace CRA_Self_drive_Rental.API.Controllers
                         Message = "No data found, check log"
                     })
                     : Ok(new
-                        {
-                            Url = result.url,
-                            View = result.view
-                        });
+                    {
+                        Url = result.url,
+                        View = result.view
+                    });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("AllCars")]
+        public async Task<IActionResult> GetAllCars()
+        {
+            try
+            {
+                var cars = await _carServ.GetAllCarsAsync();
+                return Ok(cars);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("{carId}")]
+        public async Task<IActionResult> GetCarById(Guid carId)
+        {
+            try
+            {
+                var car = await _carServ.GetCarByIdAsync(carId);
+                if (car == null)
+                {
+                    return NotFound(new
+                    {
+                        Message = "Car not found"
+                    });
+                }
+                return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
                 });
             }
         }

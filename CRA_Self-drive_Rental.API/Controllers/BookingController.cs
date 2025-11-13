@@ -56,7 +56,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         public async Task<IActionResult> CreateBooking([FromBody]BookingCreateRequest request)
         {
             var booking = await _bookingService.CreateBooking(request);
-            if (booking != null) return (IActionResult)booking;
+            if (booking != null) return Ok(booking);
             return BadRequest();
         }
 
