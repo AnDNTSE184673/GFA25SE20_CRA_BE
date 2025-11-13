@@ -29,6 +29,57 @@ namespace Service.Services.Implementation
             _file = file;
         }
 
+        public async Task<(string status, CarRegView view)> ApproveDocumentsAsync(CarRegForm form, bool isApproved)
+        {
+            try
+            {
+                _unitOfWork.BeginTransactionAsync();
+
+                var reg = await _unitOfWork._carRegRepo.FindCarRegById(form.CarId, form.UserId);
+                var car = await _unitOfWork._carRepo.GetByIdAsync(form.CarId);
+
+                if(reg == null && car == null)
+                {
+                    throw new InvalidDataException("Car and document not found");
+                }
+
+                if (isApproved) {
+                    reg.Status = ConstantEnum.Statuses.APPROVED;
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                }
+                else {
+                    reg.Status = ConstantEnum.Statuses.DENIED;
+                    car.Status = ConstantEnum.Statuses.INACTIVE;
+                }
+
+                var result = await _unitOfWork._carRegRepo.UpdateCarReg(reg);
+
+                var result2 = await _unitOfWork._carRepo.UpdateCarAsync(car);
+
+                if (result != null)
+                {
+                    await _unitOfWork.CommitTransactionAsync();
+                    return (ConstantEnum.RepoStatus.SUCCESS, _mapper.Map<CarRegView>(result));
+                }
+                else
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return (ConstantEnum.RepoStatus.FAILURE, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<CarRegView>> GetAllDocumentsAsync()
+        {
+            var result = await _unitOfWork._carRegRepo.GetCarRegsAsync();
+            return _mapper.Map<List<CarRegView>>(result);
+        }
+
         public async Task<(string signedUrl, CarRegView view)> GetCarRegDocById(GetCarRegForm form)
         {
             var row = await _unitOfWork._carRegRepo.FindCarRegById(form.CarId, form.UserId);
