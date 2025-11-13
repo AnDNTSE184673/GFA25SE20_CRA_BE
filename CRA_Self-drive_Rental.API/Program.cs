@@ -10,7 +10,6 @@ using Repository.Base;
 using Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using Repository.Extension.AutoMapper;
-using Repository.Interfaces;
 using Repository.Repositories;
 using Serilog;
 using Service;

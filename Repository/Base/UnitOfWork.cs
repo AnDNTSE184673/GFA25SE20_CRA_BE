@@ -18,14 +18,20 @@ namespace Repository.Base
 
         //only allow external code to consume, not change
         public IUserRepository _userRepo { get; }
+        public IBookingRepository _bookingRepo { get; }
+        public IInvoiceRepository _invoiceRepo { get; }
 
         //no need to construct _transaction
 
         public UnitOfWork(CRA_DbContext context,
-           IUserRepository userRepo)
+           IUserRepository userRepo,
+           IBookingRepository bookingRepo,
+           IInvoiceRepository invoiceRepo)
         {
             _context = context;
             _userRepo = userRepo;
+            _bookingRepo = bookingRepo;
+            _invoiceRepo = invoiceRepo;
         }
 
         #region How to construct Unit of Work:
