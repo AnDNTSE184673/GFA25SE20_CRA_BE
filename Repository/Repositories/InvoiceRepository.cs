@@ -51,25 +51,26 @@ namespace Repository.Repositories
         public async Task<Invoice> CreateInvoice(InvoiceCreateRequest request)
         {
             var user = await _context.Cars.Where(c => c.Id == request.CarId)
-                        .Select(c => c.UserId).FirstOrDefaultAsync();   
+                .Include(u => u.Owner).FirstOrDefaultAsync();   
             var newInvoice = new Invoice
             {
                 Id = Guid.NewGuid(),
-                InvoiceNo = "INV-" + DateTime.Now.Ticks,
-                IssueDate = DateTime.Now,
+                InvoiceNo = "INV-" + DateTime.UtcNow,
+                IssueDate = DateTime.UtcNow,
                 DueDate = request.InvoiceDue,
                 SubTotal = (request.CarRate * request.RentTime) + request.Fees,
                 GrandTotal = (request.CarRate * request.RentTime) + request.Fees,
                 Note = request.RentType,
-                CreateDate = DateTime.Now,
-                Status = ConstantEnum.Statuses.PAYMENT_PENDING,
+                CreateDate = DateTime.UtcNow,
+                Status = ConstantEnum.Statuses.PENDING,
                 CustomerId = request.CustomerId,
-                VendorId = user,
+                VendorId = user.Owner.Id,
                 InvoiceItems = new List<InvoiceItem>
                 {
                     new InvoiceItem
                     {
                         Id = Guid.NewGuid(),
+                        Item = "Car Rental Total",
                         Description = $"Rental for Car ID: {request.CarId} - {request.RentType}",
                         Quantity = request.RentTime,
                         UnitPrice = request.CarRate,
@@ -78,6 +79,7 @@ namespace Repository.Repositories
                     new InvoiceItem
                     {
                         Id = Guid.NewGuid(),
+                        Item = "Booking Fees",
                         Description = "Booking Fees",
                         Quantity = 1,
                         UnitPrice = request.Fees,

@@ -1,7 +1,9 @@
-﻿using Repository.Base;
+﻿using AutoMapper;
+using Repository.Base;
 using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
+using Repository.DTO.ResponseDTO.Booking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +17,11 @@ namespace Service.Services.Implementation
     public class BookingService : IBookingService
     {
         private readonly UnitOfWork _unitOfWork;
-        public BookingService(UnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public BookingService(UnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
         public async Task<Booking?> ChangeStatus(Guid bookingId, string status)
         {
@@ -47,7 +51,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public Task<Booking?> CreateBooking(BookingCreateRequest request)
+        public async Task<BookingView?> CreateBooking(BookingCreateRequest request)
         {
             try
             {
@@ -63,27 +67,42 @@ namespace Service.Services.Implementation
                     InvoiceDue = request.rentDateEnd,
                     RentType = request.rentType
                 };
-                var invoice = _unitOfWork._invoiceRepo.CreateInvoice(newInvoice).Result;
+                var invoice = await _unitOfWork._invoiceRepo.CreateInvoice(newInvoice);
                 var newBooking = new Booking
                 {
                     Id = Guid.NewGuid(),
                     CreateDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow,
-                    Status = request.status.ToString(),
+                    Status = ConstantEnum.Status.Pending.ToString(),
                     UserId = request.CustomerId,
                     CarId = request.CarId,
                     InvoiceId = invoice.Id
                 };
-                _unitOfWork._bookingRepo.CreateAsync(newBooking).Wait();
+                await _unitOfWork._bookingRepo.CreateAsync(newBooking);
                 _unitOfWork.CommitTransaction();
-                _unitOfWork.SaveChangesAsync().Wait();
-                var createdBooking = _unitOfWork._bookingRepo.GetByIdAsync(newBooking.Id).Result;
-                return Task.FromResult<Booking?>(createdBooking);
+                await _unitOfWork.SaveChangesAsync();
+                var createdBooking = await _unitOfWork._bookingRepo.GetByIdAsync(newBooking.Id);
+                var bookingView = _mapper.Map<BookingView>(createdBooking);
+                return bookingView;
             }
             catch (Exception ex)
             {
                 _unitOfWork.RollbackTransaction();
-                throw new Exception(ex.Message);
+                if (ex is AggregateException aggEx)
+                {
+                    foreach (var inner in aggEx.InnerExceptions)
+                    {
+                        Console.WriteLine($"[Inner Exception] {inner.Message}");
+                        if (inner.InnerException != null)
+                            Console.WriteLine($"[Deep Inner] {inner.InnerException.Message}");
+                    }
+                }
+                else if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[Inner Exception] {ex.InnerException.Message}");
+                }
+
+                throw;
             }
         }
 
