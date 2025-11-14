@@ -167,7 +167,7 @@ namespace CRA_Self_drive_Rental.API
 
             app.UseSwagger();
             app.UseSwaggerUI();
-
+            app.UseRouting();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
