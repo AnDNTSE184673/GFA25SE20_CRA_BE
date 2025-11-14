@@ -28,6 +28,9 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -45,6 +48,8 @@ namespace Repository.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CarId");
 
                     b.HasIndex("InvoiceId");
 
@@ -121,13 +126,21 @@ namespace Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("CarId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DocUrl")
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -135,7 +148,7 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UrlExpiration")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -190,6 +203,46 @@ namespace Repository.Migrations
                     b.HasIndex("PartyBId");
 
                     b.ToTable("Contracts");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.DriverLicense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UrlExpiration")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DriverLicenses");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Feedback", b =>
@@ -568,6 +621,11 @@ namespace Repository.Migrations
                         {
                             Id = 1,
                             Title = "Customer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Title = "Car Owner"
                         });
                 });
 
@@ -670,6 +728,12 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Repository.Data.Entities.Booking", b =>
                 {
+                    b.HasOne("Repository.Data.Entities.Car", "Car")
+                        .WithMany()
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Repository.Data.Entities.Invoice", "Invoice")
                         .WithMany()
                         .HasForeignKey("InvoiceId")
@@ -681,6 +745,8 @@ namespace Repository.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Car");
 
                     b.Navigation("Invoice");
 
@@ -750,6 +816,17 @@ namespace Repository.Migrations
                     b.Navigation("PartyA");
 
                     b.Navigation("PartyB");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.DriverLicense", b =>
+                {
+                    b.HasOne("Repository.Data.Entities.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Feedback", b =>

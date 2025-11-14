@@ -68,7 +68,11 @@ namespace Services.Service.Implementation
             return status;
         }
 
-        public string GenerateBodyRegisterSuccess(string username, string? password)
+        /// <summary>
+        /// productName is the name of the product or company
+        /// contactInfo can be left empty, in which case the placeholder "support@example.com" will be used
+        /// </summary>
+        public string GenerateBodyRegisterSuccess(string username, string? password, string productName, string? contactInfo)
         {
 
 
@@ -77,7 +81,7 @@ namespace Services.Service.Implementation
             mailBody.AppendLine("<div style='font-family: Arial, sans-serif; color: #000000;'>");
             mailBody.AppendLine("<h1 style='color: #000000;'>Account Confirmation</h1>");
 
-            mailBody.AppendLine($"<p style='color: #000000;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been successfully registered on YuuZone.</p>");
+            mailBody.AppendLine($"<p style='color: #000000;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been successfully registered on {productName}.</p>");
             mailBody.AppendLine("<br/>");
             mailBody.AppendLine($"<h3 style='color: #000000;'>Account Information:</h3>");
             mailBody.AppendLine($"<h4 style='color: #000000;'>NOTE: If the password box is empty, that usually means this account was created via Google</h4>");
@@ -90,8 +94,8 @@ namespace Services.Service.Implementation
             mailBody.AppendLine("Confirm Email");
             mailBody.AppendLine("</a>");*/
 
-            mailBody.AppendLine("<p style='color: #000000;'> If you didn't create this account, please contact us via our email: (contact here). </p>");
-            mailBody.AppendLine("<h5 style='color: #000000;'>Best regards,<br>YuuZone Team</h5>");
+            mailBody.AppendLine($"<p style='color: #000000;'> If you didn't create this account, please contact us via our email: {contactInfo ?? "support@example.com"}. </p>");
+            mailBody.AppendLine($"<h5 style='color: #000000;'>Best regards,<br>{productName} Team</h5>");
             mailBody.AppendLine("</div>");
 
             return mailBody.ToString();

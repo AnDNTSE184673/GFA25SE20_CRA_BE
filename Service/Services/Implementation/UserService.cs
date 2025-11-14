@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using AutoMapper;
+using Newtonsoft.Json.Linq;
 using Repository.Base;
 using Repository.CustomFunctions.TokenHandler;
 ﻿using AutoMapper;
@@ -6,6 +7,7 @@ using Repository.Base;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
+using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,11 +21,15 @@ namespace Service.Services.Implementation
     {
         private readonly UnitOfWork _unitOfWork;
         private JWTTokenProvider _jwtService;
-        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService)
+        private readonly IMapper _mapper;
+
+        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
+            _mapper = mapper;
         }
+
         public async Task<LoginResponse> AuthenticateAsync(string email, string password)
         {
             var user = await _unitOfWork._userRepo.Authentication(email, password);

@@ -13,13 +13,15 @@ namespace Repository.Data.Entities
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public string Status { get; set; }
-
         public Guid UserId { get; set; }
+        public Guid CarId { get; set; }
         public Guid InvoiceId { get; set; }
 
         [ForeignKey("UserId")]
         public User User { get; set; }
         [ForeignKey("InvoiceId")]
         public Invoice Invoice { get; set; }
+        [ForeignKey("CarId")]
+        public Car Car { get; set; }
     }
 }

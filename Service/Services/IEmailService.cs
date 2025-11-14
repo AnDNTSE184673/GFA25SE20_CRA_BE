@@ -9,6 +9,6 @@ namespace Services.Service
     public interface IEmailService
     {
         Task<bool> SendEmailAsync(string subject, string body, string receiverMail, string receiverName);
-        string GenerateBodyRegisterSuccess(string username, string password);
+        string GenerateBodyRegisterSuccess(string username, string password, string productName, string? contactInfo);
     }
 }
