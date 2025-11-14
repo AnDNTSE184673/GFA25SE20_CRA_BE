@@ -159,12 +159,15 @@ namespace CRA_Self_drive_Rental.API
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            /*if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            }*/
 
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.UseRouting();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
