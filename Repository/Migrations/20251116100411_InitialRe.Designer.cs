@@ -12,8 +12,8 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    [Migration("20251112035002_UpdateMissingRelationships")]
-    partial class UpdateMissingRelationships
+    [Migration("20251116100411_InitialRe")]
+    partial class InitialRe
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,13 +129,21 @@ namespace Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("CarId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DocUrl")
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -143,7 +151,7 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UrlExpiration")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -208,10 +216,18 @@ namespace Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DocUrl")
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -219,7 +235,7 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdateDate")
+                    b.Property<DateTime>("UrlExpiration")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -457,11 +473,24 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("OrderCode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("OrderCode"));
+
                     b.Property<double>("PaidAmount")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PaymentProofUrl")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Signature")
                         .HasColumnType("text");
 
                     b.Property<string>("Status")
@@ -506,11 +535,19 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Signature")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TransactionStatus")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -608,6 +645,11 @@ namespace Repository.Migrations
                         {
                             Id = 1,
                             Title = "Customer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Title = "Car Owner"
                         });
                 });
 
