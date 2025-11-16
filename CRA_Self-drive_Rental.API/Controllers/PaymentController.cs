@@ -43,5 +43,16 @@ namespace CRA_Self_drive_Rental.API.Controllers
             var (orderCode, checkoutUrl) = await _paymentService.CreatePayOSPaymentRequest(request);
             return Ok(new { OrderCode = orderCode, CheckoutUrl = checkoutUrl });
         }
+
+        [HttpPost("CreatePaymentFromInvoice/{invoiceId}")]
+        public async Task<IActionResult> CreatePaymentFromInvoice(Guid invoiceId)
+        {
+            var payments = await _paymentService.CreatePaymentFromInvoice(invoiceId);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments created from the specified invoice.");
+        }
     }
 }

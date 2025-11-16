@@ -36,14 +36,14 @@ namespace Service.Services.Implementation
             {
                 OrderCode = paymentHis.OrderCode,
                 Amount = (long)(request.Amount),
-                Description = $"Thanh toán cho hóa đơn {paymentHis.OrderCode} - {paymentHis.Id} của {request.PayerName}",
+                Description = $"Thanh toán cho {paymentHis.OrderCode}",
                 ReturnUrl = configSection["ReturnUrl"],
                 CancelUrl = configSection["CancelUrl"],
                 ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds(),
                 Signature = GenerateSignature(
                     amount: ((long)(request.Amount)).ToString(),
                     cancelUrl: configSection["CancelUrl"],
-                    description: $"Thanh toán cho hóa đơn {paymentHis.OrderCode} - {paymentHis.Id} của {request.PayerName}",
+                    description: $"Thanh toán cho {paymentHis.OrderCode}",
                     orderCode: paymentHis.OrderCode.ToString(),
                     returnUrl: configSection["ReturnUrl"],
                     //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",

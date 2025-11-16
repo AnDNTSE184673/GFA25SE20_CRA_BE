@@ -33,7 +33,9 @@ namespace Repository.Repositories
                 PaidAmount = invoice.InvoiceItems.ElementAt(1).Total,
                 UserId = invoice.CustomerId,
                 Item = "Booking Fee",
+                PaymentProofUrl = "N/A",
                 PaymentMethod = "N/A",
+                Note = "Payment for booking fee",
             };
             await _context.PaymentHistories.AddAsync(newPayment);
             await _context.SaveChangesAsync();
@@ -53,7 +55,9 @@ namespace Repository.Repositories
                 PaidAmount = fine,
                 UserId = invoice.CustomerId,
                 Item = "Fine Fee",
+                PaymentProofUrl = "N/A",
                 PaymentMethod = "N/A",
+                Note = "N/A"
             };
             await _context.PaymentHistories.AddAsync(newPayment);
             await _context.SaveChangesAsync();
@@ -73,7 +77,9 @@ namespace Repository.Repositories
                 PaidAmount = invoice.InvoiceItems.ElementAt(0).Total,
                 UserId = invoice.CustomerId,
                 Item = "Rental Fee",
+                PaymentProofUrl = "N/A",
                 PaymentMethod = "N/A",
+                Note = "N/A"
             };
             await _context.PaymentHistories.AddAsync(newPayment);
             await _context.SaveChangesAsync();
