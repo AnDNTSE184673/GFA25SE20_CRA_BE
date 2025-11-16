@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    partial class CRA_DbContextModelSnapshot : ModelSnapshot
+    [Migration("20251116055554_AdjustPaymentHistoryT")]
+    partial class AdjustPaymentHistoryT
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BookingHistories", (string)null);
+                    b.ToTable("BookingHistories");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Car", b =>
@@ -115,7 +118,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Cars", (string)null);
+                    b.ToTable("Cars");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.CarRegistration", b =>
@@ -160,7 +163,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CarRegistrations", (string)null);
+                    b.ToTable("CarRegistrations");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Contract", b =>
@@ -202,7 +205,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("PartyBId");
 
-                    b.ToTable("Contracts", (string)null);
+                    b.ToTable("Contracts");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.DriverLicense", b =>
@@ -242,7 +245,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DriverLicenses", (string)null);
+                    b.ToTable("DriverLicenses");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Feedback", b =>
@@ -277,7 +280,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("Feedbacks", (string)null);
+                    b.ToTable("Feedbacks");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Inquiry", b =>
@@ -316,7 +319,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Inquiries", (string)null);
+                    b.ToTable("Inquiries");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Invoice", b =>
@@ -363,7 +366,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.InvoiceItem", b =>
@@ -399,7 +402,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("InvoiceItems", (string)null);
+                    b.ToTable("InvoiceItems");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.ParkingLot", b =>
@@ -447,7 +450,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ParkingLots", (string)null);
+                    b.ToTable("ParkingLots");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.PaymentHistory", b =>
@@ -506,7 +509,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PaymentHistories", (string)null);
+                    b.ToTable("PaymentHistories");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.PaymentTransaction", b =>
@@ -552,7 +555,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("PaymentHistoryId");
 
-                    b.ToTable("PaymentTransactions", (string)null);
+                    b.ToTable("PaymentTransactions");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.PersistNotif", b =>
@@ -578,7 +581,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PersistNotifs", (string)null);
+                    b.ToTable("PersistNotifs");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.RefreshToken", b =>
@@ -608,7 +611,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Role", b =>
@@ -625,7 +628,7 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -686,7 +689,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("Schedules", (string)null);
+                    b.ToTable("Schedules");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.User", b =>
@@ -744,7 +747,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Booking", b =>

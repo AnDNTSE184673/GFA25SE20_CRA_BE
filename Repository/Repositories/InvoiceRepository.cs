@@ -113,5 +113,19 @@ namespace Repository.Repositories
                 .FirstOrDefaultAsync(i => i.Id == request.Id);
             return updatedInv;
         }
+
+        public async Task<List<Invoice>?> GetAllInvoices()
+        {
+            var invoices = await _context.Invoices
+                .Include(i => i.InvoiceItems)
+                .Include(i => i.Customer)
+                .Include(i => i.Vendor)
+                .ToListAsync();
+            if (invoices == null || invoices.Count == 0)
+            {
+                return null;
+            }
+            return invoices;
+        }
     }
 }

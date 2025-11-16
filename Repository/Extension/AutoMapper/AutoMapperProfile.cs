@@ -9,6 +9,7 @@ using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
+using Repository.DTO.ResponseDTO.Payment;
 using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
@@ -66,6 +67,8 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.InvoiceNo, opt => opt.MapFrom(src => src.Invoice.InvoiceNo));
             CreateMap<Invoice, InvoiceView>();
             CreateMap<Invoice, InvoiceOwnerView>();
+            CreateMap<InvoiceItem, InvoiceItemView>();
+            CreateMap<PaymentHistory, PaymentHistoryView>();
         }
     }
 }
