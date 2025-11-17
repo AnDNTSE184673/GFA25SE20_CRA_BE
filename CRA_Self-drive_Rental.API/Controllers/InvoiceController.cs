@@ -38,6 +38,14 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NoContent();
         }
 
+        [HttpGet("/{InvoiceId}")]
+        public async Task<IActionResult> GetAnInvoice(Guid InvoiceId)
+        {
+            var invoice = await _invoiceService.GetInvoiceById(InvoiceId);
+            if (invoice != null) return Ok(invoice);
+            return NoContent();
+        }
+
         [HttpPost("CreateInvoice")]
         public async Task<IActionResult> CreateInvoice([FromBody] InvoiceCreateRequest request)
         {

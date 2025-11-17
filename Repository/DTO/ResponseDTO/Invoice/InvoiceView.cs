@@ -17,7 +17,8 @@ namespace Repository.DTO.ResponseDTO.Invoice
         public double GrandTotal { get; set; }
         public string? Note { get; set; }
         public DateTime CreateDate { get; set; }
-
+        public Guid CustomerId { get; set; }
+        public Guid VendorId { get; set; }
         public string Status { get; set; }
         public virtual ICollection<InvoiceItemView> InvoiceItems { get; set; } = new List<InvoiceItemView>();
     }

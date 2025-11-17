@@ -23,6 +23,7 @@ namespace Repository.Base
         public IParkingLotRepository _lotRepo { get; }
         public ICarRepository _carRepo { get; }
         public ICarRegRepository _carRegRepo { get; }
+        public IPaymentRepository _paymentRepo { get; }
         public IFeedbackRepository _feedbackRepo { get; }
         public IFeedbackImageRepository _feedbackImageRepo { get; }
 
@@ -36,7 +37,8 @@ namespace Repository.Base
             IBookingRepository bookingRepo,
             IInvoiceRepository invoiceRepo,
             IFeedbackRepository feedbackRepo,
-            IFeedbackImageRepository feedbackImgRepo)
+            IFeedbackImageRepository feedbackImgRepo,
+            IPaymentRepository paymentRepo)
         {
             _context = context;
             _userRepo = userRepo;
@@ -47,6 +49,7 @@ namespace Repository.Base
             _lotRepo = lotRepo;
             _carRepo = carRepo;
             _carRegRepo = carRegRepo;
+            _paymentRepo = paymentRepo;
         }
 
         //no need to construct _transaction
