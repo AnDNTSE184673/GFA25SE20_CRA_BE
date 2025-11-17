@@ -13,8 +13,8 @@ namespace Repository.DTO.ResponseDTO.Booking
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public string Status { get; set; }
+        public string InvoiceNo { get; set; }
         public UserView User { get; set; }
         public CarView Car { get; set; }
-        public Guid InvoiceId { get; set; }
     }
 }

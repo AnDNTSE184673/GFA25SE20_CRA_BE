@@ -6,8 +6,10 @@ using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.RequestDTO.Feedback;
 using Repository.DTO.RequestDTO.ParkingLot;
+using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
+using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.Feedbacks;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.User;
@@ -68,6 +70,10 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.ImageAvatar, opt => opt.Condition(src => src.ImageAvatar != null))
                 .ForMember(dest => dest.Status, opt => opt.Condition(src => src.Status != null))
                 .ForMember(dest => dest.Gender, opt => opt.Condition(src => src.Gender != 0));
+            CreateMap<Booking, BookingView>()
+                .ForMember(dest => dest.InvoiceNo, opt => opt.MapFrom(src => src.Invoice.InvoiceNo));
+            CreateMap<Invoice, InvoiceView>();
+            CreateMap<Invoice, InvoiceOwnerView>();
         }
     }
 }

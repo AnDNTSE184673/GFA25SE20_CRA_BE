@@ -61,6 +61,7 @@ namespace Repository.CustomFunctions.TokenHandler
                         new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                         new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Name, user.Username),
                         new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email, user.Email),
+                        new Claim("IsCarOwner", user.IsCarOwner.ToString()),
                         new Claim(ClaimTypes.Role, user.RoleId.ToString()),
                         //new Claim("RoleName", user.Role.Name)
                         //new Claim("email_verified",)

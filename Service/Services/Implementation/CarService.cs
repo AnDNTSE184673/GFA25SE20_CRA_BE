@@ -23,6 +23,20 @@ namespace Service.Services.Implementation
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<List<CarView>> GetAllCarsAsync()
+        {
+            var cars = await _unitOfWork._carRepo.GetAllCars();
+            var carViews = _mapper.Map<List<CarView>>(cars);
+            return carViews;
+        }
+
+        public async Task<CarView> GetCarByIdAsync(Guid carId)
+        {
+            var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", x => x.Owner, x => x.PreferredLot);
+            var carView = _mapper.Map<CarView>(car);
+            return carView;
+        }
+
         public async Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form)
         {
             try
