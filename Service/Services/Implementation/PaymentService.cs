@@ -59,12 +59,19 @@ namespace Service.Services.Implementation
             return (response.OrderCode, response.CheckoutUrl);
         }
 
-        public async Task<(long, string)> GetPayOSPaymentResponse(long id)
+        public async Task<PaymentLink> GetPayOSPaymentResponse(long id)
         {
             var configSection = _config.GetSection("PayOS");
             PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
             var response = await payOS.PaymentRequests.GetAsync(id);
-            return (response.OrderCode, response.Id);
+            var paymentHis = await _unitOfWork._paymentRepo.GetPaymentByOrderCode(id);
+            if (paymentHis != null)
+            {
+                paymentHis.Status = response.Status.ToString();
+                await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            return response;
         }
 
         public static string GenerateSignature(string amount, string cancelUrl, string description, string orderCode, string returnUrl, string checksumKey)
