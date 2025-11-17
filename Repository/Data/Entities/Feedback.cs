@@ -24,5 +24,7 @@ namespace Repository.Data.Entities
         public virtual Car Car { get; set; }
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; }
+
+        public virtual ICollection<FeedbackImage> FeedbackImages { get; set; }
     }
 }
