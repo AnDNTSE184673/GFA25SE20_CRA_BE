@@ -61,6 +61,8 @@ namespace Repository.Repositories
         {
             return await _dbContext.Feedbacks
                 .Where(x => x.CarId.Equals(carId))
+                .Include(x => x.Car)
+                .Include(x => x.FeedbackImages)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -71,7 +73,7 @@ namespace Repository.Repositories
             {
                 var result = await UpdateAsync(feedback);
 
-                return await GetByIdAsync(feedback.Id);
+                return await GetByIdWithIncludeAsync(feedback.Id, "Id", x => x.Car);
             }
             catch (Exception ex)
             {
