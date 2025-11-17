@@ -14,7 +14,7 @@ namespace Repository.DTO.ResponseDTO.Feedbacks
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
 
-        //get images
+        public List<string> ImageUrls { get; set; } = new List<string>();
 
         public CarView car { get; set; }
         public Guid BookingId { get; set; }

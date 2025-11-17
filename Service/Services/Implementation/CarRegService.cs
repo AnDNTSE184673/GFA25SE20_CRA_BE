@@ -21,6 +21,7 @@ namespace Service.Services.Implementation
         private readonly UploadFile _file;
 
         int expirationTimeSec = 1800;
+        bool isPublic = false;
 
         public CarRegService(UnitOfWork unitOfWork, IMapper mapper, UploadFile file)
         {
@@ -33,7 +34,7 @@ namespace Service.Services.Implementation
         {
             try
             {
-                _unitOfWork.BeginTransactionAsync();
+                await _unitOfWork.BeginTransactionAsync();
 
                 var reg = await _unitOfWork._carRegRepo.FindCarRegById(form.CarId, form.UserId);
                 var car = await _unitOfWork._carRepo.GetByIdAsync(form.CarId);
@@ -107,12 +108,13 @@ namespace Service.Services.Implementation
                 var fileName = $"{form.CarId}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png
                 var imagePath = $"{form.UserId.ToString()}/{fileName}"; //userid/carid_date.ext
 
-                var url = await _file.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec);
+                var url = await _file.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec, isPublic);
 
                 //add upload checking logic here
 
                 var mapped = _mapper.Map<CarRegistration>(form);
 
+                //Id = autogen
                 mapped.FilePath = imagePath;
                 mapped.FileName = fileName;
                 mapped.Bucket = bucket;

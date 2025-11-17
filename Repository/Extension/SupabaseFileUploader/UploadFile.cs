@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Repository.Extension.SupabaseFileUploader;
 using Serilog;
 using Supabase;
+using Supabase.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
     {
         private readonly Supabase.Client _supabase;
 
-        public UploadFile(Client supabase)
+        public UploadFile(Supabase.Client supabase)
         {
             _supabase = supabase;
         }
@@ -54,7 +55,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
         /// <summary>
         /// Make sure the fileName already has the correct extension appended to the end of its name else the uploaded file will have no extension
         /// </summary>
-        public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec)
+        public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec, bool isPublic)
         {
             var allowedExtensions = new[]
             {
@@ -89,15 +90,41 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                                 Upsert = true
                             });
 
-                //make sure the bucket you're connecting to is a public bucket (dropdown and make public)
-                //return public bucket link
+                string folderPath = Path.GetDirectoryName(imagePath)?.Replace("\\", "/") + "/";
 
-                return await CreateSignedUrlAsync(targetBucket, imagePath, signedExpirationTimeSec);
+                var bucket = _supabase.Storage.From(targetBucket);
+                var files = await bucket.List(path: folderPath); // or the folder containing your file
+                if (files.Any(f => f.Name.Equals(fileName)))
+                {
+                    if (!isPublic) return await CreateSignedUrlAsync(targetBucket, imagePath, signedExpirationTimeSec);
+                    return await GetPublicUrlAsync(targetBucket, imagePath);
+                }
+                else return null;
             }
             catch (Exception ex)
             {
                 return "\nDetail: " + ex.Message;
             }
+        }
+
+        public async Task<string> GetPublicUrlAsync(string bucketName, string filePath)
+        {
+            var bucket = _supabase.Storage.From(bucketName);
+            var result = bucket.GetPublicUrl(filePath);
+            Log.Information("Signed URL generated: {Url}", result);
+            if (result.EndsWith("?"))
+                result = result[..^1]; //remove the last character
+            return result;
+        }
+
+        public async Task<string> CreateSignedUrlAsync(string bucketName, string filePath, int expirySeconds)
+        {
+            var bucket = _supabase.Storage.From(bucketName);
+            var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
+            Log.Information("Signed URL generated: {Url}", result);
+            if (result.EndsWith("?"))
+                result = result[..^1]; //remove the last character
+            return result;
         }
 
         /// <summary>
@@ -152,22 +179,6 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             {
                 return "\nDetail: " + ex.Message;
             }
-        }
-
-        public async Task<string> GetPublicUrlAsync(string bucketName, string filePath)
-        {
-            var bucket = _supabase.Storage.From(bucketName);
-            return bucket.GetPublicUrl(filePath);
-        }
-
-        public async Task<string> CreateSignedUrlAsync(string bucketName, string filePath, int expirySeconds)
-        {
-            var bucket = _supabase.Storage.From(bucketName);
-            var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
-            Log.Information("Signed URL generated: {Url}", result);
-            if (result.EndsWith("?"))
-                result = result[..^1]; //remove the last character
-            return result;
         }
     }
 }
