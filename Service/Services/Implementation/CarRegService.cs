@@ -103,7 +103,7 @@ namespace Service.Services.Implementation
 
                 string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
 
-                string originalExt = Path.GetExtension(file.FileName);
+                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
                 var fileName = $"{form.CarId}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png
                 var imagePath = $"{form.UserId.ToString()}/{fileName}"; //userid/carid_date.ext
 
@@ -117,8 +117,8 @@ namespace Service.Services.Implementation
                 mapped.FileName = fileName;
                 mapped.Bucket = bucket;
                 mapped.CreateDate = DateTime.UtcNow;
-                mapped.UrlExpiration = mapped.CreateDate.AddSeconds(expirationTimeSec);
                 mapped.Status = ConstantEnum.Statuses.PENDING;
+                mapped.FileSize = file.Length;
 
                 var result = await _unitOfWork._carRegRepo.UploadCarRegistration(mapped);
 

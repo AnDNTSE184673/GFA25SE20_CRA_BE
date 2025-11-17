@@ -95,7 +95,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpPost("registerCar/regDoc")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
-        public async Task<IActionResult> UploadImage(IFormFile image, [FromForm] CarRegForm form)
+        public async Task<IActionResult> UploadRegistrationImage(IFormFile image, [FromForm] CarRegForm form)
         {
             try
             {

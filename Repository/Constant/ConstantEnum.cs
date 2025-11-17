@@ -51,6 +51,7 @@ namespace Repository.Constant
             public const string CarRegistration = "CarRegistrationDocs";
             public const string DriverLicense = "DriverLicenseDocs";
             public const string FeedbackImages = "FeedbackImages";
+            public const string publicFolder = "public";
         }
 
         public enum RoleID
