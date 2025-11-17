@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repository.Data.Entities
 {
-    public class CarRegistration
+    public class CarImage
     {
         public int Id { get; set; }
         public string FilePath { get; set; }
@@ -22,11 +22,8 @@ namespace Repository.Data.Entities
         public string Status { get; set; }
 
         public Guid CarId { get; set; }
-        public Guid UserId { get; set; }
 
         [ForeignKey("CarId")]
         public virtual Car Car { get; set; }
-        [ForeignKey("UserId")]
-        public virtual User Owner { get; set; }
     }
 }

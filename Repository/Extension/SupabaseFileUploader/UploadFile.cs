@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Repository.Extension.SupabaseFileUploader;
 using Serilog;
 using Supabase;
 using System;
@@ -50,6 +51,9 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             }
         }
 
+        /// <summary>
+        /// Make sure the fileName already has the correct extension appended to the end of its name else the uploaded file will have no extension
+        /// </summary>
         public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec)
         {
             var allowedExtensions = new[]
@@ -73,18 +77,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                 var bytes = await file.GetBytesAsync();
 
-                // Ensure ContentType is set manually
-                var mimeType = extension switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".gif" => "image/gif",
-                    ".webp" => "image/webp",
-                    ".pdf" => "application/pdf",
-                    ".doc" => "application/msword",
-                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    _ => "application/octet-stream"
-                };
+                var mimeType = MimeTypeHelper.GetMimeType(extension);
 
                 await _supabase.Storage.From(targetBucket)
                   .Upload(bytes,
@@ -107,6 +100,9 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             }
         }
 
+        /// <summary>
+        /// Don't use this (not deprecated but not needed)
+        /// </summary>
         public async Task<string> UploadImageMemStreamAsync(IFormFile file, Guid carId, Guid ownerId, string targetBucket)
         {
             try
@@ -134,14 +130,8 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                 // Ensure ContentType is set manually
                 var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                var mimeType = extension switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".gif" => "image/gif",
-                    ".webp" => "image/webp",
-                    _ => "application/octet-stream"
-                };
+
+                var mimeType = MimeTypeHelper.GetMimeType(extension);
 
                 //upload file to bucket via supabase url and secret key (dont need s3 key)
                 using (var memoryStream = new MemoryStream())
