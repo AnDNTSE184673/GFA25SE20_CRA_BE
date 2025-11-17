@@ -19,23 +19,26 @@ namespace Repository.Data
         }
 
         //New Table here
-        public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
+        public DbSet<Booking> BookingHistories { get; set; }
         public DbSet<Car> Cars { get; set; }
+        public DbSet<CarImage> CarImages { get; set; }
+        public DbSet<CarRegistration> CarRegistrations { get; set; }
+        public DbSet<CarRentalRate> CarRentalRates { get; set; }
+        public DbSet<Contract> Contracts { get; set; }
+        public DbSet<DriverLicense> DriverLicenses { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<FeedbackImage> FeedbackImages { get; set; }
+        public DbSet<Inquiry> Inquiries { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
-        public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<Schedules> Schedules { get; set; }
-        public DbSet<PersistNotif> PersistNotifs { get; set; }
+        public DbSet<ParkingLot> ParkingLots { get; set; }
         public DbSet<PaymentHistory> PaymentHistories { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
-        public DbSet<Booking> BookingHistories { get; set; }
-        public DbSet<CarRegistration> CarRegistrations { get; set; }
-        public DbSet<Contract> Contracts { get; set; }
-        public DbSet<Inquiry> Inquiries { get; set; }
-        public DbSet<ParkingLot> ParkingLots { get; set; }
-        public DbSet<DriverLicense> DriverLicenses { get; set; }
+        public DbSet<PersistNotif> PersistNotifs { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Schedules> Schedules { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
