@@ -50,6 +50,7 @@ namespace Service.Services.Implementation
                 else if (!form.UserId.HasValue)
                 {
                     var owner = await _unitOfWork._userRepo.GetUserByUsernameAsync(form.Username);
+                    if (owner == null) throw new InvalidDataException("No user found!");
                     form.UserId = owner.Id;
                 }
                 if (!form.PrefLotId.HasValue && string.IsNullOrEmpty(form.PrefLotName))
@@ -59,6 +60,7 @@ namespace Service.Services.Implementation
                 else if (!form.PrefLotId.HasValue)
                 {
                     var lot = await _unitOfWork._lotRepo.GetLotByNameAsync(form.PrefLotName);
+                    if (lot == null) throw new InvalidDataException("No lot found!");
                     form.PrefLotId = lot.Id;
                 }
 

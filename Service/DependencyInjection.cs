@@ -66,7 +66,7 @@ namespace Service
             service.AddScoped<ICarRegService, CarRegService>();
             service.AddScoped<IParkingLotService, ParkingLotService>();
             service.AddScoped<IEmailService, EmailService>();
-            service.AddScoped<IPaymentService, PaymentService>();
+            service.AddScoped<IFeedbackService, FeedbackService>();
             return service;
         }
     }

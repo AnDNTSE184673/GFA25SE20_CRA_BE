@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Hosting;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
+using Repository.DTO.RequestDTO.Feedback;
 using Repository.DTO.RequestDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Invoice;
+using Repository.DTO.ResponseDTO.Feedbacks;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Payment;
 using Repository.DTO.ResponseDTO.User;
@@ -43,6 +46,11 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.ManagerId, opt => opt.MapFrom(src => src.UserId));
             CreateMap<PostParkingLotForm, ParkingLot>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.ManagerId));
+
+            CreateMap<CreateFeedbackForm, Feedback>();
+            CreateMap<Feedback, FeedbackView>();
+            CreateMap<EditFeedbackForm, Feedback>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<CarRegistration,CarRegView>();
 
