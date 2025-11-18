@@ -119,6 +119,8 @@ namespace CRA_Self_drive_Rental.API
                     google.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     google.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
+                    google.CallbackPath = "/api/Authen/google-callback";
+
                     google.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // explicit
                     google.SaveTokens = true;  // if you need access / refresh tokens later
 
