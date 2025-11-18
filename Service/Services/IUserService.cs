@@ -1,4 +1,5 @@
-﻿using Repository.Data.Entities;
+﻿using Repositories.DTO.ResponseDTO.User;
+using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
 using Repository.DTO.ResponseDTO.User;
@@ -12,6 +13,8 @@ namespace Service.Services
 {
     public interface IUserService
     {
+        Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId);
+        Task<(string status, UserPostRegView? user)> GoogleRegister(string email, string name, string googleId);
         Task<LoginResponse> AuthenticateAsync(string email, string password);
         Task<LoginResponse?> RegisterCustomer(RegisterRequest request);
         Task<User> CreateOwner(RegisterOwnerRequest request);

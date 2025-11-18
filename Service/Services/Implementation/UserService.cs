@@ -14,6 +14,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
+using Repository.Constant;
+using Repositories.DTO.ResponseDTO.User;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using Microsoft.Extensions.Configuration;
+using Services.Service;
 
 namespace Service.Services.Implementation
 {
@@ -22,12 +28,81 @@ namespace Service.Services.Implementation
         private readonly UnitOfWork _unitOfWork;
         private JWTTokenProvider _jwtService;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _config;
+        private readonly IEmailService _email;
 
-        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper)
+        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _mapper = mapper;
+            _config = config;
+            _email = email;
+        }
+
+        public async Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId)
+        {
+            if (email.IsNullOrEmpty() && name.IsNullOrEmpty() && googleId.IsNullOrEmpty())
+                return (null, null);
+            //This is the existing check, check account with similar email or name AND googleId
+            //If login failed = account doesnt exist, so register an account with google
+            var existing = await _unitOfWork._userRepo.LoginByGoogle(email, name, googleId);
+            if (existing == null)
+            {
+                var result = await GoogleRegister(email, name, googleId);
+                return (null, result.user);
+            }
+            else
+            {
+                var token = _jwtService.GenerateAccessToken(existing);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+
+                await RefreshTokenAsync(refreshToken, existing);
+
+                var mapped = _mapper.Map<UserLoginView?>(existing); //include Role
+                mapped.JwtToken = token;
+                return (mapped, null);
+            }
+        }
+
+        public async Task<(string status, UserPostRegView? user)> GoogleRegister(string email, string name, string googleId)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                RegisterUserForm regUser = new RegisterUserForm();
+                regUser.Email = email;
+                regUser.Username = name;
+                regUser.GoogleId = googleId;
+
+                var regData = _mapper.Map<User>(regUser);
+                var response = await _unitOfWork._authRepo.RegisterByGoogle(regData);
+
+                await _unitOfWork.CommitTransactionAsync();
+                if (response.status.Equals(ConstantEnum.RepoStatus.SUCCESS))
+                {
+                    var body = _email.GenerateBodyRegisterSuccess(response.user.Username, response.user.Password);
+                    _email.SendEmailAsync("YuuZone Account Registration", body, response.user.Email, response.user.Fullname);
+                    return (response.status, _mapper.Map<UserPostRegView>(response.user));
+                }
+                else
+                    return (response.status, null);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task RefreshTokenAsync(string refreshToken, User user)
+        {
+            var refreshExpiry = DateTime.UtcNow.AddDays(_config.GetValue<int>("JWT:RefreshTokenDay"));
+
+            var update = await _unitOfWork._authRepo.UpdateAsync(user);
+            if (update < 1)
+                _logger.LogError("Something broke when updating refresh token in DB");
         }
 
         public async Task<LoginResponse> AuthenticateAsync(string email, string password)

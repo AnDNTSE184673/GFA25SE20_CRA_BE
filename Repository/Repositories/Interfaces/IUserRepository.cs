@@ -10,6 +10,8 @@ namespace Repository.Repositories.Interfaces
 {
     public interface IUserRepository : IGenericRepository<User>
     {
+        Task<User?> LoginByGoogle(string email, string? name, string googleId);
+        Task<(string status, User? user)> RegisterByGoogle(User user);
         Task<User?> Authentication(string email, string password);
         Task<List<User>> GetAllUserAsync();
         User? GetByEmail(string email);
