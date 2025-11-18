@@ -1,4 +1,5 @@
-﻿using Repository.DTO.RequestDTO.Payment;
+﻿using PayOS.Models.V2.PaymentRequests;
+using Repository.DTO.RequestDTO.Payment;
 using Repository.DTO.ResponseDTO.Payment;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Service.Services
     {
         Task<(long, string)> CreatePayOSPaymentRequest(CreatePaymentRequest request);
         // Task<(long, string)> GetPayOSPaymentResponse(long id);
+        Task<PaymentLink> GetPayOSPaymentResponse(long id);
         Task<List<PaymentHistoryView>?> GetHistoryForUser(Guid userId); 
         Task<PaymentHistoryView?> GetPaymentByOrderCode(long orderCode);
         Task<PaymentHistoryView?> GetPaymentById(Guid paymentId);
