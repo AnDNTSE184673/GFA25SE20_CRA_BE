@@ -16,5 +16,6 @@ namespace Repository.Repositories.Interfaces
         Task<List<User>> GetAllUserAsync();
         User? GetByEmail(string email);
         Task<User?> GetUserByUsernameAsync(string managerName);
+        Task<User?> GetUserWithTokenAsync(Guid id);
     }
 }

@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Repository.CustomFunctions.TokenHandler;
+using Repository.DTO;
 using Repository.DTO.RequestDTO;
 using Service.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace CRA_Self_drive_Rental.API.Controllers
 {
@@ -11,9 +15,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
     public class AuthenController : ControllerBase
     {
         private readonly IUserService _userService;
-        public AuthenController(IUserService userService)
+        private readonly JWTTokenProvider _jwt;
+        public AuthenController(IUserService userService, JWTTokenProvider jWT)
         {
             _userService = userService;
+            _jwt = jWT;
         }
 
         [HttpPost("authenticate")]
@@ -94,6 +100,28 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     Message = ex.Message
                 });
             }
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokensRequest form)
+        {
+            var principal = _jwt.GetPrincipalFromExpiredToken(form.AccessToken);
+            if (principal == null) return BadRequest("Invalid access token");
+
+            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userService.GetUserWithToken(Guid.Parse(userId));
+
+            if (user == null || user.RefreshTokens.Last().JWTRefreshToken != form.RefreshToken || user.RefreshTokens.Last().RefreshTokenExpiry < DateTime.UtcNow)
+                return Unauthorized();
+
+            // Call the method here
+            var tokens = _jwt.RefreshTokenAsync(user);
+
+            // Update user's refresh token in DB
+            _jwt.RefreshTokenAsync(user);
+
+            return Ok(tokens);
+
         }
     }
 }

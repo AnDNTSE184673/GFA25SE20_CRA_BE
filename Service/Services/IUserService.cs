@@ -22,5 +22,6 @@ namespace Service.Services
         Task<User?> UpdateUserInfo(UserUpdateRequest request);
         Task<List<User>> GetAllUsers();
         Task<User?> GetUserById(Guid userId);
+        Task<User?> GetUserWithToken(Guid userId);
     }
 }
