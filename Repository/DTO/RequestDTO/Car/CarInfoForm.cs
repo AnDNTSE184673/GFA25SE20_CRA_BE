@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Repository.Extension;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +19,9 @@ namespace Repository.DTO.RequestDTO.Car
         public string FuelType { get; set; }
         public double FuelConsumption { get; set; }
         public string? Description { get; set; }
+
+        [MaxFileCount(5)]
+        public List<IFormFile> Medias { get; set; }
 
         public Guid? UserId { get; set; }
         public string? Username { get; set; }

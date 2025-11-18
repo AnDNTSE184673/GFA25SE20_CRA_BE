@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Base;
+using Repository.Constant;
 using Repository.Data;
 using Repository.Data.Entities;
 using Repository.Repositories.Interfaces;
@@ -19,6 +20,43 @@ namespace Repository.Repositories
         {
             _context = context;
         }
+
+        public async Task<User?> LoginByGoogle(string email, string? name, string googleId)
+        {
+
+            return await _dbContext.Users
+                .Where(x => (x.Email.Equals(email) || x.Username.Equals(name))
+                && x.GoogleId == googleId
+                && x.IsGoogle == true)
+                .Include(x => x.Role)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<(string status, User? user)> RegisterByGoogle(User user)
+        {
+            try
+            {
+                //exist check is in services layer instead
+
+                user.RoleId = (int)ConstantEnum.RoleID.CUSTOMER;
+                user.Status = ConstantEnum.Statuses.ACTIVE;
+
+                user.Id = Guid.NewGuid();
+                user.IsGoogle = true;
+
+                var result = await CreateAsync(user);
+
+                if (result > 0)
+                    return (ConstantEnum.RepoStatus.SUCCESS, user);
+                else
+                    return (ConstantEnum.RepoStatus.FAILURE, null);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public Task<User?> Authentication(string email, string password)
         {
             var user = _context.Users

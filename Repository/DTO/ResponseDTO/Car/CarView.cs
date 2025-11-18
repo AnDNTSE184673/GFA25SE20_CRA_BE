@@ -26,5 +26,7 @@ namespace Repository.DTO.ResponseDTO.Car
 
         public UserView Owner { get; set; }
         public ParkingLotView PreferredLot { get; set; }
+
+        public List<string> ImageUrls { get; set; } = new List<string>();
     }
 }

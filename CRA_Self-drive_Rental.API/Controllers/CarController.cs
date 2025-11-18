@@ -71,7 +71,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("registerCar/carInfo")]
-        public async Task<IActionResult> AddCarInfo(CarInfoForm form)
+        public async Task<IActionResult> AddCarInfo([FromForm] CarInfoForm form)
         {
             try
             {

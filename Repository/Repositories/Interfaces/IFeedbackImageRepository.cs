@@ -11,5 +11,6 @@ namespace Repository.Repositories.Interfaces
     public interface IFeedbackImageRepository : IGenericRepository<FeedbackImage>
     {
         Task<(string status, FeedbackImage? fbImage)> CreateFeedbackImageAsync(FeedbackImage fbImage);
+        Task AddFeedbackImageAsync(FeedbackImage fbImage);
     }
 }
