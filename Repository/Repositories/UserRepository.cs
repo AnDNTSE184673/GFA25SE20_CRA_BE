@@ -88,5 +88,14 @@ namespace Repository.Repositories
                 .Where(u => u.Username.Equals(managerName))
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<User?> GetUserWithTokenAsync(Guid id)
+        {
+            return await _dbContext.Users
+                .Include(u => u.RefreshTokens)
+                .Include(u => u.Role)
+                .Where(u => u.Id == id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

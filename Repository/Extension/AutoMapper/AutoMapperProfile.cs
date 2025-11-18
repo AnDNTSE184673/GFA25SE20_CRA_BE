@@ -77,6 +77,14 @@ namespace Repository.Extension.AutoMapper
             CreateMap<Invoice, InvoiceOwnerView>();
             CreateMap<InvoiceItem, InvoiceItemView>();
             CreateMap<PaymentHistory, PaymentHistoryView>();
+            CreateMap<RegisterUserForm, User>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
+                .ForMember(dest => dest.GoogleId, opt => opt.MapFrom(src => src.GoogleId))
+                .ForMember(dest => dest.Fullname, opt => opt.MapFrom(src => src.Fullname))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.GenderId));
         }
     }
 }
