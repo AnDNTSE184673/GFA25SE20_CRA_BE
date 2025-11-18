@@ -16,5 +16,6 @@ namespace Repository.Repositories.Interfaces
         Task<CarRegistration> FindCarRegById(Guid? carId, Guid? userId);
         Task<CarRegistration> FindCarRegByPath(string? filePath, string? bucket);
         Task<CarRegistration> UpdateCarReg(CarRegistration reg);
+        Task<CarRegistration> FindCarRegByInfo(string? licensePlate, string? email);
     }
 }

@@ -14,6 +14,7 @@ namespace Service.Services
         Task<(string status, CarRegView view)> ApproveDocumentsAsync(CarRegForm form, bool isApproved);
         Task<List<CarRegView>> GetAllDocumentsAsync();
         Task<(string signedUrl, CarRegView view)> GetCarRegDocById(GetCarRegForm form);
+        Task<(string signedUrl, CarRegView view)> GetCarRegDocByInfo(GetCarRegForm form);
         Task<(string signedUrl, CarRegView view)> GetCarRegDocByPath(GetCarRegForm form);
         Task<(string status, CarRegView regDoc)> SubmitRegisterDocument(IFormFile file, CarRegForm form);
     }

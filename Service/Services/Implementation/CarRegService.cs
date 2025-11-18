@@ -88,10 +88,17 @@ namespace Service.Services.Implementation
             return (url, _mapper.Map<CarRegView>(row));
         }
 
+        public async Task<(string signedUrl, CarRegView view)> GetCarRegDocByInfo(GetCarRegForm form)
+        {
+            var row = await _unitOfWork._carRegRepo.FindCarRegByInfo(form.LicensePlate, form.Email);
+            var url = await _file.CreateSignedUrlAsync(row.Bucket, row.FilePath, expirationTimeSec);
+            return (url, _mapper.Map<CarRegView>(row));
+        }
+
         public async Task<(string signedUrl, CarRegView view)> GetCarRegDocByPath(GetCarRegForm form)
         {
             var row = await _unitOfWork._carRegRepo.FindCarRegByPath(form.FilePath, form.Bucket);
-            var url = await _file.CreateSignedUrlAsync(form.Bucket, form.FilePath, expirationTimeSec);
+            var url = await _file.CreateSignedUrlAsync(row.Bucket, row.FilePath, expirationTimeSec);
             return (url, _mapper.Map<CarRegView>(row));
         }
 

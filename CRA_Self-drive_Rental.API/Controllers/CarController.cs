@@ -121,26 +121,33 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("regDoc")]
-        ///<summary>"Also send a flag indicating whether to search using path or user/car id"</summary>
-        public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, bool flagId, bool flagPath)
+        ///<summary>Also send a flag indicating whether to search using "path" or "id" or "info"</summary>
+        public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, string flag)
         {
             try
             {
                 (string url, CarRegView view) result = ("", new CarRegView());
+                var validation = form.IsValid();
 
-                if (!form.IsValid().valid)
-                    throw new InvalidOperationException("Fill either complete pairs of data");
+                if (!validation.valid)
+                    throw new InvalidOperationException("Fill 1 of 3 complete pairs of data");
 
-                if (!flagId && !flagPath)
-                    throw new InvalidOperationException("Choose between search by ids or path");
+                if (!flag.Contains(ConstantEnum.InternalFlag.IdSearch)
+                    || !flag.Contains(ConstantEnum.InternalFlag.PathSearch)
+                    || !flag.Contains(ConstantEnum.InternalFlag.InfoSearch))
+                    throw new InvalidOperationException("Choose a search method by setting flag 'flag','id', or 'info'.");
 
-                // case 1: prioritize ID
-                if (flagId && form.IsValid().isId)
+                if (flag.Contains(ConstantEnum.InternalFlag.IdSearch) && validation.isId)
                 {
                     result = await _carRegServ.GetCarRegDocById(form);
                 }
-                // case 2: use path only if ID is not prioritized
-                else if (flagPath && !flagId && !form.IsValid().isId)
+
+                else if (flag.Contains(ConstantEnum.InternalFlag.InfoSearch) && validation.isInfo)
+                {
+                    result = await _carRegServ.GetCarRegDocByInfo(form);
+                }
+
+                else if (flag.Contains(ConstantEnum.InternalFlag.PathSearch) && validation.isPath)
                 {
                     result = await _carRegServ.GetCarRegDocByPath(form);
                 }

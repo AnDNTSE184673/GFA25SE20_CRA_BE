@@ -6,6 +6,7 @@ using Repository.Data;
 using Repository.Data.Entities;
 using Repository.Repositories.Interfaces;
 using Supabase.Gotrue;
+using Supabase.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +74,16 @@ namespace Repository.Repositories
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<CarRegistration> FindCarRegByInfo(string? licensePlate, string? email)
+        {
+            return await _dbContext.CarRegistrations
+                .AsNoTracking()
+                .Include(x => x.Car)
+                .Include(x => x.Owner)
+                .Where(x => x.Car.LicensePlate.Equals(licensePlate) && x.Owner.Email.Equals(email))
+                .FirstOrDefaultAsync();
         }
     }
 }
