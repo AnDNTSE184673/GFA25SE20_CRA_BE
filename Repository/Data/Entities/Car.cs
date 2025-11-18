@@ -33,5 +33,7 @@ namespace Repository.Data.Entities
         public virtual User Owner { get; set; }
         [ForeignKey("LotId")]
         public virtual ParkingLot PreferredLot { get; set; }
+
+        public virtual ICollection<CarImage> Images { get; set; }
     }
 }

@@ -115,14 +115,39 @@ namespace Service.Services.Implementation
                 var result = await _unitOfWork._feedbackRepo.CreateFeedbackAsync(newFeedback);
                 result.feedback.Car = carExist;
 
+                //Sequential
+                /*
                 List<string> urls = new List<string>();
                 foreach (var file in form.Medias)
                 {
                     var url = await UploadFeedbackImagesAsync(file, newFeedback.Id);
                     if(url.url.IsNullOrEmpty() && url.obj == null) throw new Exception("File upload failure!");
                     urls.Add(url.url);
-                }     
+                } 
+                */
 
+                //File IO is parallel
+                var uploadTasks = new List<Task<(string url, FeedbackImage obj)>>();
+
+                foreach (var file in form.Medias)
+                {
+                    uploadTasks.Add(UploadFeedbackImagesAsync(file, newFeedback.Id));
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                //But ef core operation is sequential
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._feedbackImageRepo.AddFeedbackImageAsync(u.obj);
+                }
+                await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
                 if (result.status.Equals(ConstantEnum.RepoStatus.FAILURE))
@@ -143,7 +168,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string status, string url, FeedbackImage obj)> UploadFeedbackImagesAsync(IFormFile file, Guid feedbackId)
+        public async Task<(string url, FeedbackImage obj)> UploadFeedbackImagesAsync(IFormFile file, Guid feedbackId)
         {
             try
             {
@@ -171,16 +196,7 @@ namespace Service.Services.Implementation
                     FeedbackId = feedbackId
                 };
 
-                var result = await _unitOfWork._feedbackImageRepo.CreateFeedbackImageAsync(feedbackImage);
-
-                if (result.status.Equals(ConstantEnum.RepoStatus.FAILURE))
-                {
-                    return (result.status, null, null);
-                }
-                else
-                {
-                    return (result.status, url, result.fbImage);
-                }
+                return (url, feedbackImage);
             }
             catch (Exception ex)
             {

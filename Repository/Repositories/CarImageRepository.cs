@@ -8,20 +8,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Repository.Repositories
 {
-    public class FeedbackImageRepository : GenericRepository<FeedbackImage>, IFeedbackImageRepository
+    public class CarImageRepository : GenericRepository<CarImage>, ICarImageRepository
     {
-        public FeedbackImageRepository(CRA_DbContext dbContext) : base(dbContext)
+        public CarImageRepository(CRA_DbContext dbContext) : base(dbContext)
         {
         }
 
-        public async Task AddFeedbackImageAsync(FeedbackImage feedbackimg)
+        public async Task AddCarImageAsync(CarImage obj)
         {
             try
             {
-                var result = await _dbContext.FeedbackImages.AddAsync(feedbackimg);
+                var result = await _dbContext.CarImages.AddAsync(obj);
             }
             catch (Exception ex)
             {
@@ -29,14 +30,14 @@ namespace Repository.Repositories
             }
         }
 
-        public async Task<(string status, FeedbackImage? fbImage)> CreateFeedbackImageAsync(FeedbackImage fbImage)
+        public async Task<(string status, CarImage? carImage)> CreateCarImageAsync(CarImage carImage)
         {
             try
             {
-                var result = await CreateAsync(fbImage);
+                var result = await CreateAsync(carImage);
 
                 if (result > 0)
-                    return (ConstantEnum.RepoStatus.SUCCESS, fbImage);
+                    return (ConstantEnum.RepoStatus.SUCCESS, carImage);
                 else
                     return (ConstantEnum.RepoStatus.FAILURE, null);
             }

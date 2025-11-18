@@ -1,9 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Repository.Base;
 using Repository.Constant;
+using Repository.CustomFunctions.SupabaseFileUploader;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.ResponseDTO.Car;
+using Repository.DTO.ResponseDTO.Feedbacks;
+using Repository.Extension.SupabaseFileUploader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +21,16 @@ namespace Service.Services.Implementation
     {
         private readonly IMapper _mapper;
         private readonly UnitOfWork _unitOfWork;
+        private readonly UploadFile _upload;
 
-        public CarService(IMapper mapper, UnitOfWork unitOfWork)
+        int expirationTimeinSeconds = 1800;
+        bool isPublic = false;
+
+        public CarService(IMapper mapper, UnitOfWork unitOfWork, UploadFile upload)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _upload = upload;
         }
 
         public async Task<List<CarView>> GetAllCarsAsync()
@@ -68,20 +78,99 @@ namespace Service.Services.Implementation
 
                 newCar.Status = ConstantEnum.Statuses.PENDING;
                 newCar.Id = Guid.NewGuid();
+                newCar.Rating = 0.0;
 
                 var result = await _unitOfWork._carRepo.RegisterCarAsync(newCar);
 
+                /* //Sequential uploads
+                List<string> urls = new List<string>();
+                int count = 1;
+                foreach (var file in form.Medias)
+                {
+                    var url = await UploadCarImagesAsync(file, newCar.Id, count);
+                    if (url.url.IsNullOrEmpty() || url.obj == null) throw new Exception("File upload failure!");
+                    urls.Add(url.url);
+                    count++;
+                }
+                */
+
+                //Parallel uploads
+                var uploadTasks = new List<Task<(string url, CarImage obj)>>();
+                int count = 1;
+
+                foreach (var file in form.Medias)
+                {
+                    uploadTasks.Add(UploadCarImagesAsync(file, newCar.Id, count));
+                    count++;
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._carImageRepo.AddCarImageAsync(u.obj);
+                }
+                await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
                 var info = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(result.car.Id, "Id", x => x.Owner, x => x.PreferredLot);
 
-                var carView = _mapper.Map<CarView>(info);
-
-                return (result.status, carView);
+                if (result.status.Equals(ConstantEnum.RepoStatus.FAILURE))
+                {
+                    return (result.status, null);
+                }
+                else
+                {
+                    var mapped = _mapper.Map<CarView>(info);
+                    mapped.ImageUrls.AddRange(urls);
+                    return (result.status, mapped);
+                }
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string url, CarImage obj)> UploadCarImagesAsync(IFormFile file, Guid carId, int count)
+        {
+            try
+            {
+                string bucket = ConstantEnum.SupabaseBucket.CarImages;
+                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+
+                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
+                string fileName = $"image{count}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png
+                string imagePath = $"{carId}/{fileName}"; //userid/carid_date.ext
+
+                var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeinSeconds, isPublic);
+
+                if (url.IsNullOrEmpty()) throw new Exception("File upload failure!");
+
+                var carImage = new CarImage
+                {
+                    FilePath = imagePath,
+                    FileName = fileName,
+                    Bucket = bucket,
+                    CreateDate = DateTime.UtcNow,
+                    MimeType = MimeTypeHelper.GetMimeType(originalExt),
+                    FileSize = file.Length,
+                    Status = ConstantEnum.Statuses.ACTIVE,
+                    CarId = carId
+                };
+
+                return (url, carImage);
+
+            }
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
