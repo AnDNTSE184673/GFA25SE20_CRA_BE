@@ -20,6 +20,7 @@ using Repositories.DTO.ResponseDTO.User;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 using Microsoft.Extensions.Configuration;
 using Services.Service;
+using Microsoft.Extensions.Logging;
 
 namespace Service.Services.Implementation
 {
@@ -30,6 +31,7 @@ namespace Service.Services.Implementation
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
         private readonly IEmailService _email;
+        private readonly ILogger<UserService> _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<UserService>();
 
         public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email)
         {
@@ -60,7 +62,7 @@ namespace Service.Services.Implementation
                 await RefreshTokenAsync(refreshToken, existing);
 
                 var mapped = _mapper.Map<UserLoginView?>(existing); //include Role
-                mapped.JwtToken = token;
+                mapped.JwtToken = token.token;
                 return (mapped, null);
             }
         }
@@ -77,12 +79,13 @@ namespace Service.Services.Implementation
                 regUser.GoogleId = googleId;
 
                 var regData = _mapper.Map<User>(regUser);
-                var response = await _unitOfWork._authRepo.RegisterByGoogle(regData);
+
+                var response = await _unitOfWork._userRepo.RegisterByGoogle(regData);
 
                 await _unitOfWork.CommitTransactionAsync();
                 if (response.status.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
-                    var body = _email.GenerateBodyRegisterSuccess(response.user.Username, response.user.Password);
+                    var body = _email.GenerateBodyRegisterSuccess(response.user.Username, response.user.Password, "S", "");
                     _email.SendEmailAsync("YuuZone Account Registration", body, response.user.Email, response.user.Fullname);
                     return (response.status, _mapper.Map<UserPostRegView>(response.user));
                 }
@@ -100,7 +103,7 @@ namespace Service.Services.Implementation
         {
             var refreshExpiry = DateTime.UtcNow.AddDays(_config.GetValue<int>("JWT:RefreshTokenDay"));
 
-            var update = await _unitOfWork._authRepo.UpdateAsync(user);
+            var update = await _unitOfWork._userRepo.UpdateAsync(user);
             if (update < 1)
                 _logger.LogError("Something broke when updating refresh token in DB");
         }
@@ -268,6 +271,11 @@ namespace Service.Services.Implementation
                 _unitOfWork.RollbackTransaction();
                 throw new Exception("Update failed: " + ex.Message);
             }
+        }
+
+        public async Task<User?> GetUserWithToken(Guid userId)
+        {
+            return await _unitOfWork._userRepo.GetUserWithTokenAsync(userId);
         }
     }
 }
