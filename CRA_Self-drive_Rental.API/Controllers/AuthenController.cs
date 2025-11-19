@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Repository.CustomFunctions.TokenHandler;
@@ -58,7 +59,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpGet("login/google")]
         public async Task<IActionResult> GoogleLogin(string? localURL)
         {
-            var redirUrl = Url.Action("GoogleResponse", "Authen", null);
+            var redirUrl = Url.Action("GoogleResponse", "Authen", null, Request.Scheme, Request.Host.Value);
             var request = new AuthenticationProperties { RedirectUri = redirUrl };
             return Challenge(request, "Google");
         }
@@ -69,6 +70,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
+                //var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
                 var result = await HttpContext.AuthenticateAsync("Google");
                 if (!result.Succeeded)
                     return Unauthorized();
@@ -101,6 +104,47 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
+        //[HttpGet("google-callback")]
+        //public async Task<IActionResult> GoogleResponseDebug()
+        //{
+        //    try
+        //    {
+        //        // Authenticate using the cookie (because Google writes into this cookie)
+        //        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        //        if (!result.Succeeded)
+        //            return Unauthorized(new { error = "Auth failed", detail = result.Failure?.Message });
+
+        //        if (result.Principal == null)
+        //            return Unauthorized(new { error = "Principal is null" });
+
+        //        // Extract all claims (useful for debugging)
+        //        var claims = result.Principal.Claims.Select(c => new
+        //        {
+        //            type = c.Type,
+        //            value = c.Value
+        //        }).ToList();
+
+        //        var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+        //        var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
+        //        var googleId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        //        // Return EVERYTHING as JSON
+        //        return Ok(new
+        //        {
+        //            message = "Google authentication raw data",
+        //            email,
+        //            name,
+        //            googleId,
+        //            claims
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { message = ex.Message, exception = ex.ToString() });
+        //    }
+        //}
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokensRequest form)
