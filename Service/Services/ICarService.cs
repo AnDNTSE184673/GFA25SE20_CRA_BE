@@ -1,5 +1,6 @@
 ﻿using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
+using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Car;
 using System;
 using System.Collections.Generic;

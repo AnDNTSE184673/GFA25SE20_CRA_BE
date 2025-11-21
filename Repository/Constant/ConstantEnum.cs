@@ -55,6 +55,13 @@ namespace Repository.Constant
             public const string publicFolder = "public";
         }
 
+        public static class InternalFlag
+        {
+            public const string PathSearch = "path";
+            public const string IdSearch = "id";
+            public const string InfoSearch = "info";
+        }
+
         public enum RoleID
         {
             ADMIN = 1001,

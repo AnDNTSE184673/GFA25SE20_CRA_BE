@@ -44,9 +44,9 @@ namespace CRA_Self_drive_Rental.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "YuuZone",
+                    Title = "CRA_CarRental",
                     Version = "v1",
-                    Description = "YuuZone Backend API",
+                    Description = "Morent Backend API",
                     Contact = new OpenApiContact
                     {
                         Name = "Vinh",

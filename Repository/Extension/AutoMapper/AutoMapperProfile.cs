@@ -54,6 +54,7 @@ namespace Repository.Extension.AutoMapper
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<CarRegistration,CarRegView>();
+            CreateMap<CarRegistration, SingleRegData>();
 
             CreateMap<User, UserView>();
 

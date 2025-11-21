@@ -6,6 +6,7 @@ using Repository.Data;
 using Repository.Data.Entities;
 using Repository.Repositories.Interfaces;
 using Supabase.Gotrue;
+using Supabase.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,20 +29,18 @@ namespace Repository.Repositories
                 .ToListAsync();
         }
 
-        public async Task<CarRegistration> FindCarRegById(Guid? carId, Guid? userId)
+        public async Task<List<CarRegistration>> FindCarRegById(Guid carId, Guid userId)
         {
             return await _dbContext.CarRegistrations
-                .AsNoTracking()
                 .Where(x => x.CarId.Equals(carId) && x.UserId.Equals(userId))
-                .FirstOrDefaultAsync();
+                .ToListAsync();
         }
 
-        public async Task<CarRegistration> FindCarRegByPath(string? filePath, string? bucket)
+        public async Task<List<CarRegistration>> FindCarRegByPath(string filePath, string bucket)
         {
             return await _dbContext.CarRegistrations
-                .AsNoTracking()
                 .Where(x => x.FilePath.Equals(filePath) && x.Bucket.Equals(bucket))
-                .FirstOrDefaultAsync();
+                .ToListAsync();
         }
 
         public async Task<(string status, CarRegistration regData)> UploadCarRegistration(CarRegistration data)
@@ -61,18 +60,39 @@ namespace Repository.Repositories
             }
         }
 
+        public async Task AddCarRegistration(CarRegistration data)
+        {
+            try
+            {
+                var result = await _dbContext.CarRegistrations.AddAsync(data);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<CarRegistration> UpdateCarReg(CarRegistration reg)
         {
             try
             {
                 var result = await UpdateAsync(reg);
 
-                return await GetByIdAsync(reg.Id);
+                return reg;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<CarRegistration>> FindCarRegByInfo(string licensePlate, string email)
+        {
+            return await _dbContext.CarRegistrations
+                .Include(x => x.Car)
+                .Include(x => x.Owner)
+                .Where(x => x.Car.LicensePlate.Equals(licensePlate) && x.Owner.Email.Equals(email))
+                .ToListAsync();
         }
     }
 }

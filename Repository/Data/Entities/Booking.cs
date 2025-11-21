@@ -10,9 +10,18 @@ namespace Repository.Data.Entities
     public class Booking
     {
         public Guid Id { get; set; }
+
+        public string PickupPlace { get; set; }
+        public DateTime PickupTime { get; set; }
+       
+        public string DropoffPlace { get; set; }
+        public DateTime DropoffTime { get; set; }
+
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+
         public string Status { get; set; }
+
         public Guid UserId { get; set; }
         public Guid CarId { get; set; }
         public Guid InvoiceId { get; set; }

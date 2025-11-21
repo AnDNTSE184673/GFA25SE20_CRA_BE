@@ -11,6 +11,7 @@ namespace Repository.DTO.ResponseDTO.Car
 {
     public class CarView
     {
+        public Guid Id { get; set; }
         public string LicensePlate { get; set; }
         public string Model { get; set; }
         public string Manufacturer { get; set; }

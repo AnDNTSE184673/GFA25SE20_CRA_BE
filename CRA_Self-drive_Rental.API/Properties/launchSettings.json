@@ -21,6 +21,7 @@
     },
     "httpsDev": {
       "commandName": "Project",
+      "useHttps": true,
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -31,6 +32,7 @@
     },
     "httpsProd": {
       "commandName": "Project",
+      "useHttps": true,
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",

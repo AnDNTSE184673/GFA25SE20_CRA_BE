@@ -13,8 +13,10 @@ namespace Repository.Repositories.Interfaces
     {
         Task<List<CarRegistration>> GetCarRegsAsync();
         Task<(string status, CarRegistration regData)> UploadCarRegistration(CarRegistration data);
-        Task<CarRegistration> FindCarRegById(Guid? carId, Guid? userId);
-        Task<CarRegistration> FindCarRegByPath(string? filePath, string? bucket);
+        Task AddCarRegistration(CarRegistration data);
+        Task<List<CarRegistration>> FindCarRegById(Guid carId, Guid userId);
+        Task<List<CarRegistration>> FindCarRegByPath(string filePath, string bucket);
         Task<CarRegistration> UpdateCarReg(CarRegistration reg);
+        Task<List<CarRegistration>> FindCarRegByInfo(string licensePlate, string email);
     }
 }

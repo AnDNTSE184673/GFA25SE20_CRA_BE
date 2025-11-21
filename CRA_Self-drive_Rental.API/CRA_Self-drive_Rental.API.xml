@@ -5,7 +5,7 @@
     </assembly>
     <members>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.AuthenController.GoogleLogin(System.String)">
-            <param name="localURL">https://localhost:7184/Authen/login/google</param>
+            <param name="localURL">https://localhost:7184/api/Authen/login/google</param>
         </member>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.AuthenController.GoogleResponse">
             <summary>Don't run this</summary>
