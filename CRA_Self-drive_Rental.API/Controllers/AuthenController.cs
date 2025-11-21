@@ -53,7 +53,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return Ok(response);
         }
 
-        /// <param name="localURL">https://localhost:7184/Authen/login/google</param>
+        /// <param name="localURL">https://localhost:7184/api/Authen/login/google</param>
         [SwaggerOperation(Summary = "Copy the local url and open it on a new tab (testing)")]
         [HttpGet("login/google")]
         public async Task<IActionResult> GoogleLogin(string? localURL)

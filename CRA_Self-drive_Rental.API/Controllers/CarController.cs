@@ -26,11 +26,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("regDoc/approve")]
-        public async Task<IActionResult> ApproveDocument(CarRegForm form, bool isApproved)
+        public async Task<IActionResult> ApproveDocument(DocumentSearchForm form, bool isApproved)
         {
             try
             {
+                var validation = form.IsValid();
+
+                if (!validation.valid)
+                    throw new InvalidOperationException("Fill 1 of 2 complete pairs of data");
+
                 var result = await _carRegServ.ApproveDocumentsAsync(form, isApproved);
+
                 return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(500, new
                     {
@@ -95,15 +101,15 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpPost("registerCar/regDoc")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
-        public async Task<IActionResult> UploadRegistrationImage(IFormFile image, [FromForm] CarRegForm form)
+        public async Task<IActionResult> UploadRegistrationImage([FromForm] CarRegForm form)
         {
             try
             {
-                if (image == null)
+                if (form.images == null || form.images.Count <= 0)
                 {
                     throw new ArgumentException("No image was given!");
                 }
-                var result = await _carRegServ.SubmitRegisterDocument(image, form);
+                var result = await _carRegServ.SubmitRegisterDocument(form);
                 return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(500, new
                     {
@@ -126,7 +132,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
-                (string url, CarRegView view) result = ("", new CarRegView());
+                (string[] signedUrl, List<CarRegView> view) result = (Array.Empty<string>(), new List<CarRegView>());
                 var validation = form.IsValid();
 
                 if (!validation.valid)
@@ -165,7 +171,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     })
                     : Ok(new
                     {
-                        Url = result.url,
+                        Urls = result.signedUrl,
                         View = result.view
                     });
             }

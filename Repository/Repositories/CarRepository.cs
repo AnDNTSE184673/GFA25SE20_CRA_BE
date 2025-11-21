@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Org.BouncyCastle.Ocsp;
 using Repository.Base;
 using Repository.Constant;
 using Repository.Data;
@@ -29,13 +30,23 @@ namespace Repository.Repositories
             return await _dbContext.Cars
                 .Include(x => x.Owner)
                 .Include(x => x.PreferredLot)
+                .Include(x => x.Images)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        public Task<Car> UpdateCarAsync(Car car)
+        public async Task<Car> UpdateCarAsync(Car car)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await UpdateAsync(car);
+
+                return car;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<(string status, Car car)> RegisterCarAsync(Car car)

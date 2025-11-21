@@ -6,6 +6,7 @@ using Repository.Constant;
 using Repository.CustomFunctions.SupabaseFileUploader;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
+using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.Feedbacks;
 using Repository.Extension.SupabaseFileUploader;
@@ -36,14 +37,27 @@ namespace Service.Services.Implementation
         public async Task<List<CarView>> GetAllCarsAsync()
         {
             var cars = await _unitOfWork._carRepo.GetAllCars();
-            var carViews = _mapper.Map<List<CarView>>(cars);
+            var carViews = new List<CarView>();
+            foreach(var car in cars)
+            {
+                var urls = await Task.WhenAll(car.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+                var carView = _mapper.Map<CarView>(car);
+                carView.ImageUrls.AddRange(urls);
+                carViews.Add(carView);
+            }
             return carViews;
         }
 
         public async Task<CarView> GetCarByIdAsync(Guid carId)
         {
-            var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", x => x.Owner, x => x.PreferredLot);
+            var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", x => x.Owner, x => x.PreferredLot, x => x.Images);
+            var urls = await Task.WhenAll(car.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
             var carView = _mapper.Map<CarView>(car);
+            carView.ImageUrls.AddRange(urls);
             return carView;
         }
 
