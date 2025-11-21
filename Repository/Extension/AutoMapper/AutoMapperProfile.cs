@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Hosting;
+using Repositories.DTO.ResponseDTO.User;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.Car;
@@ -9,8 +10,8 @@ using Repository.DTO.RequestDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
-using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.Feedbacks;
+using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Payment;
 using Repository.DTO.ResponseDTO.User;
@@ -86,6 +87,8 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.GenderId));
+            CreateMap<User, UserPostRegView>();
+            CreateMap<User, UserLoginView>();
         }
     }
 }

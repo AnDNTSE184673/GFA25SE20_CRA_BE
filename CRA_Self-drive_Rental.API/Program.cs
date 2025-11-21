@@ -119,7 +119,7 @@ namespace CRA_Self_drive_Rental.API
                     google.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     google.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
-                    google.CallbackPath = "/api/Authen/google-callback";
+                    google.CallbackPath = "/signin-google";
 
                     google.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // explicit
                     google.SaveTokens = true;  // if you need access / refresh tokens later
@@ -134,7 +134,12 @@ namespace CRA_Self_drive_Rental.API
 
                     //google.CallbackPath = "/Authen/signin-google";
                 })
-                .AddCookie();
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = ".AspNetCore.Application";
+                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                });
 
             builder.Services.AddAuthorization();
             Log.Information("Added Author/Authen");
@@ -166,7 +171,21 @@ namespace CRA_Self_drive_Rental.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }*/
+            //app.Use(async (context, next) =>
+            //{
+            //    if (context.Request.Path.StartsWithSegments("/api/Authen/google-callback")
+            //        && !context.Request.Query.ContainsKey("state"))
+            //    {
+            //        context.Response.StatusCode = 400;
+            //        await context.Response.WriteAsync("Invalid OAuth direct call.");
+            //        return;
+            //    }
 
+            //    await next();
+            //});
+            app.UseForwardedHeaders();
+            app.UseCookiePolicy();
+            app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
