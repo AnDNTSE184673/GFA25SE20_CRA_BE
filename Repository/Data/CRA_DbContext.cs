@@ -106,6 +106,13 @@ namespace Repository.Data
                 .WithMany() //assuming one contract per invoice
                 .HasForeignKey(c => c.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Invoice)
+                .WithOne(i => i.Booking)
+                .HasForeignKey<Booking>(c => c.InvoiceId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

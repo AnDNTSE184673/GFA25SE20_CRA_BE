@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Data.Entities
+namespace Repository.DTO.RequestDTO.CarRentalRate
 {
-    public class CarRentalRate
+    public class CarRentalRateForm
     {
-        [Key]
-        public int Id { get; set; }
         public double? DailyRate { get; set; }
         public double? HourlyRate { get; set; }
         public double? WeeklyDiscount { get; set; }
@@ -20,9 +16,5 @@ namespace Repository.Data.Entities
         public string Status { get; set; }
 
         public Guid CarId { get; set; }
-
-        [ForeignKey("CarId")]
-        public virtual Car Car { get; set; }
-
     }
 }
