@@ -29,34 +29,90 @@ namespace Service.Services.Implementation
 
         public async Task<(long, string)> CreatePayOSPaymentRequest(CreatePaymentRequest request)
         {
-            var configSection = _config.GetSection("PayOS");
-            PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
-            var paymentHis = await _unitOfWork._paymentRepo.GetByIdAsync(request.TransactionId);
-            var paymentRequest = new CreatePaymentLinkRequest
+            try
             {
-                OrderCode = paymentHis.OrderCode,
-                Amount = (long)(request.Amount),
-                Description = $"Thanh toán cho {paymentHis.OrderCode}",
-                ReturnUrl = configSection["ReturnUrl"],
-                CancelUrl = configSection["CancelUrl"],
-                ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds(),
-                Signature = GenerateSignature(
-                    amount: ((long)(request.Amount)).ToString(),
-                    cancelUrl: configSection["CancelUrl"],
-                    description: $"Thanh toán cho {paymentHis.OrderCode}",
-                    orderCode: paymentHis.OrderCode.ToString(),
-                    returnUrl: configSection["ReturnUrl"],
-                    //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
-                    checksumKey: configSection["CheckSumKey"]
-                )
-            };
-            paymentHis.Status = "Pending";
-            paymentHis.Signature = paymentRequest.Signature;
-            paymentHis.PaymentMethod = "PayOS";
-            await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
-            await _unitOfWork.SaveChangesAsync();
-            CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
-            return (response.OrderCode, response.CheckoutUrl);
+                _unitOfWork.BeginTransaction();
+                var configSection = _config.GetSection("PayOS");
+                PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
+                var paymentHis = await _unitOfWork._paymentRepo.GetByIdAsync(request.PaymentId);
+                var paymentRequest = new CreatePaymentLinkRequest
+                {
+                    OrderCode = paymentHis.OrderCode,
+                    Amount = (long)(request.Amount),
+                    Description = $"Thanh toán cho {paymentHis.OrderCode}",
+                    ReturnUrl = configSection["ReturnUrl"],
+                    CancelUrl = configSection["CancelUrl"],
+                    ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(request.TimeToPay).ToUnixTimeSeconds(),
+                    Signature = GenerateSignature(
+                        amount: ((long)(request.Amount)).ToString(),
+                        cancelUrl: configSection["CancelUrl"],
+                        description: $"Thanh toán cho {paymentHis.OrderCode}",
+                        orderCode: paymentHis.OrderCode.ToString(),
+                        returnUrl: configSection["ReturnUrl"],
+                        //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
+                        checksumKey: configSection["CheckSumKey"]
+                    )
+                };
+                paymentHis.Status = "Pending";
+                paymentHis.Signature = paymentRequest.Signature;
+                paymentHis.PaymentMethod = "PayOS";
+                await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
+                
+                CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                return (response.OrderCode, response.CheckoutUrl);
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(long, string)> CreatePayOSFromBooking(Guid bookingId)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var configSection = _config.GetSection("PayOS");
+                PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+                var invoice = await _unitOfWork._invoiceRepo.GetInvoiceById(booking.InvoiceId);
+                var payHis = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
+                var bookingPayHis = payHis.Where(p => p.Item == "Booking Fee").FirstOrDefault();
+                var paymentRequest = new CreatePaymentLinkRequest
+                {
+                    OrderCode = bookingPayHis.OrderCode,
+                    Amount = (long)(bookingPayHis.PaidAmount),
+                    Description = $"Thanh toán cho {bookingPayHis.OrderCode}",
+                    ReturnUrl = configSection["ReturnUrl"],
+                    CancelUrl = configSection["CancelUrl"],
+                    ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds(),
+                    Signature = GenerateSignature(
+                        amount: ((long)(bookingPayHis.PaidAmount)).ToString(),
+                        cancelUrl: configSection["CancelUrl"],
+                        description: $"Thanh toán cho {bookingPayHis.OrderCode}",
+                        orderCode: bookingPayHis.OrderCode.ToString(),
+                        returnUrl: configSection["ReturnUrl"],
+                        //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
+                        checksumKey: configSection["CheckSumKey"]
+                    )
+                };
+                bookingPayHis.Status = "Pending";
+                bookingPayHis.Signature = paymentRequest.Signature;
+                bookingPayHis.PaymentMethod = "PayOS";
+                await _unitOfWork._paymentRepo.UpdateAsync(bookingPayHis);                
+                CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
+                _unitOfWork.CommitTransaction();
+                await _unitOfWork.SaveChangesAsync();
+                return (response.OrderCode, response.CheckoutUrl);
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<PaymentLink> GetPayOSPaymentResponse(long id)

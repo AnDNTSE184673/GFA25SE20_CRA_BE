@@ -10,9 +10,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
-        public BookingController(IBookingService bookingService)
+        private readonly IPaymentService _paymentService;
+        public BookingController(IBookingService bookingService, IPaymentService paymentService)
         {
             _bookingService = bookingService;
+            _paymentService = paymentService;
         }
 
         [HttpGet("GetAllBookings")]
@@ -56,7 +58,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         public async Task<IActionResult> CreateBooking([FromBody]BookingCreateRequest request)
         {
             var booking = await _bookingService.CreateBooking(request);
-            if (booking != null) return Ok(booking);
+            var payment = await _paymentService.CreatePayOSFromBooking(booking.Id);
+            if (booking != null) return Ok(payment.Item2);
             return BadRequest();
         }
 
