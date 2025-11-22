@@ -16,5 +16,6 @@ namespace Repository.Repositories.Interfaces
         Task<PaymentHistory?> UpdatePaymentStatusAndMethod(Guid paymentId, string status, string method);
         Task<List<PaymentHistory>?> GetPaymentsByUserId(Guid userId);
         Task<PaymentHistory?> GetPaymentByOrderCode(long orderCode);
+        Task<List<PaymentHistory>?> GetPaymentsByInvoiceId(Guid invoiceId);
     }
 }

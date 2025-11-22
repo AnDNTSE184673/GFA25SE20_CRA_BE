@@ -146,12 +146,9 @@ namespace CRA_Self_drive_Rental.API
             // Add CORS policy to allow specific origins (e.g., localhost for development)
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigins", policy =>
+                options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
-                          .AllowAnyMethod()
-                          .AllowAnyHeader()
-                          .AllowCredentials();
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
             });
 
@@ -185,15 +182,13 @@ namespace CRA_Self_drive_Rental.API
             //});
             app.UseForwardedHeaders();
             app.UseCookiePolicy();
-            app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
+            app.UseCors("AllowAll");         
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             //navigate to this path to check environment

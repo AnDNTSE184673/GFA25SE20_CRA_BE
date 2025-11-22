@@ -11,11 +11,14 @@ namespace Repository.DTO.RequestDTO
     {
         public Guid CustomerId { get; set; }
         public Guid CarId { get; set; }
-        public Status status { get; set; }
+        public string PickupPlace { get; set; }
+        public DateTime PickupTime { get; set; }
+
+        public string DropoffPlace { get; set; }
+        public DateTime DropoffTime { get; set; }
         public double bookingFee { get; set; }
         public double carRentPrice { get; set; }
         public int rentime { get; set; }
         public string rentType { get; set; } = "hour"; // hour, day, week, month
-        public DateTime rentDateEnd { get; set; }
     }
 }
