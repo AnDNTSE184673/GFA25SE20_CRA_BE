@@ -146,7 +146,7 @@ namespace CRA_Self_drive_Rental.API
             // Add CORS policy to allow specific origins (e.g., localhost for development)
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigins", policy =>
+                options.AddPolicy("AllowAll", policy =>
                 {
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
