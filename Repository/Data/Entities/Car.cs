@@ -28,7 +28,6 @@ namespace Repository.Data.Entities
 
         public Guid UserId { get; set; }
         public Guid PrefLotId { get; set; }
-        public Guid LotId { get; set; }
 
         [ForeignKey("UserId")]
         public virtual User Owner { get; set; }
