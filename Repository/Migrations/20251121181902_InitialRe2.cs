@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialRe : Migration
+    public partial class InitialRe2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -66,7 +66,8 @@ namespace Repository.Migrations
                     FilePath = table.Column<string>(type: "text", nullable: false),
                     FileName = table.Column<string>(type: "text", nullable: false),
                     Bucket = table.Column<string>(type: "text", nullable: false),
-                    UrlExpiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: true),
+                    MimeType = table.Column<string>(type: "text", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -318,19 +319,19 @@ namespace Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    LicensePlate = table.Column<string>(type: "text", nullable: false),
                     Model = table.Column<string>(type: "text", nullable: false),
                     Manufacturer = table.Column<string>(type: "text", nullable: false),
-                    Color = table.Column<string>(type: "text", nullable: false),
-                    LicensePlate = table.Column<string>(type: "text", nullable: false),
                     Seats = table.Column<int>(type: "integer", nullable: false),
-                    CarType = table.Column<string>(type: "text", nullable: false),
-                    Features = table.Column<string>(type: "text", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: true),
+                    YearofManufacture = table.Column<int>(type: "integer", nullable: false),
+                    Transmission = table.Column<string>(type: "text", nullable: false),
+                    FuelType = table.Column<string>(type: "text", nullable: false),
+                    FuelConsumption = table.Column<double>(type: "double precision", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     Rating = table.Column<double>(type: "double precision", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PrefLotId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LotId = table.Column<Guid>(type: "uuid", nullable: false)
+                    PrefLotId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -380,6 +381,10 @@ namespace Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PickupPlace = table.Column<string>(type: "text", nullable: false),
+                    PickupTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DropoffPlace = table.Column<string>(type: "text", nullable: false),
+                    DropoffTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
@@ -411,6 +416,32 @@ namespace Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CarImages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    Bucket = table.Column<string>(type: "text", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: true),
+                    MimeType = table.Column<string>(type: "text", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CarId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CarImages_Cars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "Cars",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CarRegistrations",
                 columns: table => new
                 {
@@ -419,7 +450,8 @@ namespace Repository.Migrations
                     FilePath = table.Column<string>(type: "text", nullable: false),
                     FileName = table.Column<string>(type: "text", nullable: false),
                     Bucket = table.Column<string>(type: "text", nullable: false),
-                    UrlExpiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: true),
+                    MimeType = table.Column<string>(type: "text", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     CarId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -443,6 +475,31 @@ namespace Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CarRentalRates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    DailyRate = table.Column<double>(type: "double precision", nullable: true),
+                    HourlyRate = table.Column<double>(type: "double precision", nullable: true),
+                    WeeklyDiscount = table.Column<double>(type: "double precision", nullable: true),
+                    MonthlyDiscount = table.Column<double>(type: "double precision", nullable: true),
+                    OvertimeRate = table.Column<double>(type: "double precision", nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CarId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarRentalRates", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CarRentalRates_Cars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "Cars",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Schedules",
                 columns: table => new
                 {
@@ -454,7 +511,8 @@ namespace Repository.Migrations
                     Priority = table.Column<int>(type: "integer", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CarId = table.Column<Guid>(type: "uuid", nullable: false)
+                    CarId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -465,6 +523,11 @@ namespace Repository.Migrations
                         principalTable: "Cars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Schedules_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -496,6 +559,32 @@ namespace Repository.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "FeedbackImages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    Bucket = table.Column<string>(type: "text", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: true),
+                    MimeType = table.Column<string>(type: "text", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    FeedbackId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FeedbackImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FeedbackImages_Feedbacks_FeedbackId",
+                        column: x => x.FeedbackId,
+                        principalTable: "Feedbacks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "Title" },
@@ -515,12 +604,18 @@ namespace Repository.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_BookingHistories_InvoiceId",
                 table: "BookingHistories",
-                column: "InvoiceId");
+                column: "InvoiceId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookingHistories_UserId",
                 table: "BookingHistories",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CarImages_CarId",
+                table: "CarImages",
+                column: "CarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CarRegistrations_CarId",
@@ -531,6 +626,11 @@ namespace Repository.Migrations
                 name: "IX_CarRegistrations_UserId",
                 table: "CarRegistrations",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CarRentalRates_CarId",
+                table: "CarRentalRates",
+                column: "CarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cars_PrefLotId",
@@ -561,6 +661,11 @@ namespace Repository.Migrations
                 name: "IX_DriverLicenses_UserId",
                 table: "DriverLicenses",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FeedbackImages_FeedbackId",
+                table: "FeedbackImages",
+                column: "FeedbackId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_BookingId",
@@ -633,6 +738,11 @@ namespace Repository.Migrations
                 column: "CarId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Schedules_UserId",
+                table: "Schedules",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
@@ -642,7 +752,13 @@ namespace Repository.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CarImages");
+
+            migrationBuilder.DropTable(
                 name: "CarRegistrations");
+
+            migrationBuilder.DropTable(
+                name: "CarRentalRates");
 
             migrationBuilder.DropTable(
                 name: "Contracts");
@@ -651,7 +767,7 @@ namespace Repository.Migrations
                 name: "DriverLicenses");
 
             migrationBuilder.DropTable(
-                name: "Feedbacks");
+                name: "FeedbackImages");
 
             migrationBuilder.DropTable(
                 name: "Inquiries");
@@ -672,10 +788,13 @@ namespace Repository.Migrations
                 name: "Schedules");
 
             migrationBuilder.DropTable(
-                name: "BookingHistories");
+                name: "Feedbacks");
 
             migrationBuilder.DropTable(
                 name: "PaymentHistories");
+
+            migrationBuilder.DropTable(
+                name: "BookingHistories");
 
             migrationBuilder.DropTable(
                 name: "Cars");

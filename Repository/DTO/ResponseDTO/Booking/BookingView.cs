@@ -10,10 +10,20 @@ namespace Repository.DTO.ResponseDTO.Booking
 {
     public class BookingView
     {
+        public Guid Id { get; set; }
+
+        public string PickupPlace { get; set; }
+        public DateTime PickupTime { get; set; }
+
+        public string DropoffPlace { get; set; }
+        public DateTime DropoffTime { get; set; }
+
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+
         public string Status { get; set; }
-        public string InvoiceNo { get; set; }
+        public string InvoiceNo { get; set; } //This should be InvoiceView
+
         public UserView User { get; set; }
         public CarView Car { get; set; }
     }

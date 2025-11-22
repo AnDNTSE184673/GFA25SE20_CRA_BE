@@ -50,6 +50,7 @@ namespace Repository.Base
             service.AddScoped<ICarRepository, CarRepository>();
             service.AddScoped<ICarImageRepository, CarImageRepository>();
             service.AddScoped<ICarRegRepository, CarRegRepository>();
+            service.AddScoped<ICarRentalRateRepository, CarRentalRateRepository>();
             service.AddScoped<IPaymentRepository, PaymentRepository>();
             service.AddScoped<IFeedbackRepository, FeedbackRepository>();
             service.AddScoped<IFeedbackImageRepository, FeedbackImageRepository>();

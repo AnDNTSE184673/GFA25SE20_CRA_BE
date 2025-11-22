@@ -1,6 +1,6 @@
 ﻿using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.CarRentalRate;
-using Repository.DTO.ResponseDTO;
+using Repository.DTO.ResponseDTO.CarRentalRate;
 using System;
 using System.Collections.Generic;
 using System.Linq;

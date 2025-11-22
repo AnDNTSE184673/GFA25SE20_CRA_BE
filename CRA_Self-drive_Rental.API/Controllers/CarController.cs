@@ -4,7 +4,9 @@ using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
+using Repository.DTO.RequestDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.CarRegister;
+using Repository.Extension.SupabaseFileUploader;
 using Repository.Repositories.Interfaces;
 using Service.Services;
 using Service.Services.Implementation;
@@ -18,11 +20,13 @@ namespace CRA_Self_drive_Rental.API.Controllers
     {
         private readonly ICarService _carServ;
         private readonly ICarRegService _carRegServ;
+        private readonly ICarRentalService _carRentalRateServ;
 
-        public CarController(ICarService carServ, ICarRegService carRegServ)
+        public CarController(ICarService carServ, ICarRegService carRegServ, ICarRentalService carRentalRateServ)
         {
             _carServ = carServ;
             _carRegServ = carRegServ;
+            _carRentalRateServ = carRentalRateServ;
         }
 
         [HttpPatch("regDoc/approve")]
@@ -215,6 +219,28 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     });
                 }
                 return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("rentalRate")]
+        public async Task<IActionResult> SetRentalRate(CarRentalRateForm form)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.SetRentalRate(form);
+                return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data creation error, check log and form"
+                    })
+                    : Ok(result.view);
             }
             catch (Exception ex)
             {
