@@ -59,7 +59,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             var booking = await _bookingService.CreateBooking(request);
             var payment = await _paymentService.CreatePayOSFromBooking(booking.Id);
-            if (booking != null) return Ok(payment.Item2);
+            var obj = new { Payment = payment.Item2, Booking = booking, };
+            if (booking != null) return Ok(obj);
             return BadRequest();
         }
 
