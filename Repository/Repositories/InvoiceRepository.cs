@@ -59,7 +59,7 @@ namespace Repository.Repositories
                 IssueDate = DateTime.UtcNow,
                 DueDate = request.InvoiceDue,
                 SubTotal = (request.CarRate * request.RentTime) + request.Fees,
-                GrandTotal = (request.CarRate * request.RentTime) + request.Fees,
+                GrandTotal = (request.CarRate * request.RentTime),
                 Note = request.RentType,
                 CreateDate = DateTime.UtcNow,
                 Status = ConstantEnum.Statuses.PENDING,
@@ -74,15 +74,17 @@ namespace Repository.Repositories
                         Description = $"Rental for Car ID: {request.CarId} - {request.RentType}",
                         Quantity = request.RentTime,
                         UnitPrice = request.CarRate,
-                        Total = request.CarRate * request.RentTime
+                        Note = $"{request.RentType} rental rate",
+                        Total = (request.CarRate * request.RentTime) - (request.CarRate * request.RentTime*request.Fees)/100
                     },
                     new InvoiceItem
                     {
                         Id = Guid.NewGuid(),
                         Item = "Booking Fees",
                         Description = "Booking Fees",
+                        Note = $"{request.Fees} % of Car Rental Total",
                         Quantity = 1,
-                        UnitPrice = request.Fees,
+                        UnitPrice = (request.CarRate * request.RentTime*request.Fees)/100,
                         Total = request.Fees
                     }
                 }
