@@ -74,7 +74,7 @@ namespace Repository.Repositories
                         Description = $"Rental for Car ID: {request.CarId} - {request.RentType}",
                         Quantity = request.RentTime,
                         UnitPrice = request.CarRate,
-                        Note = $"{request.RentType} rental rate",
+                        Note = $"{request.RentType} rental rate after fee",
                         Total = (request.CarRate * request.RentTime) - (request.CarRate * request.RentTime*request.Fees)/100
                     },
                     new InvoiceItem
@@ -85,7 +85,7 @@ namespace Repository.Repositories
                         Note = $"{request.Fees} % of Car Rental Total",
                         Quantity = 1,
                         UnitPrice = (request.CarRate * request.RentTime*request.Fees)/100,
-                        Total = request.Fees
+                        Total = (request.CarRate * request.RentTime*request.Fees)/100
                     }
                 }
             };
