@@ -8,10 +8,9 @@ namespace Repository.DTO.RequestDTO.Payment
 {
     public class CreatePaymentRequest
     {
-        public Guid TransactionId { get; set; } // PaymentHistory.Id
+        public Guid PaymentId { get; set; } // PaymentHistory.Id
         public double Amount { get; set; }
         public Guid InvoiceId { get; set; }
-        public Guid UserId { get; set; }
-        public string PayerName { get; set; }
+        public int TimeToPay { get; set; }
     }
 }

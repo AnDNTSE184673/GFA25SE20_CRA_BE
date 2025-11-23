@@ -12,6 +12,7 @@ namespace Service.Services
     public interface IPaymentService
     {
         Task<(long, string)> CreatePayOSPaymentRequest(CreatePaymentRequest request);
+        Task<(long, string)> CreatePayOSFromBooking(Guid bookingId);
         // Task<(long, string)> GetPayOSPaymentResponse(long id);
         Task<PaymentLink> GetPayOSPaymentResponse(long id);
         Task<List<PaymentHistoryView>?> GetHistoryForUser(Guid userId); 

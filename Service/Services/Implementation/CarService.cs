@@ -93,7 +93,6 @@ namespace Service.Services.Implementation
                 newCar.Status = ConstantEnum.Statuses.PENDING;
                 newCar.Id = Guid.NewGuid();
                 newCar.Rating = 0.0;
-
                 var result = await _unitOfWork._carRepo.RegisterCarAsync(newCar);
 
                 /* //Sequential uploads

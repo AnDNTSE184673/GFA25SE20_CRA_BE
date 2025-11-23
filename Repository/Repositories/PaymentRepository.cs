@@ -96,6 +96,18 @@ namespace Repository.Repositories
             return payment;
         }
 
+        public async Task<List<PaymentHistory>?> GetPaymentsByInvoiceId(Guid invoiceId)
+        {
+            var payments = await  _context.PaymentHistories
+                .Where(p => p.InvoiceId == invoiceId)
+                .ToListAsync();
+            if (payments == null)
+            {
+                return null;
+            }
+            return payments;
+        }
+
         public async Task<List<PaymentHistory>?> GetPaymentsByUserId(Guid userId)
         {
             List<PaymentHistory>? payments = await  _context.PaymentHistories

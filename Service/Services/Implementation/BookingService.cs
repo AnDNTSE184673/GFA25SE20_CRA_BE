@@ -64,7 +64,7 @@ namespace Service.Services.Implementation
                     CarRate = request.carRentPrice,
                     Fees = request.bookingFee,
                     RentTime = request.rentime,
-                    InvoiceDue = request.rentDateEnd,
+                    InvoiceDue = request.DropoffTime,
                     RentType = request.rentType
                 };
                 var invoice = await _unitOfWork._invoiceRepo.CreateInvoice(newInvoice);
@@ -73,16 +73,23 @@ namespace Service.Services.Implementation
                     Id = Guid.NewGuid(),
                     CreateDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow,
+                    PickupPlace = request.PickupPlace,
+                    PickupTime = request.PickupTime,
+                    DropoffPlace = request.DropoffPlace,
+                    DropoffTime = request.DropoffTime,
                     Status = ConstantEnum.Status.Pending.ToString(),
                     UserId = request.CustomerId,
                     CarId = request.CarId,
                     InvoiceId = invoice.Id
                 };
                 await _unitOfWork._bookingRepo.CreateAsync(newBooking);
-                _unitOfWork.CommitTransaction();
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork._paymentRepo.CreateNewPaymentForBookingFee(newBooking.InvoiceId);
+                await _unitOfWork._paymentRepo.CreateNewPaymentForRentalFee(newBooking.InvoiceId);
                 var createdBooking = await _unitOfWork._bookingRepo.GetByIdAsync(newBooking.Id);
                 var bookingView = _mapper.Map<BookingView>(createdBooking);
+
+                _unitOfWork.CommitTransaction();
+                await _unitOfWork.SaveChangesAsync();
                 return bookingView;
             }
             catch (Exception ex)
