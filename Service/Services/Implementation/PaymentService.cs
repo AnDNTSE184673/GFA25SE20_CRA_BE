@@ -266,5 +266,73 @@ namespace Service.Services.Implementation
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
         }
+
+        public Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<PaymentHistoryView>?> GetAllPaymentPayOS()
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var allPayments = await _unitOfWork._paymentRepo.GetAllAsync();
+                List<PaymentHistory>? paymentHistories = allPayments
+                    .Where(p => p.PaymentMethod == "PayOS")
+                    .ToList();
+                if (paymentHistories == null || paymentHistories.Count == 0)
+                {
+                    return null;
+                }
+                List<PaymentHistoryView> paymentHistoryViews = _mapper.Map<List<PaymentHistoryView>>(paymentHistories);
+                foreach (var paymentView in paymentHistoryViews)
+                {
+                    var payOSResponse = await GetPayOSPaymentResponse(paymentView.OrderCode);
+                    paymentView.Status = payOSResponse.Status.ToString();
+                    paymentHistories
+                        .First(p => p.Id == paymentView.Id)
+                        .Status = payOSResponse.Status.ToString();
+                    await _unitOfWork._paymentRepo.UpdateAsync(
+                        paymentHistories
+                            .First(p => p.Id == paymentView.Id)
+                    );
+                }
+                await _unitOfWork.SaveChangesAsync();
+                foreach (var paymentView in paymentHistoryViews)
+                {
+                    var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(paymentView.Id);
+                    var bookking = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(updatedPayment.UserId);
+                    foreach (var books in bookking)
+                    {
+                        if (books.UserId == updatedPayment.UserId)
+                        {
+                            if (updatedPayment.Status == "Cancelled" || updatedPayment.Status == "Expired")
+                            {
+                                books.Status = "Cancelled";
+                                await _unitOfWork._bookingRepo.UpdateAsync(books);
+                            }
+                            else if (updatedPayment.Status == "Success")
+                            {
+                                books.Status = "Confirmed";
+                                await _unitOfWork._bookingRepo.UpdateAsync(books);
+                            }
+                        }
+                    }
+                    await _unitOfWork.SaveChangesAsync();
+                }
+                _unitOfWork.CommitTransaction();
+                var paymentHistoriesUpdated = await _unitOfWork._paymentRepo.GetAllAsync();
+                List<PaymentHistory>? paymentHistoriesPayOS = paymentHistoriesUpdated
+                    .Where(p => p.PaymentMethod == "PayOS")
+                    .ToList();
+                return _mapper.Map<List<PaymentHistoryView>>(paymentHistoriesPayOS);
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

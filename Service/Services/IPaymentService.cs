@@ -15,6 +15,8 @@ namespace Service.Services
         Task<(long, string)> CreatePayOSFromBooking(Guid bookingId);
         // Task<(long, string)> GetPayOSPaymentResponse(long id);
         Task<PaymentLink> GetPayOSPaymentResponse(long id);
+        Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id);
+        Task<List<PaymentHistoryView>?> GetAllPaymentPayOS();
         Task<List<PaymentHistoryView>?> GetHistoryForUser(Guid userId); 
         Task<PaymentHistoryView?> GetPaymentByOrderCode(long orderCode);
         Task<PaymentHistoryView?> GetPaymentById(Guid paymentId);
