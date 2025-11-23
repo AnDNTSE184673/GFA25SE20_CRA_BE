@@ -10,5 +10,9 @@ namespace Repository.Repositories.Interfaces
 {
     public interface ICarRentalRateRepository : IGenericRepository<CarRentalRate>
     {
+        Task<CarRentalRate> GetRateByCarAsync(Guid carId);
+        Task<(string status, CarRentalRate obj)> CreateRateAsync(CarRentalRate carRate);
+        Task<string> DeleteRateAsync(Guid carId);
+        Task<CarRentalRate> UpdateRateAsync(CarRentalRate carRate);
     }
 }

@@ -153,6 +153,58 @@ namespace Service.Services.Implementation
             }
         }
 
+        public async Task<CarView> UpdateCarImageAsync(List<IFormFile> images, Guid carId)
+        {
+            try
+            {
+                //var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", x => x.Owner, x => x.PreferredLot, x => x.Images);
+                var car = await _unitOfWork._carRepo.GetByIdAsync(carId);
+
+                if (car == null) throw new KeyNotFoundException("Car not found!");
+
+                var existImage = await _unitOfWork._carImageRepo.GetAllAsync();
+
+                await _unitOfWork.BeginTransactionAsync();
+
+                var uploadTasks = new List<Task<(string url, CarImage obj)>>();
+                int count = existImage.Count();
+
+                foreach (var file in images)
+                {
+                    uploadTasks.Add(UploadCarImagesAsync(file, carId, count));
+                    count++;
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._carImageRepo.AddCarImageAsync(u.obj);
+                }
+                var result = await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                var info = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", x => x.Owner, x => x.PreferredLot);
+
+                if (info == null) return null;
+
+                var mapped = _mapper.Map<CarView>(info);
+                mapped.ImageUrls.AddRange(urls);
+                return mapped;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }  
+        }
+
         public async Task<(string url, CarImage obj)> UploadCarImagesAsync(IFormFile file, Guid carId, int count)
         {
             try

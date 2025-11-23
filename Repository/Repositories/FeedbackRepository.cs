@@ -73,6 +73,8 @@ namespace Repository.Repositories
             {
                 var result = await UpdateAsync(feedback);
 
+                _dbContext.ChangeTracker.Clear();
+
                 return await GetByIdWithIncludeAsync(feedback.Id, "Id", x => x.Car);
             }
             catch (Exception ex)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repository.DTO.RequestDTO.CarRentalRate
 {
-    public class CarRentalRateForm
+    public class CreateCarRentalRateForm
     {
         //infer one to another
         public double? DailyRate { get; set; }
@@ -19,9 +19,9 @@ namespace Repository.DTO.RequestDTO.CarRentalRate
         [Range(0, 100, ErrorMessage = "Overtime rate must be between 0% and 100%.")]
         public double OvertimeRate { get; set; }
 
-        public string Status { get; set; }
-
         public Guid CarId { get; set; }
+
+        //could consider passing userid to check ownerz
 
         public (bool valid, bool isHourly) IsValid()
         {
