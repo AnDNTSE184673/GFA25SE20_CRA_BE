@@ -78,7 +78,9 @@ namespace Repository.Repositories
             {
                 var result = await UpdateAsync(reg);
 
-                return reg;
+                _dbContext.ChangeTracker.Clear();
+
+                return await GetByIdAsync(reg.Id);
             }
             catch (Exception ex)
             {

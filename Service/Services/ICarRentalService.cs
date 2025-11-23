@@ -1,6 +1,6 @@
 ﻿using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.CarRentalRate;
-using Repository.DTO.ResponseDTO;
+using Repository.DTO.ResponseDTO.CarRentalRate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,9 @@ namespace Service.Services
 {
     public interface ICarRentalService
     {
-        Task<(string status, CarRentalRateView view)> SetRentalRate(CarRentalRateForm form);
+        Task<CarRentalRateView> GetCarRentalRate(Guid carId);
+        Task<(string status, CarRentalRateView view)> SetRentalRate(CreateCarRentalRateForm form);
+        Task<CarRentalRateView> UpdateRentalRate(UpdateCarRentalRateForm form);
+        Task<string> DeleteRentalRate(Guid carId);
     }
 }

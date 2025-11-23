@@ -12,7 +12,7 @@ namespace Service.Services
     public interface ICarRegService
     {
         Task<(string status, ApproveRegView view)> ApproveDocumentsAsync(DocumentSearchForm form, bool isApproved);
-        Task<List<CarRegView>> GetAllDocumentsAsync();
+        Task<(string[] signedUrl, List<CarRegView> view)> GetAllDocumentsAsync();
         Task<(string[] signedUrl, List<CarRegView> view)> GetCarRegDocById(GetCarRegForm form);
         Task<(string[] signedUrl, List<CarRegView> view)> GetCarRegDocByInfo(GetCarRegForm form);
         Task<(string[] signedUrl, List<CarRegView> view)> GetCarRegDocByPath(GetCarRegForm form);

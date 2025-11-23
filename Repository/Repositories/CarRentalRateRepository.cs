@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Repository.Base;
 using Repository.Constant;
 using Repository.Data;
@@ -13,20 +12,20 @@ using System.Threading.Tasks;
 
 namespace Repository.Repositories
 {
-    public class FeedbackRepository : GenericRepository<Feedback>, IFeedbackRepository
+    public class CarRentalRateRepository : GenericRepository<CarRentalRate>, ICarRentalRateRepository
     {
-        public FeedbackRepository(CRA_DbContext dbContext) : base(dbContext)
+        public CarRentalRateRepository(CRA_DbContext dbContext) : base(dbContext)
         {
         }
 
-        public async Task<(string status, Feedback? feedback)> CreateFeedbackAsync(Feedback feedback)
+        public async Task<(string status, CarRentalRate obj)> CreateRateAsync(CarRentalRate carRate)
         {
             try
             {
-                var result = await CreateAsync(feedback);
+                var result = await CreateAsync(carRate);
 
                 if (result > 0)
-                    return (ConstantEnum.RepoStatus.SUCCESS, feedback);
+                    return (ConstantEnum.RepoStatus.SUCCESS, carRate);
                 else
                     return (ConstantEnum.RepoStatus.FAILURE, null);
             }
@@ -36,17 +35,19 @@ namespace Repository.Repositories
             }
         }
 
-        public async Task<string> DeleteFeedbackAsync(Guid id)
+        public async Task<string> DeleteRateAsync(Guid carId)
         {
             try
             {
-                var existing = await GetByIdAsync(id);
+                var existing = await GetRateByCarAsync(carId);
                 if (existing == null)
-                    return "Post not found";
+                    return "Rate for car not found";
 
                 await RemoveAsync(existing);
 
-                if (await GetByIdAsync(id) == null)
+                _dbContext.ChangeTracker.Clear();
+
+                if (await GetRateByCarAsync(carId) == null)
                     return ConstantEnum.RepoStatus.SUCCESS;
                 else
                     return ConstantEnum.RepoStatus.FAILURE;
@@ -57,25 +58,23 @@ namespace Repository.Repositories
             }
         }
 
-        public async Task<List<Feedback>> GetFeedbacksByCar(Guid carId)
+        public async Task<CarRentalRate> GetRateByCarAsync(Guid carId)
         {
-            return await _dbContext.Feedbacks
+            return await _dbContext.CarRentalRates
                 .Where(x => x.CarId.Equals(carId))
                 .Include(x => x.Car)
-                .Include(x => x.FeedbackImages)
-                .AsNoTracking()
-                .ToListAsync();
+                .FirstOrDefaultAsync();
         }
 
-        public async Task<Feedback> UpdateFeedbackAsync(Feedback feedback)
+        public async Task<CarRentalRate> UpdateRateAsync(CarRentalRate carRate)
         {
             try
             {
-                var result = await UpdateAsync(feedback);
+                var result = await UpdateAsync(carRate);
 
                 _dbContext.ChangeTracker.Clear();
 
-                return await GetByIdWithIncludeAsync(feedback.Id, "Id", x => x.Car);
+                return await GetByIdAsync(carRate.Id);
             }
             catch (Exception ex)
             {

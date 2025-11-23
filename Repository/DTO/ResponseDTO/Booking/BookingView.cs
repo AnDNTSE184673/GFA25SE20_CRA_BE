@@ -19,7 +19,8 @@ namespace Repository.DTO.ResponseDTO.Booking
         public DateTime UpdateDate { get; set; }
         public Guid InvoiceId { get; set; }
         public string Status { get; set; }
-        public string InvoiceNo { get; set; }
+        public string InvoiceNo { get; set; } //This should be InvoiceView
+
         public UserView User { get; set; }
         public CarView Car { get; set; }
     }

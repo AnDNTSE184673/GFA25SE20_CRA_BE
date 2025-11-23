@@ -23,6 +23,5 @@ namespace Repository.Data.Entities
 
         [ForeignKey("CarId")]
         public virtual Car Car { get; set; }
-
     }
 }

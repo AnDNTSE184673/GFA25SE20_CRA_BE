@@ -4,7 +4,9 @@ using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
+using Repository.DTO.RequestDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.CarRegister;
+using Repository.Extension.SupabaseFileUploader;
 using Repository.Repositories.Interfaces;
 using Service.Services;
 using Service.Services.Implementation;
@@ -18,11 +20,13 @@ namespace CRA_Self_drive_Rental.API.Controllers
     {
         private readonly ICarService _carServ;
         private readonly ICarRegService _carRegServ;
+        private readonly ICarRentalService _carRentalRateServ;
 
-        public CarController(ICarService carServ, ICarRegService carRegServ)
+        public CarController(ICarService carServ, ICarRegService carRegServ, ICarRentalService carRentalRateServ)
         {
             _carServ = carServ;
             _carRegServ = carRegServ;
+            _carRentalRateServ = carRentalRateServ;
         }
 
         [HttpPatch("regDoc/approve")]
@@ -59,8 +63,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
             try
             {
                 var result = await _carRegServ.GetAllDocumentsAsync();
-                return result.Count <= 0
-                    ? StatusCode(500, new
+                return !result.view.Any()
+                    ? StatusCode(StatusCodes.Status404NotFound, new
                     {
                         Message = "Data fetch error, check log and form"
                     })
@@ -98,6 +102,34 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
+        [HttpPatch("registerCar/carInfo/updateImage")]
+        [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
+        ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
+        public async Task<IActionResult> UploadCarImage([FromForm] List<IFormFile> images, Guid carId)
+        {
+            try
+            {
+                if (images == null || images.Count <= 0)
+                {
+                    throw new ArgumentException("No image was given!");
+                }
+                var result = await _carServ.UpdateCarImageAsync(images, carId);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Error updating, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
         [HttpPost("registerCar/regDoc")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
@@ -125,6 +157,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
 
         [HttpGet("regDoc")]
         ///<summary>Also send a flag indicating whether to search using "path" or "id" or "info"</summary>
@@ -215,6 +248,95 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     });
                 }
                 return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("rentalRate/{carId}")]
+        public async Task<IActionResult> GetCarRentalRate(Guid carId)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.GetCarRentalRate(carId);
+
+                return result == null
+                    ? StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Message = "Data not found, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("rentalRate")]
+        public async Task<IActionResult> SetRentalRate(CreateCarRentalRateForm form)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.SetRentalRate(form);
+                return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data creation error, check log and form"
+                    })
+                    : Ok(result.view);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPatch("rentalRate")]
+        public async Task<IActionResult> UpdateRentalRate(UpdateCarRentalRateForm form)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.UpdateRentalRate(form);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data update error, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("rentalRate/{carId}")]
+        public async Task<IActionResult> DeleteRentalRate(Guid carId)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.DeleteRentalRate(carId);
+                return result.Equals(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data update error, check log and form"
+                    })
+                    : Ok(result);
             }
             catch (Exception ex)
             {

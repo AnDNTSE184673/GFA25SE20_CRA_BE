@@ -41,7 +41,9 @@ namespace Repository.Repositories
             {
                 var result = await UpdateAsync(car);
 
-                return car;
+                _dbContext.ChangeTracker.Clear();
+
+                return await GetByIdAsync(car.Id);
             }
             catch (Exception ex)
             {

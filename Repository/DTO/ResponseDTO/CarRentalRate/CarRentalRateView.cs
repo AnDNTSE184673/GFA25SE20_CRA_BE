@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Repository.DTO.ResponseDTO.Car;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.DTO.RequestDTO.CarRentalRate
+namespace Repository.DTO.ResponseDTO.CarRentalRate
 {
-    public class CarRentalRateForm
+    public class CarRentalRateView
     {
         public double? DailyRate { get; set; }
         public double? HourlyRate { get; set; }
@@ -15,6 +16,6 @@ namespace Repository.DTO.RequestDTO.CarRentalRate
         public double? OvertimeRate { get; set; }
         public string Status { get; set; }
 
-        public Guid CarId { get; set; }
+        public CarView Car { get; set; }
     }
 }

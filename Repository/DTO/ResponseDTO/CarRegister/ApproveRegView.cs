@@ -10,7 +10,7 @@ namespace Repository.DTO.ResponseDTO.CarRegister
 {
     public class ApproveRegView
     {
-        public List<SingleRegData> Document { get; set; }
+        public List<SingleRegData> Document { get; set; } = new List<SingleRegData>();
 
         public UserView Owner { get; set; }
         public CarView Car { get; set; }

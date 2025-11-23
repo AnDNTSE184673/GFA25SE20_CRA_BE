@@ -66,7 +66,8 @@ namespace Repository.Constant
         {
             ADMIN = 1001,
             STAFF = 1002,
-            CUSTOMER = 1
+            CUSTOMER = 1,
+            CAROWNER = 2,
         }
 
         public enum GenderID

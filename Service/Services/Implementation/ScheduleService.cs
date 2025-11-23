@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.DTO.ResponseDTO
+namespace Service.Services.Implementation
 {
-    public class CarRentalRateView
+    public class ScheduleService
     {
     }
 }

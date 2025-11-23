@@ -113,10 +113,16 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<List<CarRegView>> GetAllDocumentsAsync()
+        public async Task<(string[] signedUrl, List<CarRegView> view)> GetAllDocumentsAsync()
         {
             var result = await _unitOfWork._carRegRepo.GetCarRegsAsync();
-            return _mapper.Map<List<CarRegView>>(result);
+            var uploadTasks = new List<Task<string>>();
+            foreach (var r in result)
+            {
+                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
+            }
+            var uploadResults = await Task.WhenAll(uploadTasks);
+            return (uploadResults, _mapper.Map<List<CarRegView>>(result));
         }
 
         public async Task<(string[] signedUrl, List<CarRegView> view)> GetCarRegDocById(GetCarRegForm form)
