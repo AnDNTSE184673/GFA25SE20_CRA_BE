@@ -48,6 +48,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payment details found for the specified order code.");
         }
 
+        [HttpGet("/PayOS/AllPayments")]
+        public async Task<IActionResult> GetAllPayOSPayments()
+        {
+            var payments = await _paymentService.GetAllPaymentPayOS();
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No PayOS payments found.");
+        }
+
         [HttpGet("/Payment/{OrderCode}")]
         public async Task<IActionResult> GetPaymentByOrderCode(long OrderCode)
         {
