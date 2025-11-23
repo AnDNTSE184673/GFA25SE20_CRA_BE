@@ -34,8 +34,22 @@ namespace Repository.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DropoffPlace")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DropoffTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("PickupPlace")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("PickupTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -51,7 +65,8 @@ namespace Repository.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.HasIndex("InvoiceId");
+                    b.HasIndex("InvoiceId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -64,23 +79,19 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CarType")
-                        .IsRequired()
+                    b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<double>("FuelConsumption")
+                        .HasColumnType("double precision");
 
-                    b.Property<string>("Features")
+                    b.Property<string>("FuelType")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LicensePlate")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("LotId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Manufacturer")
                         .IsRequired()
@@ -88,9 +99,6 @@ namespace Repository.Migrations
 
                     b.Property<string>("Model")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Notes")
                         .HasColumnType("text");
 
                     b.Property<Guid>("PrefLotId")
@@ -106,8 +114,15 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Transmission")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("YearofManufacture")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -116,6 +131,49 @@ namespace Repository.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Cars");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.CarImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MimeType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.ToTable("CarImages");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.CarRegistration", b =>
@@ -144,12 +202,15 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MimeType")
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UrlExpiration")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -161,6 +222,43 @@ namespace Repository.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CarRegistrations");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.CarRentalRate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("DailyRate")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("HourlyRate")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("MonthlyDiscount")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("OvertimeRate")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double?>("WeeklyDiscount")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.ToTable("CarRentalRates");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Contract", b =>
@@ -228,12 +326,15 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MimeType")
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UrlExpiration")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -278,6 +379,49 @@ namespace Repository.Migrations
                     b.HasIndex("CarId");
 
                     b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.FeedbackImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FeedbackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long?>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MimeType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeedbackId");
+
+                    b.ToTable("FeedbackImages");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Inquiry", b =>
@@ -470,11 +614,24 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("OrderCode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("OrderCode"));
+
                     b.Property<double>("PaidAmount")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PaymentProofUrl")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Signature")
                         .HasColumnType("text");
 
                     b.Property<string>("Status")
@@ -519,11 +676,19 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Signature")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TransactionStatus")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -661,9 +826,14 @@ namespace Repository.Migrations
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CarId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Schedules");
                 });
@@ -735,8 +905,8 @@ namespace Repository.Migrations
                         .IsRequired();
 
                     b.HasOne("Repository.Data.Entities.Invoice", "Invoice")
-                        .WithMany()
-                        .HasForeignKey("InvoiceId")
+                        .WithOne("Booking")
+                        .HasForeignKey("Repository.Data.Entities.Booking", "InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -772,6 +942,17 @@ namespace Repository.Migrations
                     b.Navigation("PreferredLot");
                 });
 
+            modelBuilder.Entity("Repository.Data.Entities.CarImage", b =>
+                {
+                    b.HasOne("Repository.Data.Entities.Car", "Car")
+                        .WithMany("Images")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+                });
+
             modelBuilder.Entity("Repository.Data.Entities.CarRegistration", b =>
                 {
                     b.HasOne("Repository.Data.Entities.Car", "Car")
@@ -789,6 +970,17 @@ namespace Repository.Migrations
                     b.Navigation("Car");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.CarRentalRate", b =>
+                {
+                    b.HasOne("Repository.Data.Entities.Car", "Car")
+                        .WithMany()
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Contract", b =>
@@ -846,6 +1038,17 @@ namespace Repository.Migrations
                     b.Navigation("Booking");
 
                     b.Navigation("Car");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.FeedbackImage", b =>
+                {
+                    b.HasOne("Repository.Data.Entities.Feedback", "Feedback")
+                        .WithMany("FeedbackImages")
+                        .HasForeignKey("FeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feedback");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Inquiry", b =>
@@ -968,7 +1171,13 @@ namespace Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Repository.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Car");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.User", b =>
@@ -982,8 +1191,21 @@ namespace Repository.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("Repository.Data.Entities.Car", b =>
+                {
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Repository.Data.Entities.Feedback", b =>
+                {
+                    b.Navigation("FeedbackImages");
+                });
+
             modelBuilder.Entity("Repository.Data.Entities.Invoice", b =>
                 {
+                    b.Navigation("Booking")
+                        .IsRequired();
+
                     b.Navigation("InvoiceItems");
                 });
 

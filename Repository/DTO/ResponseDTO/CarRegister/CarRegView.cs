@@ -8,14 +8,12 @@ namespace Repository.DTO.ResponseDTO.CarRegister
 {
     public class CarRegView
     {
-        public string FilePath { get; set; }
-        public string Bucket { get; set; }
-        public DateTime UrlExpiration { get; set; }
-        public DateTime CreateDate { get; set; }
-
-        public string Status { get; set; }
-
         public Guid? CarId { get; set; }
         public Guid? UserId { get; set; }
+
+        public List<string> Urls { get; set; }
+        public DateTime CreateDate { get; set; }
+
+        public string Status { get; set; }    
     }
 }

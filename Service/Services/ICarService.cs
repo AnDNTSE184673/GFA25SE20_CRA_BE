@@ -1,5 +1,7 @@
-﻿using Repository.Data.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
+using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Car;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ namespace Service.Services
     public interface ICarService
     {
         Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form);
+        Task<CarView> UpdateCarImageAsync(List<IFormFile> images, Guid carId);
         Task<List<CarView>> GetAllCarsAsync();
         Task<CarView> GetCarByIdAsync(Guid carId);
     }

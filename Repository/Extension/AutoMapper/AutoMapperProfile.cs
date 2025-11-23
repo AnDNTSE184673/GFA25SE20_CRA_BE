@@ -1,13 +1,21 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Hosting;
+using Repositories.DTO.ResponseDTO.User;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
+using Repository.DTO.RequestDTO.CarRentalRate;
+using Repository.DTO.RequestDTO.Feedback;
 using Repository.DTO.RequestDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
+using Repository.DTO.ResponseDTO.CarRentalRate;
+using Repository.DTO.ResponseDTO.Feedbacks;
+using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
+using Repository.DTO.ResponseDTO.Payment;
 using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
@@ -42,12 +50,25 @@ namespace Repository.Extension.AutoMapper
             CreateMap<PostParkingLotForm, ParkingLot>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.ManagerId));
 
+            CreateMap<CreateFeedbackForm, Feedback>();
+            CreateMap<Feedback, FeedbackView>();
+            CreateMap<EditFeedbackForm, Feedback>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<CarRegistration,CarRegView>();
+            CreateMap<CarRegistration, SingleRegData>();
 
             CreateMap<User, UserView>();
 
             CreateMap<CarInfoForm, Car>();
             CreateMap<Car, CarView>();
+
+            CreateMap<CreateCarRentalRateForm, CarRentalRate>();
+            CreateMap<UpdateCarRentalRateForm, CarRentalRate>()
+                .ForMember(d => d.CarId, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+                
+            CreateMap<CarRentalRate, CarRentalRateView>();
 
             CreateMap<CarRegForm, CarRegistration>();
             CreateMap<CarRegistration, CarRegView>();
@@ -63,6 +84,20 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.Gender, opt => opt.Condition(src => src.Gender != 0));
             CreateMap<Booking, BookingView>()
                 .ForMember(dest => dest.InvoiceNo, opt => opt.MapFrom(src => src.Invoice.InvoiceNo));
+            CreateMap<Invoice, InvoiceView>();
+            CreateMap<Invoice, InvoiceOwnerView>();
+            CreateMap<InvoiceItem, InvoiceItemView>();
+            CreateMap<PaymentHistory, PaymentHistoryView>();
+            CreateMap<RegisterUserForm, User>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
+                .ForMember(dest => dest.GoogleId, opt => opt.MapFrom(src => src.GoogleId))
+                .ForMember(dest => dest.Fullname, opt => opt.MapFrom(src => src.Fullname))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.GenderId));
+            CreateMap<User, UserPostRegView>();
+            CreateMap<User, UserLoginView>();
         }
     }
 }

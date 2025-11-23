@@ -15,15 +15,18 @@ namespace Repository.DTO.RequestDTO.CarRegister
         public Guid? CarId { get; set; }
         public Guid? UserId { get; set; }
 
-        public (bool valid, bool isId) IsValid()
+        public string? Email { get; set; }
+        public string? LicensePlate { get; set; }
+
+        public (bool valid, bool isId, bool isPath, bool isInfo) IsValid()
         {
-            bool pair1Filled = !string.IsNullOrEmpty(FilePath) && !string.IsNullOrEmpty(Bucket);
-            bool pair2Filled = CarId.HasValue && UserId.HasValue;
+            bool pair2Filled = !string.IsNullOrEmpty(FilePath) && !string.IsNullOrEmpty(Bucket);
+            bool pair1Filled = CarId.HasValue && UserId.HasValue;
+            bool pair3Filled = !string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(LicensePlate);
 
-            bool valid = pair1Filled || pair2Filled;
-            bool isId = pair2Filled; //true if ID pair is filled, false if string pair
+            bool valid = pair1Filled || pair2Filled || pair3Filled;
 
-            return (valid, isId);
+            return (valid, pair1Filled, pair2Filled, pair3Filled);
         }
     }
     

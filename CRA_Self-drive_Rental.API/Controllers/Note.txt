@@ -1,0 +1,81 @@
+﻿[FromQuery]
+Use it when you want to get values from the URL query string.
+Example: https://example.com/api/products?category=electronics&page=2
+[HttpGet]
+public IActionResult GetProducts([FromQuery] string category, [FromQuery] int page)
+{
+    return Ok($"Category: {category}, Page: {page}");
+}
+Use case: When you want to filter or paginate data (like ?search=apple&page=1).
+
+2. [FromRoute]
+
+Use it when you need values from the URL route parameters.
+Example: https://example.com/api/products/5
+[HttpGet("{id}")]
+public IActionResult GetProductById([FromRoute] int id)
+{
+    return Ok($"Product ID: {id}");
+}
+Use case: When fetching a resource by ID or meaningful route segments.
+
+3. [FromBody]
+
+Use it when you expect data in the request body (JSON/XML).
+Example: POST or PUT request with a JSON body.
+
+{
+    "name": "Laptop",
+    "price": 999.99
+}
+[HttpPost]
+public IActionResult CreateProduct([FromBody] Product product)
+{
+    return Ok($"Created product: {product.Name}, Price: {product.Price}");
+}
+Use case: When handling large data payloads (like creating or updating resources).
+Note: do not use for GET requests (since they don’t have a body).
+
+4. [FromForm]
+
+Use it for form-data (e.g., file uploads, form submissions).
+Example: multipart/form-data or application/x-www-form-urlencoded
+
+[HttpPost("upload")]
+public IActionResult UploadFile([FromForm] IFormFile file)
+{
+    return Ok($"File name: {file.FileName}");
+}
+Use case: Uploading images, handling forms, file processing.
+
+5. [FromHeader]
+
+Use it to extract values from HTTP headers.
+Example: Custom headers like Authorization, User-Agent, etc.
+
+[HttpGet("userinfo")]
+public IActionResult GetUserInfo([FromHeader] string userAgent)
+{
+    return Ok($"User-Agent: {userAgent}");
+}
+Use case: Handling authentication tokens, user agents, custom headers.
+
+6. [FromServices]
+
+Use it when injecting dependencies directly into an action method.
+Instead of constructor injection, you can inject services into a specific action:
+
+[HttpGet("log")]
+public IActionResult LogInfo([FromServices] ILogger<HomeController> logger)
+{
+    logger.LogInformation("Logging from action method");
+    return Ok("Log recorded.");
+}
+Use case: When you need a service but don’t want to inject it into the constructor.
+
+Note:- To get to know about it in more details with more words please take the references from here:
+1. https://dotnettutorials.net/lesson/model-binding-asp-net-core/
+2. https://www.csharp.com/article/model-binding-in-asp-net-core/
+3. https://learn.microsoft.com/en-us/aspnet/core/mvc/models/model-binding?view=aspnetcore-9.0
+
+Here you can read a quite comprehensive article: https://www.dotnetcurry.com/aspnet/1390/aspnet-core-web-api-attributes

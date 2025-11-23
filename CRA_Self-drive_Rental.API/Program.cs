@@ -44,9 +44,9 @@ namespace CRA_Self_drive_Rental.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "YuuZone",
+                    Title = "CRA_CarRental",
                     Version = "v1",
-                    Description = "YuuZone Backend API",
+                    Description = "Morent Backend API",
                     Contact = new OpenApiContact
                     {
                         Name = "Vinh",
@@ -119,6 +119,8 @@ namespace CRA_Self_drive_Rental.API
                     google.ClientId = builder.Configuration["Authentication:Google:ClientId"];
                     google.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
+                    google.CallbackPath = "/signin-google";
+
                     google.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // explicit
                     google.SaveTokens = true;  // if you need access / refresh tokens later
 
@@ -132,19 +134,21 @@ namespace CRA_Self_drive_Rental.API
 
                     //google.CallbackPath = "/Authen/signin-google";
                 })
-                .AddCookie();
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = ".AspNetCore.Application";
+                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                });
 
             builder.Services.AddAuthorization();
             Log.Information("Added Author/Authen");
             // Add CORS policy to allow specific origins (e.g., localhost for development)
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigins", policy =>
+                options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
-                          .AllowAnyMethod()
-                          .AllowAnyHeader()
-                          .AllowCredentials();
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
             });
 
@@ -164,15 +168,27 @@ namespace CRA_Self_drive_Rental.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }*/
+            //app.Use(async (context, next) =>
+            //{
+            //    if (context.Request.Path.StartsWithSegments("/api/Authen/google-callback")
+            //        && !context.Request.Query.ContainsKey("state"))
+            //    {
+            //        context.Response.StatusCode = 400;
+            //        await context.Response.WriteAsync("Invalid OAuth direct call.");
+            //        return;
+            //    }
 
+            //    await next();
+            //});
+            app.UseForwardedHeaders();
+            app.UseCookiePolicy();
             app.UseSwagger();
             app.UseSwaggerUI();
-
+            app.UseRouting();
+            app.UseCors("AllowAll");         
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             //navigate to this path to check environment

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Repository.Extension.SupabaseFileUploader;
 using Serilog;
 using Supabase;
+using Supabase.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
     {
         private readonly Supabase.Client _supabase;
 
-        public UploadFile(Client supabase)
+        public UploadFile(Supabase.Client supabase)
         {
             _supabase = supabase;
         }
@@ -50,7 +52,10 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             }
         }
 
-        public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec)
+        /// <summary>
+        /// Make sure the fileName already has the correct extension appended to the end of its name else the uploaded file will have no extension
+        /// </summary>
+        public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec, bool isPublic)
         {
             var allowedExtensions = new[]
             {
@@ -73,18 +78,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                 var bytes = await file.GetBytesAsync();
 
-                // Ensure ContentType is set manually
-                var mimeType = extension switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".gif" => "image/gif",
-                    ".webp" => "image/webp",
-                    ".pdf" => "application/pdf",
-                    ".doc" => "application/msword",
-                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    _ => "application/octet-stream"
-                };
+                var mimeType = MimeTypeHelper.GetMimeType(extension);
 
                 await _supabase.Storage.From(targetBucket)
                   .Upload(bytes,
@@ -96,10 +90,16 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                                 Upsert = true
                             });
 
-                //make sure the bucket you're connecting to is a public bucket (dropdown and make public)
-                //return public bucket link
+                string folderPath = Path.GetDirectoryName(imagePath)?.Replace("\\", "/") + "/";
 
-                return await CreateSignedUrlAsync(targetBucket, imagePath, signedExpirationTimeSec);
+                var bucket = _supabase.Storage.From(targetBucket);
+                var files = await bucket.List(path: folderPath); // or the folder containing your file
+                if (files.Any(f => f.Name.Equals(fileName)))
+                {
+                    if (!isPublic) return await CreateSignedUrlAsync(targetBucket, imagePath, signedExpirationTimeSec);
+                    return await GetPublicUrlAsync(targetBucket, imagePath);
+                }
+                else return null;
             }
             catch (Exception ex)
             {
@@ -107,6 +107,29 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             }
         }
 
+        public async Task<string> GetPublicUrlAsync(string bucketName, string filePath)
+        {
+            var bucket = _supabase.Storage.From(bucketName);
+            var result = bucket.GetPublicUrl(filePath);
+            Log.Information("Signed URL generated: {Url}", result);
+            if (result.EndsWith("?"))
+                result = result[..^1]; //remove the last character
+            return result;
+        }
+
+        public async Task<string> CreateSignedUrlAsync(string bucketName, string filePath, int expirySeconds)
+        {
+            var bucket = _supabase.Storage.From(bucketName);
+            var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
+            Log.Information("Signed URL generated: {Url}", result);
+            if (result.EndsWith("?"))
+                result = result[..^1]; //remove the last character
+            return result;
+        }
+
+        /// <summary>
+        /// Don't use this (not deprecated but not needed)
+        /// </summary>
         public async Task<string> UploadImageMemStreamAsync(IFormFile file, Guid carId, Guid ownerId, string targetBucket)
         {
             try
@@ -134,14 +157,8 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                 // Ensure ContentType is set manually
                 var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                var mimeType = extension switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    ".gif" => "image/gif",
-                    ".webp" => "image/webp",
-                    _ => "application/octet-stream"
-                };
+
+                var mimeType = MimeTypeHelper.GetMimeType(extension);
 
                 //upload file to bucket via supabase url and secret key (dont need s3 key)
                 using (var memoryStream = new MemoryStream())
@@ -162,22 +179,6 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             {
                 return "\nDetail: " + ex.Message;
             }
-        }
-
-        public async Task<string> GetPublicUrlAsync(string bucketName, string filePath)
-        {
-            var bucket = _supabase.Storage.From(bucketName);
-            return bucket.GetPublicUrl(filePath);
-        }
-
-        public async Task<string> CreateSignedUrlAsync(string bucketName, string filePath, int expirySeconds)
-        {
-            var bucket = _supabase.Storage.From(bucketName);
-            var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
-            Log.Information("Signed URL generated: {Url}", result);
-            if (result.EndsWith("?"))
-                result = result[..^1]; //remove the last character
-            return result;
         }
     }
 }

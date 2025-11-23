@@ -18,9 +18,16 @@ namespace Repository.Data.Entities
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
 
+        public string? Note { get; set; }
+
+        public string Status { get; set; }
+
         public Guid CarId { get; set; }
+        public Guid? UserId { get; set; }
 
         [ForeignKey("CarId")]
         public virtual Car Car { get; set; }
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; }
     }
 }

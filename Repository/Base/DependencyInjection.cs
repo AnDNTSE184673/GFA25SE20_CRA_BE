@@ -48,7 +48,13 @@ namespace Repository.Base
             service.AddScoped<IInvoiceRepository, InvoiceRepository>();
             service.AddScoped<IParkingLotRepository, ParkingLotRepository>();
             service.AddScoped<ICarRepository, CarRepository>();
+            service.AddScoped<ICarImageRepository, CarImageRepository>();
             service.AddScoped<ICarRegRepository, CarRegRepository>();
+            service.AddScoped<ICarRentalRateRepository, CarRentalRateRepository>();
+            service.AddScoped<IPaymentRepository, PaymentRepository>();
+            service.AddScoped<IFeedbackRepository, FeedbackRepository>();
+            service.AddScoped<IFeedbackImageRepository, FeedbackImageRepository>();
+            service.AddScoped<IParkingLotRepository, ParkingLotRepository>();
             return service;
         }
     }

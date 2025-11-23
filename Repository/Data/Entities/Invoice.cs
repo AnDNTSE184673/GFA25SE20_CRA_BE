@@ -30,6 +30,7 @@ namespace Repository.Data.Entities
         [ForeignKey("VendorId")]
         public virtual User Vendor { get; set; }
 
+        public virtual Booking Booking { get; set; }
         public virtual ICollection<InvoiceItem> InvoiceItems { get; set; } = new List<InvoiceItem>();
     }
 }

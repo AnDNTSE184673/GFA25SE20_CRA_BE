@@ -23,6 +23,11 @@ namespace Repository.Base
         public IParkingLotRepository _lotRepo { get; }
         public ICarRepository _carRepo { get; }
         public ICarRegRepository _carRegRepo { get; }
+        public IPaymentRepository _paymentRepo { get; }
+        public IFeedbackRepository _feedbackRepo { get; }
+        public IFeedbackImageRepository _feedbackImageRepo { get; }
+        public ICarImageRepository _carImageRepo { get; }
+        public ICarRentalRateRepository _carRentalRateRepo { get; }
 
         //no need to construct _transaction
 
@@ -32,15 +37,25 @@ namespace Repository.Base
             ICarRepository carRepo, 
             ICarRegRepository carRegRepo, 
             IBookingRepository bookingRepo,
-            IInvoiceRepository invoiceRepo)
+            IInvoiceRepository invoiceRepo,
+            IFeedbackRepository feedbackRepo,
+            IFeedbackImageRepository feedbackImgRepo,
+            ICarImageRepository carImgRepo,
+            ICarRentalRateRepository carRentalRateRepo,
+            IPaymentRepository paymentRepo)
         {
             _context = context;
             _userRepo = userRepo;
             _bookingRepo = bookingRepo;
             _invoiceRepo = invoiceRepo;
+            _feedbackRepo = feedbackRepo;
+            _feedbackImageRepo = feedbackImgRepo;
+            _carImageRepo = carImgRepo;
+            _carRentalRateRepo = carRentalRateRepo;
             _lotRepo = lotRepo;
             _carRepo = carRepo;
             _carRegRepo = carRegRepo;
+            _paymentRepo = paymentRepo;
         }
 
         //no need to construct _transaction
@@ -122,9 +137,9 @@ namespace Repository.Base
             }
         }
 
-        public async Task SaveChangesAsync()
+        public async Task<int> SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
 
         public void Dispose()

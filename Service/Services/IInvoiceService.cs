@@ -1,5 +1,6 @@
 ﻿using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
+using Repository.DTO.ResponseDTO.Invoice;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,13 @@ namespace Service.Services
 {
     public interface IInvoiceService
     {
-        Task<List<Invoice>?> GetInvoicesByCusId(Guid userId);
-        Task<List<Invoice>?> GetInvoicesByVendorId(Guid vendorId);
-        Task<List<Invoice>?> GetInvoices();
-        Task<Invoice?> CreateInvoice(InvoiceCreateRequest request);
-        Task<Invoice?> UpdateInvoiceToCompleted(Guid id);
-        Task<Invoice?> UpdateInvoice(InvoiceUpdateRequest request);
-        Task<Invoice?> UpdateInvoiceToFailed(Guid id);
+        Task<List<InvoiceView>?> GetInvoicesByCusId(Guid userId);
+        Task<List<InvoiceView>?> GetInvoicesByVendorId(Guid vendorId);
+        Task<List<InvoiceView>?> GetInvoices();
+        Task<InvoiceView?> GetInvoiceById(Guid id);
+        Task<InvoiceView?> CreateInvoice(InvoiceCreateRequest request);
+        Task<InvoiceView?> UpdateInvoiceToCompleted(Guid id);
+        Task<InvoiceView?> UpdateInvoice(InvoiceUpdateRequest request);
+        Task<InvoiceView?> UpdateInvoiceToFailed(Guid id);
     }
 }

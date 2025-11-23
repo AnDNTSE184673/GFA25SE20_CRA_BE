@@ -4,7 +4,9 @@ using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
+using Repository.DTO.RequestDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.CarRegister;
+using Repository.Extension.SupabaseFileUploader;
 using Repository.Repositories.Interfaces;
 using Service.Services;
 using Service.Services.Implementation;
@@ -18,19 +20,27 @@ namespace CRA_Self_drive_Rental.API.Controllers
     {
         private readonly ICarService _carServ;
         private readonly ICarRegService _carRegServ;
+        private readonly ICarRentalService _carRentalRateServ;
 
-        public CarController(ICarService carServ, ICarRegService carRegServ)
+        public CarController(ICarService carServ, ICarRegService carRegServ, ICarRentalService carRentalRateServ)
         {
             _carServ = carServ;
             _carRegServ = carRegServ;
+            _carRentalRateServ = carRentalRateServ;
         }
 
         [HttpPatch("regDoc/approve")]
-        public async Task<IActionResult> ApproveDocument(CarRegForm form, bool isApproved)
+        public async Task<IActionResult> ApproveDocument(DocumentSearchForm form, bool isApproved)
         {
             try
             {
+                var validation = form.IsValid();
+
+                if (!validation.valid)
+                    throw new InvalidOperationException("Fill 1 of 2 complete pairs of data");
+
                 var result = await _carRegServ.ApproveDocumentsAsync(form, isApproved);
+
                 return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(500, new
                     {
@@ -53,8 +63,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
             try
             {
                 var result = await _carRegServ.GetAllDocumentsAsync();
-                return result.Count <= 0
-                    ? StatusCode(500, new
+                return !result.view.Any()
+                    ? StatusCode(StatusCodes.Status404NotFound, new
                     {
                         Message = "Data fetch error, check log and form"
                     })
@@ -71,7 +81,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("registerCar/carInfo")]
-        public async Task<IActionResult> AddCarInfo(CarInfoForm form)
+        public async Task<IActionResult> AddCarInfo([FromForm] CarInfoForm form)
         {
             try
             {
@@ -92,18 +102,46 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpPost("registerCar/regDoc")]
+        [HttpPatch("registerCar/carInfo/updateImage")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
-        public async Task<IActionResult> UploadImage(IFormFile image, [FromForm] CarRegForm form)
+        public async Task<IActionResult> UploadCarImage([FromForm] List<IFormFile> images, Guid carId)
         {
             try
             {
-                if (image == null)
+                if (images == null || images.Count <= 0)
                 {
                     throw new ArgumentException("No image was given!");
                 }
-                var result = await _carRegServ.SubmitRegisterDocument(image, form);
+                var result = await _carServ.UpdateCarImageAsync(images, carId);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Error updating, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("registerCar/regDoc")]
+        [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
+        ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
+        public async Task<IActionResult> UploadRegistrationImage([FromForm] CarRegForm form)
+        {
+            try
+            {
+                if (form.images == null || form.images.Count <= 0)
+                {
+                    throw new ArgumentException("No image was given!");
+                }
+                var result = await _carRegServ.SubmitRegisterDocument(form);
                 return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(500, new
                     {
@@ -120,27 +158,35 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
+
         [HttpGet("regDoc")]
-        ///<summary>"Also send a flag indicating whether to search using path or user/car id"</summary>
-        public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, bool flagId, bool flagPath)
+        ///<summary>Also send a flag indicating whether to search using "path" or "id" or "info"</summary>
+        public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, string flag)
         {
             try
             {
-                (string url, CarRegView view) result = ("", new CarRegView());
+                (string[] signedUrl, List<CarRegView> view) result = (Array.Empty<string>(), new List<CarRegView>());
+                var validation = form.IsValid();
 
-                if (!form.IsValid().valid)
-                    throw new InvalidOperationException("Fill either complete pairs of data");
+                if (!validation.valid)
+                    throw new InvalidOperationException("Fill 1 of 3 complete pairs of data");
 
-                if (!flagId && !flagPath)
-                    throw new InvalidOperationException("Choose between search by ids or path");
+                if (!flag.Contains(ConstantEnum.InternalFlag.IdSearch)
+                    || !flag.Contains(ConstantEnum.InternalFlag.PathSearch)
+                    || !flag.Contains(ConstantEnum.InternalFlag.InfoSearch))
+                    throw new InvalidOperationException("Choose a search method by setting flag 'flag','id', or 'info'.");
 
-                // case 1: prioritize ID
-                if (flagId && form.IsValid().isId)
+                if (flag.Contains(ConstantEnum.InternalFlag.IdSearch) && validation.isId)
                 {
                     result = await _carRegServ.GetCarRegDocById(form);
                 }
-                // case 2: use path only if ID is not prioritized
-                else if (flagPath && !flagId && !form.IsValid().isId)
+
+                else if (flag.Contains(ConstantEnum.InternalFlag.InfoSearch) && validation.isInfo)
+                {
+                    result = await _carRegServ.GetCarRegDocByInfo(form);
+                }
+
+                else if (flag.Contains(ConstantEnum.InternalFlag.PathSearch) && validation.isPath)
                 {
                     result = await _carRegServ.GetCarRegDocByPath(form);
                 }
@@ -158,7 +204,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     })
                     : Ok(new
                     {
-                        Url = result.url,
+                        Urls = result.signedUrl,
                         View = result.view
                     });
             }
@@ -202,6 +248,95 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     });
                 }
                 return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("rentalRate/{carId}")]
+        public async Task<IActionResult> GetCarRentalRate(Guid carId)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.GetCarRentalRate(carId);
+
+                return result == null
+                    ? StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Message = "Data not found, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("rentalRate")]
+        public async Task<IActionResult> SetRentalRate(CreateCarRentalRateForm form)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.SetRentalRate(form);
+                return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data creation error, check log and form"
+                    })
+                    : Ok(result.view);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPatch("rentalRate")]
+        public async Task<IActionResult> UpdateRentalRate(UpdateCarRentalRateForm form)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.UpdateRentalRate(form);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data update error, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("rentalRate/{carId}")]
+        public async Task<IActionResult> DeleteRentalRate(Guid carId)
+        {
+            try
+            {
+                var result = await _carRentalRateServ.DeleteRentalRate(carId);
+                return result.Equals(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data update error, check log and form"
+                    })
+                    : Ok(result);
             }
             catch (Exception ex)
             {

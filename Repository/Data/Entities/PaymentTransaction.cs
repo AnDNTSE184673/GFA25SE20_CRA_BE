@@ -12,6 +12,8 @@ namespace Repository.Data.Entities
         public Guid Id { get; set; }
         public string GatewayName { get; set; }
         public string TransactionId { get; set; }
+        public string TransactionStatus { get; set; } 
+        public string Signature { get; set; }
         public double Amount { get; set; }
         public DateTime PaidDate { get; set; }
         public string ResponseData { get; set; }
