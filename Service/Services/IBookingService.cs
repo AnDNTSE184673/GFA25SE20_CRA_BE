@@ -16,6 +16,6 @@ namespace Service.Services
         Task<List<Booking>?> GetBookingsFromCustomer(Guid customerId);
         Task<List<Booking>?> GetBookingsFromCar(Guid carId);
         Task<BookingView?> CreateBooking(BookingCreateRequest request);
-        Task<Booking?> ChangeStatus(Guid bookingId, string status);
+        Task<BookingView?> ChangeStatus(Guid bookingId, string status);
     }
 }

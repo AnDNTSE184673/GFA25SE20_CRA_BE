@@ -23,7 +23,7 @@ namespace Service.Services.Implementation
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<Booking?> ChangeStatus(Guid bookingId, string status)
+        public async Task<BookingView?> ChangeStatus(Guid bookingId, string status)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Service.Services.Implementation
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
-                return updatedBooking;
+                return _mapper.Map<BookingView>(updatedBooking);
             }
             catch (Exception ex)
             {
