@@ -16,7 +16,7 @@ namespace Repository.DTO.RequestDTO
 
         public string DropoffPlace { get; set; }
         public DateTime DropoffTime { get; set; }
-        public double bookingFee { get; set; }
+        public double bookingFee { get; set; } = 15;
         public double carRentPrice { get; set; }
         public int rentime { get; set; }
         public string rentType { get; set; } = "hour"; // hour, day, week, month
