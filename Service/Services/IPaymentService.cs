@@ -14,12 +14,15 @@ namespace Service.Services
         Task<(long, string)> CreatePayOSPaymentRequest(CreatePaymentRequest request);
         Task<(long, string)> CreatePayOSFromBooking(Guid bookingId);
         // Task<(long, string)> GetPayOSPaymentResponse(long id);
+        Task<(long, string)> CreatePayOSPaymentRequestForRentalAfterBooking(Guid bookingId, Guid payId);
         Task<PaymentLink> GetPayOSPaymentResponse(long id);
         Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id);
         Task<List<PaymentHistoryView>?> GetAllPaymentPayOS();
         Task<List<PaymentHistoryView>?> GetHistoryForUser(Guid userId); 
         Task<PaymentHistoryView?> GetPaymentByOrderCode(long orderCode);
         Task<PaymentHistoryView?> GetPaymentById(Guid paymentId);
+        Task<List<PaymentHistoryView>?> GetPaymentsByInvoiceId(Guid invoiceId);
+        Task<List<PaymentHistoryView>?> GetPaymentsByBookingId(Guid bookingId);
         Task<List<PaymentHistoryView>?> GetAllPayment();
         Task<PaymentHistoryView?> UpdatePaymentStatusAndMethod(Guid paymentId, string status, string method);
         Task<PaymentHistoryView?> UpdatePaymentUsingOrderCode(long orderCode, string status, string method);

@@ -335,5 +335,82 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<(long, string)> CreatePayOSPaymentRequestForRentalAfterBooking(Guid bookingId, Guid payId)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var configSection = _config.GetSection("PayOS");
+                PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+                var paymentHis = await _unitOfWork._paymentRepo.GetByIdAsync(payId);
+                var payFromBooking = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+                var rentalPayHis = payFromBooking.Where(p => p.Item == "Rental Fee").FirstOrDefault();
+                if (paymentHis.Id != payFromBooking.Where(p => p.Item == "Booking Fee").FirstOrDefault().Id)
+                {
+                    return (0,"");
+                }
+                var paymentRequest = new CreatePaymentLinkRequest
+                {
+                    OrderCode = rentalPayHis.OrderCode,
+                    Amount = (long)(rentalPayHis.PaidAmount),
+                    Description = $"Thanh toán cho {rentalPayHis.OrderCode}",
+                    ReturnUrl = configSection["ReturnUrl"],
+                    CancelUrl = configSection["CancelUrl"],
+                    ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds(),
+                    Signature = GenerateSignature(
+                        amount: ((long)(rentalPayHis.PaidAmount)).ToString(),
+                        cancelUrl: configSection["CancelUrl"],
+                        description: $"Thanh toán cho {rentalPayHis.OrderCode}",
+                        orderCode: rentalPayHis.OrderCode.ToString(),
+                        returnUrl: configSection["ReturnUrl"],
+                        //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
+                        checksumKey: configSection["CheckSumKey"]
+                    )
+                };
+                rentalPayHis.Status = "Pending";
+                rentalPayHis.Signature = paymentRequest.Signature;
+                rentalPayHis.PaymentMethod = "PayOS";
+                await _unitOfWork._paymentRepo.UpdateAsync(rentalPayHis);
+                CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                return (response.OrderCode, response.CheckoutUrl);
+
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentsByInvoiceId(Guid invoiceId)
+        {
+            var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoiceId);
+            if (payments == null || payments.Count == 0)
+            {
+                return null;
+            }
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentsByBookingId(Guid bookingId)
+        {
+            var booking = await  _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+            if (booking == null)
+            {
+                return null;
+            }
+            var payments =  await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+            if (payments == null || payments.Count == 0)
+            {
+                return null;
+            }
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
     }
 }
