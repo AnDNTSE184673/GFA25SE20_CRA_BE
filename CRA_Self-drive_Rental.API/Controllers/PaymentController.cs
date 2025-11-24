@@ -70,6 +70,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payment found for the specified order code.");
         }
 
+        [HttpGet("/Invoice/{invoiceId}")]
+        public async Task<IActionResult> GetPaymentsByInvoiceId(Guid invoiceId)
+        {
+            var payments = await _paymentService.GetPaymentsByInvoiceId(invoiceId);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified invoice ID.");
+        }
+
         [HttpPost("/CreatePayOSPaymentRequest")]
         public async Task<IActionResult> CreatePayOSPaymentRequest([FromBody] CreatePaymentRequest request)
         {
@@ -77,7 +88,14 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return Ok(new { OrderCode = orderCode, CheckoutUrl = checkoutUrl });
         }
 
-        [HttpPost("CreatePaymentFromInvoice/{invoiceId}")]
+        [HttpPost("/PayOS/Booking/CreateRentalPayment/")]
+        public async Task<IActionResult> CreatePayOSPaymentRequestForRentalAfterBooking([FromBody]CreatePaymentRentalPayOS request)
+        {
+            var (orderCode, checkoutUrl) = await _paymentService.CreatePayOSPaymentRequestForRentalAfterBooking(request.BookingId, request.PaymentId);
+            return Ok(new { OrderCode = orderCode, CheckoutUrl = checkoutUrl });
+        }
+
+[HttpPost("CreatePaymentFromInvoice/{invoiceId}")]
         public async Task<IActionResult> CreatePaymentFromInvoice(Guid invoiceId)
         {
             var payments = await _paymentService.CreatePaymentFromInvoice(invoiceId);
