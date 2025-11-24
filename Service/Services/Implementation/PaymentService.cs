@@ -396,5 +396,21 @@ namespace Service.Services.Implementation
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
         }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentsByBookingId(Guid bookingId)
+        {
+            var booking = await  _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+            if (booking == null)
+            {
+                return null;
+            }
+            var payments =  await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+            if (payments == null || payments.Count == 0)
+            {
+                return null;
+            }
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
     }
 }
