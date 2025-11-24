@@ -267,9 +267,15 @@ namespace Service.Services.Implementation
             return paymentViews;
         }
 
-        public Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id)
+        public async Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id)
         {
-            throw new NotImplementedException();
+            var paymentHistories =  await _unitOfWork._paymentRepo.GetAllAsync();
+            List<PaymentHistory>? paymentHistoriesPayOS = paymentHistories
+                .Where(p => p.UserId == id && p.PaymentMethod == "PayOS")
+                .ToList();
+            if (paymentHistoriesPayOS == null || paymentHistoriesPayOS.Count == 0) return null;
+            List<PaymentHistoryView> paymentHistoryViews = _mapper.Map<List< PaymentHistoryView>>(paymentHistoriesPayOS);
+            return paymentHistoryViews;
         }
 
         public async Task<List<PaymentHistoryView>?> GetAllPaymentPayOS()
@@ -312,7 +318,7 @@ namespace Service.Services.Implementation
                                 books.Status = "Cancelled";
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
-                            else if (updatedPayment.Status == "Success")
+                            else if (updatedPayment.Status == "Paid")
                             {
                                 books.Status = "Confirmed";
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
