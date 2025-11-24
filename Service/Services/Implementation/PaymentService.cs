@@ -291,27 +291,22 @@ namespace Service.Services.Implementation
                 {
                     return null;
                 }
-                List<PaymentHistoryView> paymentHistoryViews = _mapper.Map<List<PaymentHistoryView>>(paymentHistories);
-                foreach (var paymentView in paymentHistoryViews)
+                foreach (var payment in paymentHistories)
                 {
-                    var payOSResponse = await GetPayOSPaymentResponse(paymentView.OrderCode);
-                    paymentView.Status = payOSResponse.Status.ToString();
-                    paymentHistories
-                        .First(p => p.Id == paymentView.Id)
-                        .Status = payOSResponse.Status.ToString();
-                    await _unitOfWork._paymentRepo.UpdateAsync(
-                        paymentHistories
-                            .First(p => p.Id == paymentView.Id)
-                    );
+                    var payOSResponse = await GetPayOSPaymentResponse(payment.OrderCode);
+                    payment.Status = payOSResponse.Status.ToString();
+                    await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                    
                 }
                 await _unitOfWork.SaveChangesAsync();
-                foreach (var paymentView in paymentHistoryViews)
+                var updatedPayments = await _unitOfWork._paymentRepo.GetAllAsync();
+                foreach (var paymentView in updatedPayments)
                 {
                     var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(paymentView.Id);
                     var bookking = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(updatedPayment.UserId);
                     foreach (var books in bookking)
                     {
-                        if (books.UserId == updatedPayment.UserId)
+                        if (books.InvoiceId == updatedPayment.InvoiceId)
                         {
                             if (updatedPayment.Status == "Cancelled" || updatedPayment.Status == "Expired")
                             {
