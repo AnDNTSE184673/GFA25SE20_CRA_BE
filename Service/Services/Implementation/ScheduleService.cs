@@ -445,7 +445,7 @@ namespace Service.Services.Implementation
         {
             try
             {
-                string bucket = ConstantEnum.SupabaseBucket.CarRegistration;
+                string bucket = ConstantEnum.SupabaseBucket.CheckInOutImages;
                 string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
 
                 string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
