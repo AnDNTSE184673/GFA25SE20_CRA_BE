@@ -39,7 +39,7 @@ namespace Service.Services.Implementation
                 {
                     OrderCode = paymentHis.OrderCode,
                     Amount = (long)(request.Amount),
-                    Description = $"Thanh toán cho {paymentHis.OrderCode}",
+                    Description = $"{paymentHis.OrderCode}",
                     ReturnUrl = configSection["ReturnUrl"],
                     CancelUrl = configSection["CancelUrl"],
                     ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(request.TimeToPay).ToUnixTimeSeconds(),
@@ -85,14 +85,14 @@ namespace Service.Services.Implementation
                 {
                     OrderCode = bookingPayHis.OrderCode,
                     Amount = (long)(bookingPayHis.PaidAmount),
-                    Description = $"Thanh toán cho {bookingPayHis.OrderCode}",
+                    Description = $"{bookingPayHis.OrderCode}",
                     ReturnUrl = configSection["ReturnUrl"],
                     CancelUrl = configSection["CancelUrl"],
                     ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds(),
                     Signature = GenerateSignature(
                         amount: ((long)(bookingPayHis.PaidAmount)).ToString(),
                         cancelUrl: configSection["CancelUrl"],
-                        description: $"Thanh toán cho {bookingPayHis.OrderCode}",
+                        description: $"{bookingPayHis.OrderCode}",
                         orderCode: bookingPayHis.OrderCode.ToString(),
                         returnUrl: configSection["ReturnUrl"],
                         //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
@@ -355,14 +355,14 @@ namespace Service.Services.Implementation
                 {
                     OrderCode = rentalPayHis.OrderCode,
                     Amount = (long)(rentalPayHis.PaidAmount),
-                    Description = $"Thanh toán cho {rentalPayHis.OrderCode}",
+                    Description = $"{rentalPayHis.OrderCode}",
                     ReturnUrl = configSection["ReturnUrl"],
                     CancelUrl = configSection["CancelUrl"],
                     ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds(),
                     Signature = GenerateSignature(
                         amount: ((long)(rentalPayHis.PaidAmount)).ToString(),
                         cancelUrl: configSection["CancelUrl"],
-                        description: $"Thanh toán cho {rentalPayHis.OrderCode}",
+                        description: $"{rentalPayHis.OrderCode}",
                         orderCode: rentalPayHis.OrderCode.ToString(),
                         returnUrl: configSection["ReturnUrl"],
                         //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
