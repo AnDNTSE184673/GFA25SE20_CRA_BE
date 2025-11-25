@@ -102,7 +102,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpPost("/PayOS/Booking/CreateRentalPayment/")]
         public async Task<IActionResult> CreatePayOSPaymentRequestForRentalAfterBooking([FromBody] CreatePaymentRentalPayOS request)
         {
-            var (orderCode, checkoutUrl) = await _paymentService.CreatePayOSPaymentRequestForRentalAfterBooking(request.BookingId, request.PaymentId);
+            var (orderCode, checkoutUrl) = await _paymentService.CreatePayOSPaymentRequestForRentalAfterBooking(request.BookingId);
             return Ok(new { OrderCode = orderCode, CheckoutUrl = checkoutUrl });
         }
 
@@ -115,6 +115,30 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 return Ok(payments);
             }
             return NotFound("No payments created from the specified invoice.");
+        }
+
+        [HttpPatch("/UpdatePayment/Booking/RentalPayment")]
+        public async Task<IActionResult> UpdateRentalPayWithBooking([FromBody]UpdatePayUsingBooking request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var payment = await _paymentService.UpdateRentalPayWithBooking(request.BookingId, request.status);
+            if (payment != null)
+            {
+                return Ok(payment);
+            }
+            return NotFound("No payment found to update for the specified booking ID.");
+        }
+
+        [HttpPatch("/UpdatePayment/Booking/BookingPayment")]
+        public async Task<IActionResult> UpdateBookingPayWithBooking([FromBody]UpdatePayUsingBooking request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var payment = await _paymentService.UpdateBookingPayWithBooking(request.BookingId, request.status);
+            if (payment != null)
+            {
+                return Ok(payment);
+            }
+            return NotFound("No payment found to update for the specified booking ID.");
         }
     }
 }

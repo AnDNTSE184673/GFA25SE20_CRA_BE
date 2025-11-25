@@ -14,7 +14,7 @@ namespace Service.Services
         Task<(long, string)> CreatePayOSPaymentRequest(CreatePaymentRequest request);
         Task<(long, string)> CreatePayOSFromBooking(Guid bookingId);
         // Task<(long, string)> GetPayOSPaymentResponse(long id);
-        Task<(long, string)> CreatePayOSPaymentRequestForRentalAfterBooking(Guid bookingId, Guid payId);
+        Task<(long, string)> CreatePayOSPaymentRequestForRentalAfterBooking(Guid bookingId);
         Task<PaymentLink> GetPayOSPaymentResponse(long id);
         Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id);
         Task<List<PaymentHistoryView>?> GetAllPaymentPayOS();
@@ -26,6 +26,9 @@ namespace Service.Services
         Task<List<PaymentHistoryView>?> GetAllPayment();
         Task<PaymentHistoryView?> UpdatePaymentStatusAndMethod(Guid paymentId, string status, string method);
         Task<PaymentHistoryView?> UpdatePaymentUsingOrderCode(long orderCode, string status, string method);
+        Task<PaymentHistoryView?> UpdateRentalPayWithBooking(Guid bookingId, string status);
+        Task<PaymentHistoryView?> UpdateBookingPayWithBooking(Guid bookingId, string status);
+        Task<List<PaymentHistoryView>?> UpdateOtherPayWithBooking(Guid bookingId, string status);
         Task<List<PaymentHistoryView>?> CreatePaymentFromInvoice(Guid InvoiceId);
         Task<PaymentHistoryView?> CreateNewFinePaymentFromInvoice(Guid InvoiceId, double fine);
     }
