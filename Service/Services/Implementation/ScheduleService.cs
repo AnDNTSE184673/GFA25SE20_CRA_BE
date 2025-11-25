@@ -346,5 +346,40 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<(string status, ScheduleView view)> SetCarSchedulesInnerServiceAsync(CreateScheduleForm form)
+        {
+            try
+            {
+                var user = new User();
+                var booking = new Booking();
+                var car = await _unitOfWork._carRepo.GetByIdAsync(form.CarId);
+                if (car == null) throw new KeyNotFoundException("Car not found!");
+                if (form.UserId.HasValue) user = await _unitOfWork._userRepo.GetByIdAsync(form.UserId.Value);
+                if (form.BookingId.HasValue) booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.BookingId.Value);
+
+                var mapped = _mapper.Map<Schedules>(form);
+                mapped.Id = Guid.NewGuid();
+                mapped.CreateDate = DateTime.UtcNow;
+                mapped.UpdateDate = DateTime.UtcNow;
+                mapped.Status = ConstantEnum.Statuses.ACTIVE;
+
+                var result1 = await _unitOfWork._scheduleRepo.CreateScheduleAsync(mapped);
+
+                if (result1.status.Equals(ConstantEnum.RepoStatus.FAILURE))
+                {
+                    throw new Exception("Create function failed to create the object!");
+                }
+                else
+                {
+                    var returnObj = _mapper.Map<ScheduleView>(result1.Schedules);
+                    return (ConstantEnum.RepoStatus.SUCCESS, returnObj);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
