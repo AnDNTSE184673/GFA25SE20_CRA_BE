@@ -69,7 +69,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         public async Task<IActionResult> UpdateBooking([FromBody]BookingUpdateRequest request)
         {
             if(!ModelState.IsValid) return BadRequest();
-            var booking = await _bookingService.ChangeStatus(request.BookingId, request.Status.ToString());
+            var booking = await _bookingService.ChangeStatus(request.BookingId, request.Status);
             if (booking != null) return Ok(booking);
             return BadRequest();
         }

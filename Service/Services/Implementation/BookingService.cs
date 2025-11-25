@@ -37,30 +37,27 @@ namespace Service.Services.Implementation
                 if (booking == null)
                 {
                     throw new Exception("Booking not found");
-                }
-                if (!Enum.TryParse<Status>(status, true, out var parsedStatus))
-                {
-                    throw new Exception($"Invalid status: {status}");
-                };
-                if (parsedStatus == Status.Cancelled)
+                }                
+                if (ConstantEnum.Statuses.CANCELLED.ToLower().Equals(status.ToLower()))
                 {
                     var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
                     if (invoice == null)
                     {
                         throw new Exception("Invoice not found for the booking");
                     }
-                    invoice.Status = ConstantEnum.Status.Refunded.ToString();
+                    invoice.Status = ConstantEnum.Status.Cancelled.ToString();
                     var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
                     foreach (var payment in payments)
                     {
-                        payment.Status = ConstantEnum.Status.Refunded.ToString();
-                        _unitOfWork._paymentRepo.Update(payment);
+                        payment.Status = ConstantEnum.Status.Cancelled.ToString();
+                        payment.UpdateDate = DateTime.UtcNow;
                         _unitOfWork._paymentRepo.Update(payment);
                     }
-                    _unitOfWork._invoiceRepo.Update(invoice);                    
+                    _unitOfWork._invoiceRepo.Update(invoice);
+                    _unitOfWork.SaveChanges();
 
                 }
-                if (parsedStatus == Status.Completed)
+                if (ConstantEnum.Statuses.CONFIRMED.ToLower().Equals(status.ToLower()))
                 {
                     var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
                     if (invoice == null)
@@ -72,11 +69,17 @@ namespace Service.Services.Implementation
                     var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
                     foreach (var payment in payments)
                     {
-                        payment.Status = ConstantEnum.Status.SUCCESS.ToString();
+                        payment.Status = ConstantEnum.Status.Success.ToString();
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = "Cash on Delivery";
                         _unitOfWork._paymentRepo.Update(payment);
                     }
+                    var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
+                    existCar.Status = ConstantEnum.Statuses.RESERVED;
+                    await _unitOfWork._carRepo.UpdateCarAsync(existCar);
+                    _unitOfWork.SaveChanges();
                 }
-                booking.Status = parsedStatus.ToString();
+                booking.Status = status;
                 _unitOfWork._bookingRepo.Update(booking);                
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();

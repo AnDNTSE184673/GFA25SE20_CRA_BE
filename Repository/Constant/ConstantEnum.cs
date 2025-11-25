@@ -50,6 +50,8 @@ namespace Repository.Constant
             public const string ONGOING = "Ongoing";
             public const string PAYMENT_PENDING = "Waiting for Payment";
             public const string REFUNDED = "Refunded";
+            public const string PAID = "Paid";
+            public const string SUCCESS = "Success";
             public const string RESERVED = "Reserved";
             public const string APPROVED = "Approved";
             public const string DENIED = "Denied";
@@ -134,8 +136,9 @@ namespace Repository.Constant
             Ongoing,
             [EnumMember(Value ="Waiting for Payment")]
             PaymentPending,
+            Paid,
             Refunded,
-            SUCCESS,
+            Success,
             Reserved,
             Approved,
             Denied
