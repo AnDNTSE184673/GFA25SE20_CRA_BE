@@ -1,13 +1,19 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
+using PayOS.Exceptions;
 using Repository.Base;
 using Repository.Constant;
+using Repository.CustomFunctions.SupabaseFileUploader;
 using Repository.Data.Entities;
+using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.RequestDTO.Schedule;
 using Repository.DTO.ResponseDTO.Car;
+using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.DTO.ResponseDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.Schedule;
+using Repository.Extension.SupabaseFileUploader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +26,16 @@ namespace Service.Services.Implementation
     {
         private readonly IMapper _mapper;
         private readonly UnitOfWork _unitOfWork;
+        private readonly UploadFile _upload;
 
-        public ScheduleService(IMapper mapper, UnitOfWork unitOfWork)
+        int expirationTimeSec = 1800;
+        bool isPublic = false;
+
+        public ScheduleService(IMapper mapper, UnitOfWork unitOfWork, UploadFile upload)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _upload = upload;
         }
 
         public async Task<ScheduleView> StatusChangeAsync(Guid bookingId, bool isCompleted, bool isOverdue)
@@ -144,16 +155,14 @@ namespace Service.Services.Implementation
                 await _unitOfWork.BeginTransactionAsync();
 
                 var booking = await _unitOfWork._bookingRepo.GetUnfinishedLatestBookingFromCarAndCustomer(userId, carId);
-
-                if (booking == null) throw new KeyNotFoundException("Booking not found");
+                if (booking == null) throw new KeyNotFoundException("Ongoing booking not found");
 
                 var user = await _unitOfWork._userRepo.GetByIdAsync(booking.UserId);
-                
                 var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
-
                 if (car == null || booking == null) throw new KeyNotFoundException("Car and user related to the booking not found");
 
                 var oldSchedules = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(booking.Id, ConstantEnum.ScheduleTypeConstants.Pickup);
+                if(oldSchedules == null) throw new KeyNotFoundException("Schedules for pick up not found");
 
                 oldSchedules.Status = ConstantEnum.Statuses.COMPLETED;
 
@@ -207,17 +216,14 @@ namespace Service.Services.Implementation
                 await _unitOfWork.BeginTransactionAsync();
 
                 var booking = await _unitOfWork._bookingRepo.GetUnfinishedLatestBookingFromCarAndCustomer(userId, carId);
-
-                if (booking == null) throw new KeyNotFoundException("Booking not found");
+                if (booking == null) throw new KeyNotFoundException("Ongoing booking not found");
 
                 var user = await _unitOfWork._userRepo.GetByIdAsync(booking.UserId);
-
                 var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
-
                 if (car == null || booking == null) throw new KeyNotFoundException("Car and user related to the booking not found");
 
                 var oldSchedules = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(booking.Id, ConstantEnum.ScheduleTypeConstants.Return);
-
+                if (oldSchedules == null) throw new KeyNotFoundException("Schedules for return not found");
                 oldSchedules.Status = ConstantEnum.Statuses.COMPLETED;
 
                 var result1 = await _unitOfWork._scheduleRepo.UpdateScheduleAsync(oldSchedules);
@@ -375,6 +381,93 @@ namespace Service.Services.Implementation
                     var returnObj = _mapper.Map<ScheduleView>(result1.Schedules);
                     return (ConstantEnum.RepoStatus.SUCCESS, returnObj);
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form)
+        {
+            var bucket = ConstantEnum.SupabaseBucket.CheckInOutImages;
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.bookingId);
+
+                if (booking == null) throw new NotFoundException("Booking not found!");
+
+                int count = 1;
+                var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
+                foreach (var file in form.images)
+                {
+                    uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count));
+                    count++;
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._scheduleRepo.AddScheduleImages(u.obj);
+                }
+
+                var result = await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                var view = new CICOImageView
+                {
+                    BookingId = form.bookingId,
+                    Urls = urls,
+                    CreateDate = DateTime.UtcNow,
+                    Status = ConstantEnum.Statuses.PENDING
+                };
+                return (ConstantEnum.RepoStatus.SUCCESS, view);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string url, ScheduleImage obj)> UploadCICOImagesAsync(IFormFile file, Guid bookingId, int count)
+        {
+            try
+            {
+                string bucket = ConstantEnum.SupabaseBucket.CarRegistration;
+                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+
+                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
+                string fileName = $"image{count}_{uploadDate}{originalExt}";
+                string imagePath = $"{bookingId}/{fileName}";
+
+                var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec, isPublic);
+
+                if (url.IsNullOrEmpty()) throw new Exception("File upload failure!");
+
+                var image = new ScheduleImage
+                {
+                    FilePath = imagePath,
+                    FileName = fileName,
+                    Bucket = bucket,
+                    CreateDate = DateTime.UtcNow,
+                    MimeType = MimeTypeHelper.GetMimeType(originalExt),
+                    FileSize = file.Length,
+                    Status = ConstantEnum.Statuses.PENDING,
+                    BookingId = bookingId
+                };
+
+                return (url, image);
+
             }
             catch (Exception ex)
             {

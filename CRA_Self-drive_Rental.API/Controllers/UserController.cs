@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Repository.Constant;
 using Repository.DTO.RequestDTO;
+using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.RequestDTO.DriverLicense;
 using Repository.DTO.RequestDTO.User;
+using Repository.DTO.ResponseDTO.CarRegister;
+using Repository.DTO.ResponseDTO.DriverLicense;
 using Service.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using static System.Net.Mime.MediaTypeNames;
@@ -101,6 +105,42 @@ namespace CRA_Self_drive_Rental.API.Controllers
                         Message = "Error updating, check log and form"
                     })
                     : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("driverLicense")]
+        ///<summary>Leave form blank to get all, fill to get specific</summary>
+        public async Task<IActionResult> GetDriverLicense([FromQuery] LicenseSearchForm form)
+        {
+            try
+            {
+                (string[] signedUrl, List<DriverLicenseView> view) result = (Array.Empty<string>(), new List<DriverLicenseView>());
+                if (!form.IsValid())
+                {
+                    result = await _licenseService.GetAllDocumentsAsync();
+                }
+                else
+                {
+                    result = await _licenseService.GetDriverLicenseByUser(form);
+                }
+
+                return result.view == null
+                    ? StatusCode(404, new
+                    {
+                        Message = "No data found, check log"
+                    })
+                    : Ok(new
+                    {
+                        Urls = result.signedUrl,
+                        View = result.view
+                    });
             }
             catch (Exception ex)
             {

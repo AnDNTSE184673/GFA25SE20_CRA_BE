@@ -64,6 +64,7 @@ namespace Repository.Constant
             public const string FeedbackImages = "FeedbackImages";
             public const string CarImages = "CarImages";
             public const string UserAvatars = "UserAvatars";
+            public const string CheckInOutImages = "CheckInOutImages";
             public const string publicFolder = "public";
         }
 
