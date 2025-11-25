@@ -70,7 +70,7 @@ namespace Repository.Repositories
                 .Include(x => x.User)
                 .Include(x => x.Booking)
                 .AsNoTracking()
-                .LastOrDefaultAsync();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<Schedules>> GetSchedulesByBooking(Guid bookingId)

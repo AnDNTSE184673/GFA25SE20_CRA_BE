@@ -1,6 +1,7 @@
 ﻿using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO.Booking;
+using Repository.DTO.ResponseDTO.Schedule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Service.Services
         Task<Booking> GetBooking(Guid id);
         Task<List<Booking>?> GetBookingsFromCustomer(Guid customerId);
         Task<List<Booking>?> GetBookingsFromCar(Guid carId);
-        Task<BookingView?> CreateBooking(BookingCreateRequest request);
+        Task<(BookingView? booking, ScheduleView schedule)> CreateBooking(BookingCreateRequest request);
         Task<BookingView?> ChangeStatus(Guid bookingId, string status);
     }
 }

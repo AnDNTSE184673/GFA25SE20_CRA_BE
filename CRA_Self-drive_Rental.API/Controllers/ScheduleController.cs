@@ -105,17 +105,21 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("checkIn")]
-        public async Task<IActionResult> CheckInSchedule(Guid userId, Guid carId)
+        public async Task<IActionResult> CheckInSchedule([FromForm] CICOForm form)
         {
             try
             {
-                var result = await _scheduleServ.CheckInAsync(userId,carId);
+                var result = await _scheduleServ.CheckInAsync(form);
                 return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {
                         Message = "Data creation error, check log and form"
                     })
-                    : Ok(result);
+                    : Ok(new
+                    {
+                        NewSchedule = result.view,
+                        Image = result.image
+                    });
             }
             catch (Exception ex)
             {
@@ -127,17 +131,21 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("checkOut")]
-        public async Task<IActionResult> CheckOutSchedule(Guid userId, Guid carId)
+        public async Task<IActionResult> CheckOutSchedule([FromForm] CICOForm form)
         {
             try
             {
-                var result = await _scheduleServ.CheckOutAsync(userId, carId);
+                var result = await _scheduleServ.CheckOutAsync(form);
                 return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {
                         Message = "Data creation error, check log and form"
                     })
-                    : Ok(result);
+                    : Ok(new 
+                    {
+                        NewSchedule = result.view,
+                        Image = result.image
+                    });
             }
             catch (Exception ex)
             {
@@ -193,7 +201,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("statusChange/{scheduleId}")]
-        public async Task<IActionResult> MaintenanceSchedule(Guid bookingId, bool isCompleted)
+        public async Task<IActionResult> StatusChange(Guid bookingId, bool isCompleted)
         {
             try
             {

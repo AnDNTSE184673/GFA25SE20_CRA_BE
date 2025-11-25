@@ -5,6 +5,7 @@ using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.Schedule;
 using Repository.DTO.ResponseDTO.Booking;
+using Repository.DTO.ResponseDTO.Schedule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,7 +94,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<BookingView?> CreateBooking(BookingCreateRequest request)
+        public async Task<(BookingView? booking, ScheduleView schedule)> CreateBooking(BookingCreateRequest request)
         {
             try
             {
@@ -146,14 +147,14 @@ namespace Service.Services.Implementation
                 var createdSchedule = await _scheduleServ.SetCarSchedulesInnerServiceAsync(bookingSchedule);
 
                 var existCar = await _unitOfWork._carRepo.GetByIdAsync(request.CarId);
-                existCar.Status = ConstantEnum.Statuses.INACTIVE;
+                existCar.Status = ConstantEnum.Statuses.RESERVED;
                 await _unitOfWork._carRepo.UpdateCarAsync(existCar);
 
                 var createdBooking = await _unitOfWork._bookingRepo.GetByIdAsync(newBooking.Id);
                 var bookingView = _mapper.Map<BookingView>(createdBooking);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();                
-                return bookingView;
+                return (bookingView, _mapper.Map<ScheduleView>(createdSchedule.view));
             }
             catch (Exception ex)
             {
