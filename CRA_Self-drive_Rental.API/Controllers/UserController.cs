@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repository.DTO.RequestDTO;
+using Repository.DTO.RequestDTO.DriverLicense;
+using Repository.DTO.RequestDTO.User;
 using Service.Services;
+using Swashbuckle.AspNetCore.Annotations;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CRA_Self_drive_Rental.API.Controllers
 {
@@ -10,11 +14,13 @@ namespace CRA_Self_drive_Rental.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IDriverLicenseService _licenseService;
+
+        public UserController(IUserService userService, IDriverLicenseService licenseService)
         {
             _userService = userService;
+            _licenseService = licenseService;
         }
-
 
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
@@ -47,6 +53,62 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
             var response = await _userService.UpdateUserInfo(request);
             return Ok(response);
+        }
+
+        [HttpPatch("upload-avatar/{userId}")]
+        [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
+        ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
+        public async Task<IActionResult> UploadUserAvatarImage([FromForm] UserAvatarImage form)
+        {
+            try
+            {
+                if (form.image == null)
+                {
+                    throw new ArgumentException("No image was given!");
+                }
+                var result = await _userService.UpdateUserAvatarAsync(form.image, form.userId);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Error updating, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("driverLicense/{userId}")]
+        [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
+        ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
+        public async Task<IActionResult> UploadDriverLicenseImage([FromForm] UploadDriverLicenses form)
+        {
+            try
+            {
+                if (form.images == null || form.images.Count <= 0)
+                {
+                    throw new ArgumentException("No image was given!");
+                }
+                var result = await _licenseService.UpdateDriverLicenseAsync(form.images, form.userId);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Error updating, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
+            }
         }
     }
 }

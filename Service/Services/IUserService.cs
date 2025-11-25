@@ -1,4 +1,5 @@
-﻿using Repositories.DTO.ResponseDTO.User;
+﻿using Microsoft.AspNetCore.Http;
+using Repositories.DTO.ResponseDTO.User;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO;
@@ -23,5 +24,6 @@ namespace Service.Services
         Task<List<User>> GetAllUsers();
         Task<User?> GetUserById(Guid userId);
         Task<User?> GetUserWithToken(Guid userId);
+        Task<UserView> UpdateUserAvatarAsync(IFormFile image, Guid userId);
     }
 }
