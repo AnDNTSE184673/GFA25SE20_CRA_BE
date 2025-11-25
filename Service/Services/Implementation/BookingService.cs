@@ -148,9 +148,8 @@ namespace Service.Services.Implementation
 
                 var createdBooking = await _unitOfWork._bookingRepo.GetByIdAsync(newBooking.Id);
                 var bookingView = _mapper.Map<BookingView>(createdBooking);
-
-                _unitOfWork.CommitTransaction();
                 await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();                
                 return bookingView;
             }
             catch (Exception ex)

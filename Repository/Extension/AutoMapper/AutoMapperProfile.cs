@@ -17,6 +17,7 @@ using Repository.DTO.ResponseDTO.Feedbacks;
 using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Payment;
+using Repository.DTO.ResponseDTO.Schedule;
 using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
@@ -104,6 +105,7 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.GenderId));
             CreateMap<User, UserPostRegView>();
             CreateMap<User, UserLoginView>();
+            CreateMap<Schedules, ScheduleView>();
         }
     }
 }

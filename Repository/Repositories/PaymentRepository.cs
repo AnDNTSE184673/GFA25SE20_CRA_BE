@@ -22,10 +22,12 @@ namespace Repository.Repositories
 
         public async Task<PaymentHistory?> CreateNewPaymentForBookingFee(Guid invoiceId)
         {
-            var invoice = await _context.Invoices.Include(i => i.InvoiceItems).FirstOrDefaultAsync(i => i.Id == invoiceId);
+            var invoice = await _context.Invoices.Include(i => i.InvoiceItems).Include(Booking => Booking.Booking)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
             var newPayment = new PaymentHistory
             {
                 Id = Guid.NewGuid(),
+                OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 InvoiceId = invoice.Id,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,
@@ -44,10 +46,12 @@ namespace Repository.Repositories
 
         public async Task<PaymentHistory?> CreateNewPaymentForFineFee(Guid invoiceId, double fine)
         {
-            var invoice = await _context.Invoices.Include(i => i.InvoiceItems).FirstOrDefaultAsync(i => i.Id == invoiceId);
+            var invoice = await _context.Invoices.Include(i => i.InvoiceItems).Include(Booking => Booking.Booking)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
             var newPayment = new PaymentHistory
             {
                 Id = Guid.NewGuid(),
+                OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 InvoiceId = invoice.Id,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,
@@ -66,10 +70,12 @@ namespace Repository.Repositories
 
         public async Task<PaymentHistory?> CreateNewPaymentForRentalFee(Guid invoiceId)
         {
-            var invoice = await _context.Invoices.Include(i => i.InvoiceItems).FirstOrDefaultAsync(i => i.Id == invoiceId);
+            var invoice = await _context.Invoices.Include(i => i.InvoiceItems).Include(Booking=> Booking.Booking)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
             var newPayment = new PaymentHistory
             {
                 Id = Guid.NewGuid(),
+                OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 InvoiceId = invoice.Id,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,
