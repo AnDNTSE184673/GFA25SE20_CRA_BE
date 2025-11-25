@@ -140,7 +140,7 @@ namespace Service.Services.Implementation
                     BookingId = newBooking.Id
                 };
 
-                var createdSchedule = await _scheduleServ.SetCarSchedulesAsync(bookingSchedule);
+                var createdSchedule = await _scheduleServ.SetCarSchedulesInnerServiceAsync(bookingSchedule);
 
                 var existCar = await _unitOfWork._carRepo.GetByIdAsync(request.CarId);
                 existCar.Status = ConstantEnum.Statuses.INACTIVE;

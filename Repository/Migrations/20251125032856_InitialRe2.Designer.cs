@@ -12,8 +12,8 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    [Migration("20251123160356_ChangeInSchedule")]
-    partial class ChangeInSchedule
+    [Migration("20251125032856_InitialRe2")]
+    partial class InitialRe2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -818,6 +818,9 @@ namespace Repository.Migrations
                     b.Property<bool>("IsBlocking")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
                     b.Property<string>("Note")
                         .HasColumnType("text");
 
@@ -881,10 +884,10 @@ namespace Repository.Migrations
                     b.Property<string>("ImageAvatar")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsCarOwner")
+                    b.Property<bool>("IsGoogle")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsGoogle")
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Password")
