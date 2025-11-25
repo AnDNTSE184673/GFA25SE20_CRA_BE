@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace Repository.DTO.RequestDTO
 
         public string DropoffPlace { get; set; }
         public DateTime DropoffTime { get; set; }
-        public double bookingFee { get; set; }
+        [Range(15, double.MaxValue)]
+        public double bookingFee { get; set; } = 15;
         public double carRentPrice { get; set; }
         public int rentime { get; set; }
         public string rentType { get; set; } = "hour"; // hour, day, week, month

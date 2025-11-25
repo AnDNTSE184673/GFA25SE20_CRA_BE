@@ -28,7 +28,7 @@ namespace Service.Services.Implementation
             _scheduleServ = scheduleServ;
         }
 
-        public async Task<Booking?> ChangeStatus(Guid bookingId, string status)
+        public async Task<BookingView?> ChangeStatus(Guid bookingId, string status)
         {
             try
             {
@@ -42,12 +42,46 @@ namespace Service.Services.Implementation
                 {
                     throw new Exception($"Invalid status: {status}");
                 };
+                if (parsedStatus == Status.Cancelled)
+                {
+                    var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
+                    if (invoice == null)
+                    {
+                        throw new Exception("Invoice not found for the booking");
+                    }
+                    invoice.Status = ConstantEnum.Status.Refunded.ToString();
+                    var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
+                    foreach (var payment in payments)
+                    {
+                        payment.Status = ConstantEnum.Status.Refunded.ToString();
+                        _unitOfWork._paymentRepo.Update(payment);
+                        _unitOfWork._paymentRepo.Update(payment);
+                    }
+                    _unitOfWork._invoiceRepo.Update(invoice);                    
+
+                }
+                if (parsedStatus == Status.Completed)
+                {
+                    var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
+                    if (invoice == null)
+                    {
+                        throw new Exception("Invoice not found for the booking");
+                    }
+                    invoice.Status = ConstantEnum.Status.Completed.ToString();
+                    _unitOfWork._invoiceRepo.Update(invoice);
+                    var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
+                    foreach (var payment in payments)
+                    {
+                        payment.Status = ConstantEnum.Status.SUCCESS.ToString();
+                        _unitOfWork._paymentRepo.Update(payment);
+                    }
+                }
                 booking.Status = parsedStatus.ToString();
                 _unitOfWork._bookingRepo.Update(booking);                
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
-                return updatedBooking;
+                return _mapper.Map<BookingView>(updatedBooking);
             }
             catch (Exception ex)
             {

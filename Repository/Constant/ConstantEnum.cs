@@ -135,6 +135,7 @@ namespace Repository.Constant
             [EnumMember(Value ="Waiting for Payment")]
             PaymentPending,
             Refunded,
+            SUCCESS,
             Reserved,
             Approved,
             Denied

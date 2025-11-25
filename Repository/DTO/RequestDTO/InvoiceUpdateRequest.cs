@@ -12,7 +12,7 @@ namespace Repository.DTO.RequestDTO
     {
         [Required]
         public Guid Id { get; set; }
-        public Status status { get; set; }
+        public string status { get; set; }
         public DateTime DueDate { get; set; }
     }
 }
