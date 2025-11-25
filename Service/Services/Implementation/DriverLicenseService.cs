@@ -56,7 +56,7 @@ namespace Service.Services.Implementation
 
                 if (user == null) throw new KeyNotFoundException("No user with that email/Id found!");
 
-                regs = await _unitOfWork._driverLicenseRepo.GetLicenseByUserAsync(user.Id);
+                regs = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(user.Id);
 
                 var mapped = new ApproveLicenseView();
 
@@ -104,14 +104,36 @@ namespace Service.Services.Implementation
             }
         }
 
-        public Task<(string[] signedUrl, List<DriverLicenseView> view)> GetAllDocumentsAsync()
+        public async Task<(string[] signedUrl, List<DriverLicenseView> view)> GetAllDocumentsAsync()
         {
-            throw new NotImplementedException();
+            var result = await _unitOfWork._driverLicenseRepo.GetAllAsync();
+            var uploadTasks = new List<Task<string>>();
+            foreach (var r in result)
+            {
+                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
+            }
+            var uploadResults = await Task.WhenAll(uploadTasks);
+            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(result));
         }
 
-        public Task<(string[] signedUrl, List<DriverLicenseView> view)> GetCarRegDocById(GetCarRegForm form)
+        public async Task<(string[] signedUrl, List<DriverLicenseView> view)> GetDriverLicenseByUser(LicenseSearchForm form)
         {
-            throw new NotImplementedException();
+            List<DriverLicense> result = new List<DriverLicense>();
+            if (!form.IsValid()) throw new InvalidDataException("Fill the given parameters!");
+            if (form.UserId.HasValue) result = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(form.UserId.Value);
+            else
+            {
+                var user = _unitOfWork._userRepo.GetByEmail(form.Email);
+                if (user == null) throw new KeyNotFoundException("User with the email not found!");
+                result = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(user.Id);
+            }
+            var uploadTasks = new List<Task<string>>();
+            foreach (var r in result)
+            {
+                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
+            }
+            var uploadResults = await Task.WhenAll(uploadTasks);
+            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(result));
         }
 
         public async Task<DriverLicenseView> UpdateDriverLicenseAsync(List<IFormFile> images, Guid userId)

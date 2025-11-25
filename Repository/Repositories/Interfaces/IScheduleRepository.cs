@@ -17,5 +17,6 @@ namespace Repository.Repositories.Interfaces
         Task<(string status, Schedules? Schedules)> CreateScheduleAsync(Schedules schedules);
         Task<string> DeleteScheduleAsync(Guid id);
         Task<Schedules> UpdateScheduleAsync(Schedules schedules);
+        Task AddScheduleImages(ScheduleImage data);
     }
 }

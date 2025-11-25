@@ -21,5 +21,6 @@ namespace Service.Services
         Task<string> RemoveSchedulesAsync(Guid scheduleId);
         Task<(string status, ScheduleView view)> CheckInAsync(Guid userId, Guid carId);
         Task<(string status, ScheduleView view)> CheckOutAsync(Guid userId, Guid carId);
+        Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form);
     }
 }

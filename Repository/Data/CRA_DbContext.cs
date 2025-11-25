@@ -38,6 +38,7 @@ namespace Repository.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Schedules> Schedules { get; set; }
+        public DbSet<ScheduleImage> ScheduleImages { get; set; }
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
