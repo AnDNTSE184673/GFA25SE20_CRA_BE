@@ -49,7 +49,7 @@ namespace Repository.Repositories
             }
         }
 
-        public async Task<List<DriverLicense>> GetLicenseByUserAsync(Guid id)
+        public async Task<List<DriverLicense>> GetLicenseByUserIdAsync(Guid id)
         {
             return await _dbContext.DriverLicenses
                 .Where(x => x.UserId.Equals(id))

@@ -12,7 +12,7 @@ namespace Repository.Repositories.Interfaces
     {
         Task<(string status, DriverLicense? license)> CreateDriverLicenseAsync(DriverLicense license);
         Task AddDriverLicenseAsync(DriverLicense license);
-        Task<List<DriverLicense>> GetLicenseByUserAsync(Guid id);
+        Task<List<DriverLicense>> GetLicenseByUserIdAsync(Guid id);
         Task<DriverLicense> UpdateLicenseAsync(DriverLicense license);
     }
 }

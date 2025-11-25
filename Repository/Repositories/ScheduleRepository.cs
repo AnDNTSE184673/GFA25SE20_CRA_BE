@@ -121,5 +121,17 @@ namespace Repository.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task AddScheduleImages(ScheduleImage data)
+        {
+            try
+            {
+                var result = await _dbContext.ScheduleImages.AddAsync(data);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

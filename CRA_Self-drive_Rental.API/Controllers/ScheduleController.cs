@@ -148,6 +148,28 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
+        [HttpPost("checkIn/images")]
+        public async Task<IActionResult> UploadCheckInImages([FromForm]CheckInOutImages form)
+        {
+            try
+            {
+                var result = await _scheduleServ.UploadImageWhenCheckInOut(form);
+                return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data creation error, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
         [HttpPost("maintenance")]
         public async Task<IActionResult> MaintenanceSchedule(MaintenanceSchedule form)
         {
