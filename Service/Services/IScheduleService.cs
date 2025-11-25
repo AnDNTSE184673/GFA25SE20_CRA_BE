@@ -16,6 +16,7 @@ namespace Service.Services
         Task<List<ScheduleView>> GetAllSchedulesOfCarAsync(Guid carId);
         Task<List<ScheduleView>> GetAllSchedulesOfBookingAsync(Guid bookingId);
         Task<(string status, ScheduleView view)> SetCarSchedulesAsync(CreateScheduleForm form);
+        Task<(string status, ScheduleView view)> SetCarSchedulesInnerServiceAsync(CreateScheduleForm form);
         Task<ScheduleView> UpdateCarSchedulesAsync(UpdateScheduleForm form);
         Task<string> RemoveSchedulesAsync(Guid scheduleId);
         Task<(string status, ScheduleView view)> CheckInAsync(Guid userId, Guid carId);
