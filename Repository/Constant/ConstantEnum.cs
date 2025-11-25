@@ -9,6 +9,13 @@ namespace Repository.Constant
 {
     public static class ConstantEnum
     {
+        public static class ScheduleDefaultTitle
+        {
+            public const string PICKUP = "Car check-in";
+            public const string RETURN = "Car check-out";
+            public const string MAINTENANCE = "Car maintenance";
+        }
+
         public static class RepoStatus
         {
             public const string SUCCESS = "Success";
@@ -27,6 +34,7 @@ namespace Repository.Constant
             public const string ADMIN = "Admin";
             public const string STAFF = "Staff";
             public const string CUSTOMER = "Customer";
+            public const string CAROWNER = "Car Owner";
         }
         
         public static class Statuses
@@ -37,6 +45,7 @@ namespace Repository.Constant
             public const string PUBLIC = "Public";
             public const string PRIVATE = "Private";
             public const string COMPLETED = "Completed";
+            public const string CONFIRMED = "Confirmed";
             public const string CANCELLED = "Cancelled";
             public const string ONGOING = "Ongoing";
             public const string PAYMENT_PENDING = "Waiting for Payment";
@@ -52,6 +61,7 @@ namespace Repository.Constant
             public const string DriverLicense = "DriverLicenseDocs";
             public const string FeedbackImages = "FeedbackImages";
             public const string CarImages = "CarImages";
+            public const string UserAvatars = "UserAvatars";
             public const string publicFolder = "public";
         }
 
@@ -60,6 +70,26 @@ namespace Repository.Constant
             public const string PathSearch = "path";
             public const string IdSearch = "id";
             public const string InfoSearch = "info";
+        }
+
+        public static class ScheduleTypeConstants
+        {
+            public const string Booking = "Booking";
+            public const string Pickup = "Pickup";
+            public const string Rental = "Rental";
+            public const string Return = "Return";
+            public const string Maintenance = "Maintenance";
+            public const string Overdue = "Overdue";
+        }
+
+        public enum ScheduleType
+        {
+            Booking = 1,
+            Pickup = 2,
+            Rental = 3,
+            Return = 4,
+            Maintenance = 5,
+            Overdue = 6
         }
 
         public enum RoleID

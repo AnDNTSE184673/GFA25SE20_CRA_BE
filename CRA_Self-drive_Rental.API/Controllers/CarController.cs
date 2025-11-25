@@ -105,15 +105,15 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpPatch("registerCar/carInfo/updateImage")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
-        public async Task<IActionResult> UploadCarImage([FromForm] List<IFormFile> images, Guid carId)
+        public async Task<IActionResult> UploadCarImage([FromForm] UploadCarImages form)
         {
             try
             {
-                if (images == null || images.Count <= 0)
+                if (form.images == null || form.images.Count <= 0)
                 {
                     throw new ArgumentException("No image was given!");
                 }
-                var result = await _carServ.UpdateCarImageAsync(images, carId);
+                var result = await _carServ.UpdateCarImageAsync(form.images, form.carId);
                 return result == null
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {

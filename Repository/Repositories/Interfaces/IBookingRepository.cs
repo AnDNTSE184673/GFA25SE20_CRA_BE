@@ -14,6 +14,7 @@ namespace Repository.Repositories.Interfaces
 
         Task<List<Booking>?> GetBookingsFromCustomer(Guid customerId);
         Task<List<Booking>?> GetBookingsFromCar(Guid carId);
+        Task<Booking?> GetUnfinishedLatestBookingFromCarAndCustomer(Guid carId, Guid customerId);
         
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Repository.Base;
+using Repository.Constant;
 using Repository.Data;
 using Repository.Data.Entities;
 using Repository.Repositories.Interfaces;
@@ -30,6 +31,16 @@ namespace Repository.Repositories
             }
             var updatedBooking = _context.BookingHistories.FirstOrDefault(b => b.Id == bookingId);
             return Task.FromResult(updatedBooking);
+        }
+
+        public async Task<Booking?> GetUnfinishedLatestBookingFromCarAndCustomer(Guid carId, Guid customerId)
+        {
+            return await _dbContext.BookingHistories
+                .Where(x => x.CarId.Equals(carId) && x.UserId.Equals(customerId) && x.Status.Equals(ConstantEnum.Statuses.CONFIRMED))
+                .Include(x => x.Invoice)
+                .Include(x => x.User)
+                .Include(x => x.Car)
+                .LastOrDefaultAsync();
         }
 
         public async Task<List<Booking>?> GetBookingsFromCar(Guid carId)

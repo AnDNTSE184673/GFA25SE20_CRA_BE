@@ -815,6 +815,9 @@ namespace Repository.Migrations
                     b.Property<bool>("IsBlocking")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
                     b.Property<string>("Note")
                         .HasColumnType("text");
 
@@ -878,10 +881,10 @@ namespace Repository.Migrations
                     b.Property<string>("ImageAvatar")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsCarOwner")
+                    b.Property<bool>("IsGoogle")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsGoogle")
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Password")

@@ -21,11 +21,16 @@ using static Org.BouncyCastle.Math.EC.ECCurve;
 using Microsoft.Extensions.Configuration;
 using Services.Service;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
+using Repository.CustomFunctions.SupabaseFileUploader;
+using Repository.Extension.SupabaseFileUploader;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Service.Services.Implementation
 {
     public class UserService : IUserService
     {
+        private readonly UploadFile _upload;
         private readonly UnitOfWork _unitOfWork;
         private JWTTokenProvider _jwtService;
         private readonly IMapper _mapper;
@@ -33,13 +38,18 @@ namespace Service.Services.Implementation
         private readonly IEmailService _email;
         private readonly ILogger<UserService> _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<UserService>();
 
-        public UserService(UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email)
+        int expirationTimeSec = 1800;
+        bool isPublic = false;
+
+        public UserService(UploadFile upload, UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email, ILogger<UserService> logger)
         {
+            _upload = upload;
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _mapper = mapper;
             _config = config;
             _email = email;
+            _logger = logger;
         }
 
         public async Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId)
@@ -142,10 +152,10 @@ namespace Service.Services.Implementation
                     Fullname = request.Fullname,
                     Address = request.Address,
                     ImageAvatar = request.ImageAvatar,
-                    IsCarOwner = request.IsCarOwner,
+                    IsVerified = request.IsVerified,
                     Rating = request.Rating,
                     Status = request.Status,
-                    RoleId = request.RoleId
+                    RoleId = (int)ConstantEnum.RoleID.CAROWNER
                 };
                 await _unitOfWork._userRepo.CreateAsync(newUser);
                 await _unitOfWork.SaveChangesAsync();
@@ -186,9 +196,9 @@ namespace Service.Services.Implementation
                 Fullname = request.Fullname,
                 Address = request.Address,
                 Gender = request.Gender,
-                RoleId = 1, //Customer role
+                RoleId = (int)ConstantEnum.RoleID.CUSTOMER, //Customer role
                 IsGoogle = false,
-                IsCarOwner = false,
+                IsVerified = false,
                 Status = "Pending",
             };
             try
@@ -220,7 +230,7 @@ namespace Service.Services.Implementation
                 throw new Exception("User not found");
             }
             _unitOfWork.BeginTransaction();
-            user.IsCarOwner = true;
+            user.RoleId = (int)ConstantEnum.RoleID.CAROWNER; //
             try
             {
                 await _unitOfWork._userRepo.UpdateAsync(user);
@@ -276,6 +286,64 @@ namespace Service.Services.Implementation
         public async Task<User?> GetUserWithToken(Guid userId)
         {
             return await _unitOfWork._userRepo.GetUserWithTokenAsync(userId);
+        }
+
+        public async Task<UserView> UpdateUserAvatarAsync(IFormFile image, Guid userId)
+        {
+            try
+            {
+                var user = await _unitOfWork._userRepo.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+                await _unitOfWork.BeginTransactionAsync();
+
+                user.ImageAvatar = await UploadUserAvatarAsync(image, userId);
+
+                await _unitOfWork._userRepo.UpdateAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+
+                var result = await _unitOfWork._userRepo.GetByIdAsync(userId);
+                if (result != null)
+                {
+                    await _unitOfWork.CommitTransactionAsync();
+                    return _mapper.Map<UserView>(result);
+                }
+                else
+                {
+                    throw new Exception("Update failed");
+                }
+            }
+            catch(Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> UploadUserAvatarAsync(IFormFile file, Guid userId)
+        {
+            try
+            {
+                string bucket = ConstantEnum.SupabaseBucket.UserAvatars;
+                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+
+                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
+                string fileName = $"avatar_{uploadDate}{originalExt}";
+                string imagePath = $"{userId}/{fileName}";
+
+                var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec, isPublic);
+
+                if (url.IsNullOrEmpty()) throw new Exception("File upload failure!");
+
+                return url;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

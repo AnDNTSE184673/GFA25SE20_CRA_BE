@@ -18,7 +18,7 @@ namespace Repositories.DTO.ResponseDTO.User
         public string Fullname { get; set; }
         public string? Address { get; set; }
 
-        public bool IsCarOwner { get; set; }
+        public bool IsVerified { get; set; }
 
         public string Status { get; set; }
 

@@ -55,6 +55,8 @@ namespace Repository.Base
             service.AddScoped<IFeedbackRepository, FeedbackRepository>();
             service.AddScoped<IFeedbackImageRepository, FeedbackImageRepository>();
             service.AddScoped<IParkingLotRepository, ParkingLotRepository>();
+            service.AddScoped<IDriverLicenseRepository, DriverLicenseRepository>();
+            service.AddScoped<IScheduleRepository, ScheduleRepository>();
             return service;
         }
     }
