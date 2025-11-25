@@ -800,6 +800,9 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("BookingId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("CarId")
                         .HasColumnType("uuid");
 
@@ -808,6 +811,15 @@ namespace Repository.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsBlocking")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
 
                     b.Property<int>("Priority")
                         .HasColumnType("integer");
@@ -818,6 +830,10 @@ namespace Repository.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -830,6 +846,8 @@ namespace Repository.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
 
                     b.HasIndex("CarId");
 
@@ -863,10 +881,10 @@ namespace Repository.Migrations
                     b.Property<string>("ImageAvatar")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsCarOwner")
+                    b.Property<bool>("IsGoogle")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsGoogle")
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Password")
@@ -1165,6 +1183,10 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Repository.Data.Entities.Schedules", b =>
                 {
+                    b.HasOne("Repository.Data.Entities.Booking", "Booking")
+                        .WithMany()
+                        .HasForeignKey("BookingId");
+
                     b.HasOne("Repository.Data.Entities.Car", "Car")
                         .WithMany()
                         .HasForeignKey("CarId")
@@ -1174,6 +1196,8 @@ namespace Repository.Migrations
                     b.HasOne("Repository.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Booking");
 
                     b.Navigation("Car");
 

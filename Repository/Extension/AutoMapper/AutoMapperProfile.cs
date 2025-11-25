@@ -8,6 +8,7 @@ using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.RequestDTO.CarRentalRate;
 using Repository.DTO.RequestDTO.Feedback;
 using Repository.DTO.RequestDTO.ParkingLot;
+using Repository.DTO.RequestDTO.Schedule;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
@@ -67,7 +68,12 @@ namespace Repository.Extension.AutoMapper
             CreateMap<UpdateCarRentalRateForm, CarRentalRate>()
                 .ForMember(d => d.CarId, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-                
+
+            CreateMap<CreateScheduleForm, Schedules>();
+            CreateMap<UpdateScheduleForm, Schedules>()
+                .ForMember(d => d.CarId, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<CarRentalRate, CarRentalRateView>();
 
             CreateMap<CarRegForm, CarRegistration>();

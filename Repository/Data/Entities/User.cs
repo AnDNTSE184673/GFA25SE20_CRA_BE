@@ -25,7 +25,7 @@ namespace Repository.Data.Entities
         public bool IsGoogle { get; set; }
         public string? GoogleId { get; set; }
 
-        public bool IsCarOwner { get; set; }
+        public bool IsVerified { get; set; }
         public double Rating { get; set; }
 
         public string Status { get; set; }

@@ -197,26 +197,15 @@ namespace Service.Services.Implementation
                 var result = await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
-                if(result <= 0)
+                var carRegView = new CarRegView
                 {
-                    return (ConstantEnum.RepoStatus.FAILURE, null);
-                }
-                else
-                {
-                    /*var objList = uploadResults.Select(r => {
-                            return r.obj;
-                        }).ToList();
-                    carRegViews = _mapper.Map<List<CarRegView>>(objList);*/
-                    var carRegView = new CarRegView
-                    {
-                        CarId = form.CarId,
-                        UserId = form.UserId,
-                        Urls = urls,
-                        CreateDate = DateTime.UtcNow,
-                        Status = ConstantEnum.Statuses.PENDING
-                    };
-                    return (ConstantEnum.RepoStatus.SUCCESS, carRegView);
-                }
+                    CarId = form.CarId,
+                    UserId = form.UserId,
+                    Urls = urls,
+                    CreateDate = DateTime.UtcNow,
+                    Status = ConstantEnum.Statuses.PENDING
+                };
+                return (ConstantEnum.RepoStatus.SUCCESS, carRegView);
             }
             catch (Exception ex)
             {

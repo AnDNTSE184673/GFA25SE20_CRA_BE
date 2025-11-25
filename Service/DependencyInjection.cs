@@ -69,6 +69,8 @@ namespace Service
             service.AddScoped<IEmailService, EmailService>();
             service.AddScoped<IFeedbackService, FeedbackService>();
             service.AddScoped<IPaymentService, PaymentService>();
+            service.AddScoped<IScheduleService, ScheduleService>();
+            service.AddScoped<IDriverLicenseService, DriverLicenseService>();
             return service;
         }
     }

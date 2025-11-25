@@ -11,6 +11,7 @@ namespace Repository.Data.Entities
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
+        public string? Location { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string ScheduleType { get; set; }
@@ -20,13 +21,18 @@ namespace Repository.Data.Entities
 
         public string? Note { get; set; }
 
+        public bool IsBlocking { get; set; }
+
         public string Status { get; set; }
 
         public Guid CarId { get; set; }
         public Guid? UserId { get; set; }
+        public Guid? BookingId { get; set; }
 
         [ForeignKey("CarId")]
         public virtual Car Car { get; set; }
+        [ForeignKey("BookingId")]
+        public virtual Booking Booking { get; set; }
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
     }

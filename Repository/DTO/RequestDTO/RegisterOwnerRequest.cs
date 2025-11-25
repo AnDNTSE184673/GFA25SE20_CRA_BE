@@ -16,7 +16,7 @@ namespace Repository.DTO.RequestDTO
         public string? Fullname { get; set; }
         public string? Address { get; set; }
         public string? ImageAvatar { get; set; }
-        public bool IsCarOwner { get; set; } = true;
+        public bool IsVerified { get; set; } = true;
         public double Rating { get; set; }
         public string Status { get; set; } = "Active";
         public int RoleId { get; set; }

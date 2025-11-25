@@ -3,6 +3,7 @@ using Repository.Base;
 using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
+using Repository.DTO.RequestDTO.Schedule;
 using Repository.DTO.ResponseDTO.Booking;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,15 @@ namespace Service.Services.Implementation
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public BookingService(UnitOfWork unitOfWork, IMapper mapper)
+        private readonly IScheduleService _scheduleServ;
+
+        public BookingService(UnitOfWork unitOfWork, IMapper mapper, IScheduleService scheduleServ)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _scheduleServ = scheduleServ;
         }
+
         public async Task<Booking?> ChangeStatus(Guid bookingId, string status)
         {
             try
@@ -85,6 +90,28 @@ namespace Service.Services.Implementation
                 await _unitOfWork._bookingRepo.CreateAsync(newBooking);
                 await _unitOfWork._paymentRepo.CreateNewPaymentForBookingFee(newBooking.InvoiceId);
                 await _unitOfWork._paymentRepo.CreateNewPaymentForRentalFee(newBooking.InvoiceId);
+
+                var bookingSchedule = new CreateScheduleForm
+                {
+                    Title = ConstantEnum.ScheduleDefaultTitle.PICKUP,
+                    Location = request.PickupPlace,
+                    StartDate = request.PickupTime,
+                    EndDate = request.PickupTime,
+                    ScheduleType = ConstantEnum.ScheduleTypeConstants.Pickup,
+                    Priority = 1,
+                    Note = "",
+                    IsBlocking = true, //Car is not available for rent atm
+                    CarId = request.CarId,
+                    UserId = request.CustomerId,
+                    BookingId = newBooking.Id
+                };
+
+                var createdSchedule = await _scheduleServ.SetCarSchedulesAsync(bookingSchedule);
+
+                var existCar = await _unitOfWork._carRepo.GetByIdAsync(request.CarId);
+                existCar.Status = ConstantEnum.Statuses.INACTIVE;
+                await _unitOfWork._carRepo.UpdateCarAsync(existCar);
+
                 var createdBooking = await _unitOfWork._bookingRepo.GetByIdAsync(newBooking.Id);
                 var bookingView = _mapper.Map<BookingView>(createdBooking);
 

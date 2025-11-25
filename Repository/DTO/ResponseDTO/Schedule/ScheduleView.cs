@@ -1,4 +1,5 @@
-﻿using Repository.DTO.ResponseDTO.Car;
+﻿using Repository.DTO.ResponseDTO.Booking;
+using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.User;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Repository.DTO.ResponseDTO.Schedule
 {
     public class ScheduleView
     {
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -19,7 +21,14 @@ namespace Repository.DTO.ResponseDTO.Schedule
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
 
+        public string? Note { get; set; }
+
+        public bool IsBlocking { get; set; }
+
+        public string Status { get; set; }
+
         public CarView Car { get; set; }
-        public UserView User { get; set; }
+        public UserView? User { get; set; }
+        public BookingView? Booking { get; set; }
     }
 }

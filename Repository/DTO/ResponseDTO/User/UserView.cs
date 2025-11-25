@@ -18,7 +18,7 @@ namespace Repository.DTO.ResponseDTO.User
         public string? ImageAvatar { get; set; }
         public bool IsGoogle { get; set; }
 
-        public bool IsCarOwner { get; set; }
+        public bool IsVerified { get; set; }
         public double Rating { get; set; }
 
         public string Status { get; set; }
