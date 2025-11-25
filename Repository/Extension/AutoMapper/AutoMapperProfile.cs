@@ -74,6 +74,7 @@ namespace Repository.Extension.AutoMapper
             CreateMap<UpdateScheduleForm, Schedules>()
                 .ForMember(d => d.CarId, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Schedules, ScheduleView>();
 
             CreateMap<CarRentalRate, CarRentalRateView>();
 

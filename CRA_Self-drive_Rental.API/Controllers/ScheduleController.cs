@@ -39,11 +39,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("booking")]
-        public async Task<IActionResult> GetScheduleByBooking(Guid carId)
+        public async Task<IActionResult> GetScheduleByBooking(Guid bookingId)
         {
             try
             {
-                var result = await _scheduleServ.GetAllSchedulesOfBookingAsync(carId);
+                var result = await _scheduleServ.GetAllSchedulesOfBookingAsync(bookingId);
                 return !result.Any()
                     ? StatusCode(StatusCodes.Status404NotFound, new
                     {
@@ -61,11 +61,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("user")]
-        public async Task<IActionResult> GetScheduleByUser(Guid carId)
+        public async Task<IActionResult> GetScheduleByUser(Guid userId)
         {
             try
             {
-                var result = await _scheduleServ.GetAllSchedulesOfUserAsync(carId);
+                var result = await _scheduleServ.GetAllSchedulesOfUserAsync(userId);
                 return !result.Any()
                     ? StatusCode(StatusCodes.Status404NotFound, new
                     {
