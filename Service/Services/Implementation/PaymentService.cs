@@ -104,8 +104,8 @@ namespace Service.Services.Implementation
                 bookingPayHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(bookingPayHis);                
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
-                _unitOfWork.CommitTransaction();
                 await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();                
                 return (response.OrderCode, response.CheckoutUrl);
             }
             catch (Exception ex)
