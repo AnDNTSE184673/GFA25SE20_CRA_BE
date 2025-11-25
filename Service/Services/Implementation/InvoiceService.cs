@@ -27,14 +27,14 @@ namespace Service.Services.Implementation
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                var newInvoice = await _unitOfWork._invoiceRepo.CreateInvoice(request);
-                _unitOfWork.CommitTransaction();
+                var newInvoice = await _unitOfWork._invoiceRepo.CreateInvoice(request);                
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork._paymentRepo.CreateNewPaymentForBookingFee(newInvoice.Id);
                 await _unitOfWork._paymentRepo.CreateNewPaymentForRentalFee(newInvoice.Id);
                 await _unitOfWork.SaveChangesAsync();
                 var InvoiceResult = await _unitOfWork._invoiceRepo.GetInvoiceById(newInvoice.Id);
                 var ListInvoiceView = _mapper.Map<InvoiceView>(InvoiceResult);
+                _unitOfWork.CommitTransaction();
                 return ListInvoiceView;
             }
             catch (Exception ex)

@@ -11,6 +11,7 @@ using PayOS.Models.V2.PaymentRequests;
 using Repository.DTO.ResponseDTO.Payment;
 using Repository.Data.Entities;
 using AutoMapper;
+using Repository.Constant;
 
 
 namespace Service.Services.Implementation
@@ -39,7 +40,7 @@ namespace Service.Services.Implementation
                 {
                     OrderCode = paymentHis.OrderCode,
                     Amount = (long)(request.Amount),
-                    Description = $"Thanh toán cho {paymentHis.OrderCode}",
+                    Description = $"{paymentHis.OrderCode}",
                     ReturnUrl = configSection["ReturnUrl"],
                     CancelUrl = configSection["CancelUrl"],
                     ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(request.TimeToPay).ToUnixTimeSeconds(),
@@ -57,7 +58,7 @@ namespace Service.Services.Implementation
                 paymentHis.Signature = paymentRequest.Signature;
                 paymentHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
-                
+
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -85,14 +86,14 @@ namespace Service.Services.Implementation
                 {
                     OrderCode = bookingPayHis.OrderCode,
                     Amount = (long)(bookingPayHis.PaidAmount),
-                    Description = $"Thanh toán cho {bookingPayHis.OrderCode}",
+                    Description = $"{bookingPayHis.OrderCode}",
                     ReturnUrl = configSection["ReturnUrl"],
                     CancelUrl = configSection["CancelUrl"],
                     ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds(),
                     Signature = GenerateSignature(
                         amount: ((long)(bookingPayHis.PaidAmount)).ToString(),
                         cancelUrl: configSection["CancelUrl"],
-                        description: $"Thanh toán cho {bookingPayHis.OrderCode}",
+                        description: $"{bookingPayHis.OrderCode}",
                         orderCode: bookingPayHis.OrderCode.ToString(),
                         returnUrl: configSection["ReturnUrl"],
                         //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
@@ -102,10 +103,10 @@ namespace Service.Services.Implementation
                 bookingPayHis.Status = "Pending";
                 bookingPayHis.Signature = paymentRequest.Signature;
                 bookingPayHis.PaymentMethod = "PayOS";
-                await _unitOfWork._paymentRepo.UpdateAsync(bookingPayHis);                
+                await _unitOfWork._paymentRepo.UpdateAsync(bookingPayHis);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
-                _unitOfWork.CommitTransaction();
                 await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
                 return (response.OrderCode, response.CheckoutUrl);
             }
             catch (Exception ex)
@@ -147,7 +148,7 @@ namespace Service.Services.Implementation
 
         public async Task<List<PaymentHistoryView>?> GetHistoryForUser(Guid userId)
         {
-            List<PaymentHistory>? paymentHistories = await  _unitOfWork._paymentRepo.GetPaymentsByUserId(userId);
+            List<PaymentHistory>? paymentHistories = await _unitOfWork._paymentRepo.GetPaymentsByUserId(userId);
             if (paymentHistories == null || paymentHistories.Count == 0)
             {
                 return null;
@@ -269,12 +270,12 @@ namespace Service.Services.Implementation
 
         public async Task<List<PaymentHistoryView>?> GetHistoryForUserPayOS(Guid id)
         {
-            var paymentHistories =  await _unitOfWork._paymentRepo.GetAllAsync();
+            var paymentHistories = await _unitOfWork._paymentRepo.GetAllAsync();
             List<PaymentHistory>? paymentHistoriesPayOS = paymentHistories
                 .Where(p => p.UserId == id && p.PaymentMethod == "PayOS")
                 .ToList();
             if (paymentHistoriesPayOS == null || paymentHistoriesPayOS.Count == 0) return null;
-            List<PaymentHistoryView> paymentHistoryViews = _mapper.Map<List< PaymentHistoryView>>(paymentHistoriesPayOS);
+            List<PaymentHistoryView> paymentHistoryViews = _mapper.Map<List<PaymentHistoryView>>(paymentHistoriesPayOS);
             return paymentHistoryViews;
         }
 
@@ -294,9 +295,13 @@ namespace Service.Services.Implementation
                 foreach (var payment in paymentHistories)
                 {
                     var payOSResponse = await GetPayOSPaymentResponse(payment.OrderCode);
-                    payment.Status = payOSResponse.Status.ToString();
+                    if (payment.Status != "Paid" || payment.Status != "Success" || payment.Status != "SUCCESS")
+                    {
+                        payment.Status = payOSResponse.Status.ToString();
+                        payment.UpdateDate = DateTime.Now;
+                    }
                     await _unitOfWork._paymentRepo.UpdateAsync(payment);
-                    
+
                 }
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayments = await _unitOfWork._paymentRepo.GetAllAsync();
@@ -311,17 +316,20 @@ namespace Service.Services.Implementation
                             if (updatedPayment.Status == "Cancelled" || updatedPayment.Status == "Expired")
                             {
                                 books.Status = "Cancelled";
+                                books.UpdateDate = DateTime.Now;
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
-                            else if (updatedPayment.Status == "Paid")
+                            else if (updatedPayment.Status == "Paid" || updatedPayment.Status == "Success" || updatedPayment.Status == "SUCCESS")
                             {
                                 books.Status = "Confirmed";
+                                books.UpdateDate = DateTime.Now;
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                         }
                     }
-                    await _unitOfWork.SaveChangesAsync();
+                    
                 }
+                await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var paymentHistoriesUpdated = await _unitOfWork._paymentRepo.GetAllAsync();
                 List<PaymentHistory>? paymentHistoriesPayOS = paymentHistoriesUpdated
@@ -336,7 +344,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(long, string)> CreatePayOSPaymentRequestForRentalAfterBooking(Guid bookingId, Guid payId)
+        public async Task<(long, string)> CreatePayOSPaymentRequestForRentalAfterBooking(Guid bookingId)
         {
             try
             {
@@ -344,25 +352,20 @@ namespace Service.Services.Implementation
                 var configSection = _config.GetSection("PayOS");
                 PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
                 var booking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
-                var paymentHis = await _unitOfWork._paymentRepo.GetByIdAsync(payId);
                 var payFromBooking = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
                 var rentalPayHis = payFromBooking.Where(p => p.Item == "Rental Fee").FirstOrDefault();
-                if (paymentHis.Id != payFromBooking.Where(p => p.Item == "Booking Fee").FirstOrDefault().Id)
-                {
-                    return (0,"");
-                }
                 var paymentRequest = new CreatePaymentLinkRequest
                 {
                     OrderCode = rentalPayHis.OrderCode,
                     Amount = (long)(rentalPayHis.PaidAmount),
-                    Description = $"Thanh toán cho {rentalPayHis.OrderCode}",
+                    Description = $"{rentalPayHis.OrderCode}",
                     ReturnUrl = configSection["ReturnUrl"],
                     CancelUrl = configSection["CancelUrl"],
                     ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds(),
                     Signature = GenerateSignature(
                         amount: ((long)(rentalPayHis.PaidAmount)).ToString(),
                         cancelUrl: configSection["CancelUrl"],
-                        description: $"Thanh toán cho {rentalPayHis.OrderCode}",
+                        description: $"{rentalPayHis.OrderCode}",
                         orderCode: rentalPayHis.OrderCode.ToString(),
                         returnUrl: configSection["ReturnUrl"],
                         //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
@@ -399,18 +402,136 @@ namespace Service.Services.Implementation
 
         public async Task<List<PaymentHistoryView>?> GetPaymentsByBookingId(Guid bookingId)
         {
-            var booking = await  _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+            var booking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
             if (booking == null)
             {
                 return null;
             }
-            var payments =  await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+            var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
             if (payments == null || payments.Count == 0)
             {
                 return null;
             }
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
+        }
+
+        public async Task<PaymentHistoryView?> UpdateRentalPayWithBooking(Guid bookingId, string status)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var bookingTask = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+                var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(bookingTask.InvoiceId);
+                var rentalPay = pays.Where(p => p.Item == "Rental Fee").FirstOrDefault();
+                if (ConstantEnum.Statuses.PAID.Equals(status, StringComparison.OrdinalIgnoreCase))
+                {
+                    rentalPay.Status = ConstantEnum.Statuses.PAID;
+                    rentalPay.PaymentMethod = "Cash On Delivery";
+                    bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                    await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
+                    await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
+                }
+                if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
+                {
+                    rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                    bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                    await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
+                    await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
+                }
+                await _unitOfWork.SaveChangesAsync();
+                var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(rentalPay.Id);
+                if (updatedPayment == null) return null;
+                _unitOfWork.CommitTransaction();
+                var paymentView = _mapper.Map<PaymentHistoryView>(updatedPayment);
+                return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<PaymentHistoryView?> UpdateBookingPayWithBooking(Guid bookingId, string status)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var bookingTask = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+                var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(bookingTask.InvoiceId);
+                var rentalPay = pays.Where(p => p.Item == "Booking Fee").FirstOrDefault();
+                if (ConstantEnum.Statuses.PAID.Equals(status, StringComparison.OrdinalIgnoreCase))
+                {
+                    rentalPay.Status = ConstantEnum.Statuses.PAID;
+                    rentalPay.PaymentMethod = "Cash On Delivery";
+                    bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                    await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
+                    await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
+                }
+                if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
+                {
+                    rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                    bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                    await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
+                    await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
+                }
+                await _unitOfWork.SaveChangesAsync();
+                var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(rentalPay.Id);
+                if (updatedPayment == null) return null;
+                _unitOfWork.CommitTransaction();
+                var paymentView = _mapper.Map<PaymentHistoryView>(updatedPayment);
+                return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<PaymentHistoryView>?> UpdateOtherPayWithBooking(Guid bookingId, string status)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var bookingTask = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+                var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(bookingTask.InvoiceId);
+                var FinePays = pays.Where(p => p.Item == "Fine Fee").ToList();
+                if (ConstantEnum.Statuses.PAID.Equals(status, StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var rentalPay in FinePays)
+                    {
+                        rentalPay.Status = ConstantEnum.Statuses.PAID;
+                        rentalPay.PaymentMethod = "Cash On Delivery";
+                        bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                        await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
+                        await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
+                    }
+                }
+                if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var rentalPay in FinePays)
+                    {
+                        rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                        bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                        await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
+                        await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
+                    }
+                }
+                await _unitOfWork.SaveChangesAsync();
+                var updatedPayments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(bookingTask.InvoiceId);
+                if (updatedPayments == null) return null;
+                _unitOfWork.CommitTransaction();
+                var updatedPayment = updatedPayments.Where(p => p.Item == "Fine Fee").ToList();
+                var paymentView = _mapper.Map<List<PaymentHistoryView>>(updatedPayment);
+                return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

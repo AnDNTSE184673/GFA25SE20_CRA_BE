@@ -106,6 +106,7 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.GenderId));
             CreateMap<User, UserPostRegView>();
             CreateMap<User, UserLoginView>();
+            CreateMap<Schedules, ScheduleView>();
         }
     }
 }
