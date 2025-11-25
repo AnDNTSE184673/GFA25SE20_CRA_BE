@@ -295,10 +295,10 @@ namespace Service.Services.Implementation
                 foreach (var payment in paymentHistories)
                 {
                     var payOSResponse = await GetPayOSPaymentResponse(payment.OrderCode);
-                    if (payment.Status != "Paid" || payment.Status != "Success" || payment.Status != "SUCCESS")
+                    if (payment.Status != "Paid" && payment.Status != "Success" && payment.Status != "SUCCESS")
                     {
                         payment.Status = payOSResponse.Status.ToString();
-                        payment.UpdateDate = DateTime.Now;
+                        payment.UpdateDate = DateTime.UtcNow;
                     }
                     await _unitOfWork._paymentRepo.UpdateAsync(payment);
 
@@ -316,13 +316,13 @@ namespace Service.Services.Implementation
                             if (updatedPayment.Status == "Cancelled" || updatedPayment.Status == "Expired")
                             {
                                 books.Status = "Cancelled";
-                                books.UpdateDate = DateTime.Now;
+                                books.UpdateDate = DateTime.UtcNow;
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                             else if (updatedPayment.Status == "Paid" || updatedPayment.Status == "Success" || updatedPayment.Status == "SUCCESS")
                             {
                                 books.Status = "Confirmed";
-                                books.UpdateDate = DateTime.Now;
+                                books.UpdateDate = DateTime.UtcNow;
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                         }
@@ -428,14 +428,18 @@ namespace Service.Services.Implementation
                 {
                     rentalPay.Status = ConstantEnum.Statuses.PAID;
                     rentalPay.PaymentMethod = "Cash On Delivery";
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
                 if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
                 {
                     rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
@@ -465,14 +469,18 @@ namespace Service.Services.Implementation
                 {
                     rentalPay.Status = ConstantEnum.Statuses.PAID;
                     rentalPay.PaymentMethod = "Cash On Delivery";
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
                 if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
                 {
                     rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
@@ -504,7 +512,9 @@ namespace Service.Services.Implementation
                     {
                         rentalPay.Status = ConstantEnum.Statuses.PAID;
                         rentalPay.PaymentMethod = "Cash On Delivery";
+                        bookingTask.UpdateDate = DateTime.UtcNow;
                         bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                        bookingTask.UpdateDate = DateTime.UtcNow;
                         await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                         await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                     }
@@ -514,7 +524,9 @@ namespace Service.Services.Implementation
                     foreach (var rentalPay in FinePays)
                     {
                         rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                        rentalPay.UpdateDate = DateTime.UtcNow;
                         bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                        bookingTask.UpdateDate = DateTime.UtcNow;
                         await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                         await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                     }
