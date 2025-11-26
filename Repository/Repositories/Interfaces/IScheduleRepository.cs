@@ -18,5 +18,6 @@ namespace Repository.Repositories.Interfaces
         Task<string> DeleteScheduleAsync(Guid id);
         Task<Schedules> UpdateScheduleAsync(Schedules schedules);
         Task AddScheduleImages(ScheduleImage data);
+        Task<List<ScheduleImage>> GetScheduleImageByBookingAndState(Guid bookingId, bool isCheckIn);
     }
 }

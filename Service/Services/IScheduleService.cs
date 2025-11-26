@@ -22,5 +22,6 @@ namespace Service.Services
         Task<(string status, ScheduleView view, CICOImageView image)> CheckInAsync(CICOForm form);
         Task<(string status, ScheduleView view, CICOImageView image)> CheckOutAsync(CICOForm form);
         Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form);
+        Task<(string[] signedUrl, List<CICOImageView> view)> GetCICOImageByBooking(CICOImageSearch form);
     }
 }

@@ -156,6 +156,32 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
+        [HttpGet("checkIn/images")]
+        public async Task<IActionResult> GetCICOImages([FromQuery] CICOImageSearch form)
+        {
+            try
+            {
+                var result = await _scheduleServ.GetCICOImageByBooking(form);
+                return result.view == null
+                    ? StatusCode(404, new
+                    {
+                        Message = "No data found, check log"
+                    })
+                    : Ok(new
+                    {
+                        Urls = result.signedUrl,
+                        View = result.view
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
         [HttpPost("checkIn/images")]
         public async Task<IActionResult> UploadCheckInImages([FromForm]CheckInOutImages form)
         {

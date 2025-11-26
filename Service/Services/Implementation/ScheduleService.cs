@@ -407,7 +407,7 @@ namespace Service.Services.Implementation
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
                 foreach (var file in images)
                 {
-                    uploadTasks.Add(UploadCICOImagesAsync(file, bookingId, count, folder));
+                    uploadTasks.Add(UploadCICOImagesAsync(file, bookingId, count, folder, isCheckIn));
                     count++;
                 }
 
@@ -441,7 +441,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string url, ScheduleImage obj)> UploadCICOImagesAsync(IFormFile file, Guid bookingId, int count, string folder)
+        public async Task<(string url, ScheduleImage obj)> UploadCICOImagesAsync(IFormFile file, Guid bookingId, int count, string folder, bool isCheckIn)
         {
             try
             {
@@ -465,7 +465,9 @@ namespace Service.Services.Implementation
                     MimeType = MimeTypeHelper.GetMimeType(originalExt),
                     FileSize = file.Length,
                     Status = ConstantEnum.Statuses.PENDING,
-                    BookingId = bookingId
+                    BookingId = bookingId,
+                    IsCheckIn = isCheckIn,
+                    IsCheckOut = !isCheckIn,
                 };
 
                 return (url, image);
@@ -475,6 +477,18 @@ namespace Service.Services.Implementation
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<(string[] signedUrl, List<CICOImageView> view)> GetCICOImageByBooking(CICOImageSearch form)
+        {
+            var rows = await _unitOfWork._scheduleRepo.GetScheduleImageByBookingAndState(form.BookingId, form.isCheckIn);
+            var uploadTasks = new List<Task<string>>();
+            foreach (var r in rows)
+            {
+                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
+            }
+            var uploadResults = await Task.WhenAll(uploadTasks);
+            return (uploadResults, _mapper.Map<List<CICOImageView>>(rows));
         }
 
         public async Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form)
@@ -494,7 +508,7 @@ namespace Service.Services.Implementation
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
                 foreach (var file in form.images)
                 {
-                    uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count, folder));
+                    uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count, folder, form.isCheckIn));
                     count++;
                 }
 
