@@ -148,25 +148,27 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string status, ScheduleView view)> CheckInAsync(Guid userId, Guid carId)
+        public async Task<(string status, ScheduleView view, CICOImageView image)> CheckInAsync(CICOForm form)
         {
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                var booking = await _unitOfWork._bookingRepo.GetUnfinishedLatestBookingFromCarAndCustomer(userId, carId);
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.BookingId);
                 if (booking == null) throw new KeyNotFoundException("Ongoing booking not found");
 
                 var user = await _unitOfWork._userRepo.GetByIdAsync(booking.UserId);
                 var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
                 if (car == null || booking == null) throw new KeyNotFoundException("Car and user related to the booking not found");
+                if (!(car.Id.Equals(form.CarId)) || !(user.Id.Equals(form.UserId))) throw new InvalidDataException("Car and user is not related to this booking");
 
                 var oldSchedules = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(booking.Id, ConstantEnum.ScheduleTypeConstants.Pickup);
                 if(oldSchedules == null) throw new KeyNotFoundException("Schedules for pick up not found");
-
                 oldSchedules.Status = ConstantEnum.Statuses.COMPLETED;
 
                 await _unitOfWork._scheduleRepo.UpdateScheduleAsync(oldSchedules);
+
+                var imageResult = await UploadImageWhenCheckInOutInnerService(booking.Id, form.images, true);
 
                 var newSchedules = new CreateScheduleForm
                 {
@@ -185,6 +187,7 @@ namespace Service.Services.Implementation
 
                 var mapped = _mapper.Map<Schedules>(newSchedules);
                 mapped.Status = ConstantEnum.Statuses.ACTIVE;
+                mapped.CreateDate = mapped.UpdateDate = DateTime.UtcNow;
                 var result1 = await _unitOfWork._scheduleRepo.CreateScheduleAsync(mapped);
 
                 car.Status = ConstantEnum.Statuses.ACTIVE;
@@ -199,7 +202,7 @@ namespace Service.Services.Implementation
                 else
                 {
                     var returnObj = _mapper.Map<ScheduleView>(result1.Schedules);
-                    return (ConstantEnum.RepoStatus.SUCCESS, returnObj);
+                    return (ConstantEnum.RepoStatus.SUCCESS, returnObj, imageResult.regDoc);
                 }
             }
             catch (Exception ex)
@@ -209,24 +212,27 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string status, ScheduleView view)> CheckOutAsync(Guid userId, Guid carId)
+        public async Task<(string status, ScheduleView view, CICOImageView image)> CheckOutAsync(CICOForm form)
         {
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                var booking = await _unitOfWork._bookingRepo.GetUnfinishedLatestBookingFromCarAndCustomer(userId, carId);
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.BookingId);
                 if (booking == null) throw new KeyNotFoundException("Ongoing booking not found");
 
                 var user = await _unitOfWork._userRepo.GetByIdAsync(booking.UserId);
                 var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
                 if (car == null || booking == null) throw new KeyNotFoundException("Car and user related to the booking not found");
+                if (!(car.Id.Equals(form.CarId)) || !(user.Id.Equals(form.UserId))) throw new InvalidDataException("Car and user is not related to this booking");
 
                 var oldSchedules = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(booking.Id, ConstantEnum.ScheduleTypeConstants.Return);
-                if (oldSchedules == null) throw new KeyNotFoundException("Schedules for return not found");
+                if (oldSchedules == null) throw new KeyNotFoundException("Schedules for pick up not found");
                 oldSchedules.Status = ConstantEnum.Statuses.COMPLETED;
 
                 var result1 = await _unitOfWork._scheduleRepo.UpdateScheduleAsync(oldSchedules);
+
+                var imageResult = await UploadImageWhenCheckInOutInnerService(booking.Id, form.images, false);
 
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -237,7 +243,7 @@ namespace Service.Services.Implementation
                 else
                 {
                     var returnObj = _mapper.Map<ScheduleView>(result1);
-                    return (ConstantEnum.RepoStatus.SUCCESS, returnObj);
+                    return (ConstantEnum.RepoStatus.SUCCESS, returnObj, imageResult.regDoc);
                 }
             }
             catch (Exception ex)
@@ -388,22 +394,121 @@ namespace Service.Services.Implementation
             }
         }
 
+        public async Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOutInnerService(Guid bookingId, List<IFormFile> images, bool isCheckIn)
+        {
+            var bucket = ConstantEnum.SupabaseBucket.CheckInOutImages;
+            try
+            {
+                string folder = "";
+
+                if (isCheckIn) folder = "CheckIn";
+                else folder = "CheckOut";
+                int count = 1;
+                var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
+                foreach (var file in images)
+                {
+                    uploadTasks.Add(UploadCICOImagesAsync(file, bookingId, count, folder, isCheckIn));
+                    count++;
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._scheduleRepo.AddScheduleImages(u.obj);
+                }
+
+                var result = await _unitOfWork.SaveChangesAsync();
+
+                var view = new CICOImageView
+                {
+                    BookingId = bookingId,
+                    Urls = urls,
+                    CreateDate = DateTime.UtcNow,
+                    Status = ConstantEnum.Statuses.PENDING
+                };
+                return (ConstantEnum.RepoStatus.SUCCESS, view);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string url, ScheduleImage obj)> UploadCICOImagesAsync(IFormFile file, Guid bookingId, int count, string folder, bool isCheckIn)
+        {
+            try
+            {
+                string bucket = ConstantEnum.SupabaseBucket.CheckInOutImages;
+                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+
+                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
+                string fileName = $"image{count}_{uploadDate}{originalExt}";
+                string imagePath = $"{folder}/{bookingId}/{fileName}";
+
+                var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec, isPublic);
+
+                if (url.IsNullOrEmpty()) throw new Exception("File upload failure!");
+
+                var image = new ScheduleImage
+                {
+                    FilePath = imagePath,
+                    FileName = fileName,
+                    Bucket = bucket,
+                    CreateDate = DateTime.UtcNow,
+                    MimeType = MimeTypeHelper.GetMimeType(originalExt),
+                    FileSize = file.Length,
+                    Status = ConstantEnum.Statuses.PENDING,
+                    BookingId = bookingId,
+                    IsCheckIn = isCheckIn,
+                    IsCheckOut = !isCheckIn,
+                };
+
+                return (url, image);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string[] signedUrl, List<CICOImageView> view)> GetCICOImageByBooking(CICOImageSearch form)
+        {
+            var rows = await _unitOfWork._scheduleRepo.GetScheduleImageByBookingAndState(form.BookingId, form.isCheckIn);
+            var uploadTasks = new List<Task<string>>();
+            foreach (var r in rows)
+            {
+                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
+            }
+            var uploadResults = await Task.WhenAll(uploadTasks);
+            return (uploadResults, _mapper.Map<List<CICOImageView>>(rows));
+        }
+
         public async Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form)
         {
             var bucket = ConstantEnum.SupabaseBucket.CheckInOutImages;
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-
+                string folder = "";
                 var booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.bookingId);
 
                 if (booking == null) throw new NotFoundException("Booking not found!");
 
+                if (form.isCheckIn) folder = "CheckIn";
+                else folder = "CheckOut";
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
                 foreach (var file in form.images)
                 {
-                    uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count));
+                    uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count, folder, form.isCheckIn));
                     count++;
                 }
 
@@ -435,42 +540,6 @@ namespace Service.Services.Implementation
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<(string url, ScheduleImage obj)> UploadCICOImagesAsync(IFormFile file, Guid bookingId, int count)
-        {
-            try
-            {
-                string bucket = ConstantEnum.SupabaseBucket.CarRegistration;
-                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
-
-                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
-                string fileName = $"image{count}_{uploadDate}{originalExt}";
-                string imagePath = $"{bookingId}/{fileName}";
-
-                var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeSec, isPublic);
-
-                if (url.IsNullOrEmpty()) throw new Exception("File upload failure!");
-
-                var image = new ScheduleImage
-                {
-                    FilePath = imagePath,
-                    FileName = fileName,
-                    Bucket = bucket,
-                    CreateDate = DateTime.UtcNow,
-                    MimeType = MimeTypeHelper.GetMimeType(originalExt),
-                    FileSize = file.Length,
-                    Status = ConstantEnum.Statuses.PENDING,
-                    BookingId = bookingId
-                };
-
-                return (url, image);
-
-            }
-            catch (Exception ex)
-            {
                 throw new Exception(ex.Message);
             }
         }

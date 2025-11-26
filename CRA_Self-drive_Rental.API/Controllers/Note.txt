@@ -20,6 +20,7 @@ public IActionResult GetProductById([FromRoute] int id)
 Use case: When fetching a resource by ID or meaningful route segments.
 
 3. [FromBody]
+NOTE: Request with GET/HEAD method cannot have body.
 
 Use it when you expect data in the request body (JSON/XML).
 Example: POST or PUT request with a JSON body.
@@ -37,6 +38,7 @@ Use case: When handling large data payloads (like creating or updating resources
 Note: do not use for GET requests (since they don’t have a body).
 
 4. [FromForm]
+NOTE: Request with GET/HEAD method cannot have body.
 
 Use it for form-data (e.g., file uploads, form submissions).
 Example: multipart/form-data or application/x-www-form-urlencoded

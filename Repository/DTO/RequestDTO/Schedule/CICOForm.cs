@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Repository.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Repository.DTO.RequestDTO.Schedule
 {
-    public class CheckInOutImages
+    public class CICOForm
     {
-        [MaxFileCount(5)]
+        public Guid UserId { get; set; }
+        public Guid CarId { get; set; }
+        public Guid BookingId { get; set; }
         public List<IFormFile> images { get; set; }
-        public Guid bookingId { get; set; }
-        public bool isCheckIn { get; set; } //checkIn is true checkOut is false
     }
 }

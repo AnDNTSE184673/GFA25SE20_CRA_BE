@@ -17,6 +17,9 @@ namespace Repository.Data.Entities
         public long? FileSize { get; set; }
         public string? MimeType { get; set; }
 
+        public bool IsCheckIn { get; set; }
+        public bool IsCheckOut { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public string Status { get; set; }
