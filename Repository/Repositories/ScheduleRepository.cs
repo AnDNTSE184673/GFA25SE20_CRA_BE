@@ -4,6 +4,7 @@ using Repository.Constant;
 using Repository.Data;
 using Repository.Data.Entities;
 using Repository.Repositories.Interfaces;
+using Supabase.Gotrue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace Repository.Repositories
                 .Include(x => x.User)
                 .Include(x => x.Booking)
                 .AsNoTracking()
-                .LastOrDefaultAsync();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<Schedules>> GetSchedulesByBooking(Guid bookingId)
@@ -102,6 +103,14 @@ namespace Repository.Repositories
                 .Include(x => x.Car)
                 .Include(x => x.User)
                 .Include(x => x.Booking)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<List<ScheduleImage>> GetScheduleImageByBookingAndState(Guid bookingId, bool isCheckIn)
+        {
+            return await _dbContext.ScheduleImages
+                .Where(x => x.BookingId.Equals(bookingId) && x.IsCheckIn == isCheckIn)
                 .AsNoTracking()
                 .ToListAsync();
         }
