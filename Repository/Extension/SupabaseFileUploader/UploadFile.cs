@@ -73,8 +73,8 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                 await _supabase.InitializeAsync();
 
-                //upload file to bucket via supabase url and secret key (dont need s3 key)
-                //await using var fileStream = file.OpenReadStream()
+                var storageStatus = _supabase.Storage == null ? "NULL (NOT INITIALIZED)" : "OK (READY)";
+                Log.Information("Supabase Storage initialization check: {Status}", storageStatus);
 
                 var bytes = await file.GetBytesAsync();
 

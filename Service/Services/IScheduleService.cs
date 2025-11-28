@@ -19,8 +19,8 @@ namespace Service.Services
         Task<(string status, ScheduleView view)> SetCarSchedulesInnerServiceAsync(CreateScheduleForm form);
         Task<ScheduleView> UpdateCarSchedulesAsync(UpdateScheduleForm form);
         Task<string> RemoveSchedulesAsync(Guid scheduleId);
-        Task<(string status, ScheduleView view, CICOImageView image)> CheckInAsync(CICOForm form);
-        Task<(string status, ScheduleView view, CICOImageView image)> CheckOutAsync(CICOForm form);
+        Task<(string status, ScheduleView view, CICOImageView image)> CheckInAsync(CICOForm form, string userAgent);
+        Task<(string status, ScheduleView view, CICOImageView image)> CheckOutAsync(CICOForm form, string userAgent);
         Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form);
         Task<(string[] signedUrl, List<CICOImageView> view)> GetCICOImageByBooking(CICOImageSearch form);
     }

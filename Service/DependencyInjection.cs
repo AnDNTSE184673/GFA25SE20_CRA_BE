@@ -49,6 +49,7 @@ namespace Service
                     {
                         AutoRefreshToken = true,
                         AutoConnectRealtime = true,
+                        StorageUrlFormat = $"{url}/storage/v1",
                     }
                 );
             });
@@ -71,6 +72,8 @@ namespace Service
             service.AddScoped<IPaymentService, PaymentService>();
             service.AddScoped<IScheduleService, ScheduleService>();
             service.AddScoped<IDriverLicenseService, DriverLicenseService>();
+            service.AddScoped<IStaffLogService, StaffLogService>();
+            service.AddScoped<ICarHandoverService, CarHandoverService>();
             return service;
         }
     }
