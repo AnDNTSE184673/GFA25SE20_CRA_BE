@@ -74,6 +74,7 @@ namespace Service
             service.AddScoped<IDriverLicenseService, DriverLicenseService>();
             service.AddScoped<IStaffLogService, StaffLogService>();
             service.AddScoped<ICarHandoverService, CarHandoverService>();
+            service.AddScoped<ITrackAsiaService, TrackAsiaService>();
             return service;
         }
     }

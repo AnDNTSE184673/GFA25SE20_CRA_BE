@@ -39,8 +39,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("staffLogs")]
-        public async Task<IActionResult> GetStaffLogsByStaffAsync([FromQuery] Guid staffId)
+        [HttpGet("staffLogs/{staffid}")]
+        public async Task<IActionResult> GetStaffLogsByStaffAsync(Guid staffId)
         {
             try
             {
@@ -83,8 +83,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("carHandover")]
-        public async Task<IActionResult> GetCarHandoversByScheduleAsync([FromQuery] Guid scheduleId)
+        [HttpGet("carHandover/{scheduleId}")]
+        public async Task<IActionResult> GetCarHandoversByScheduleAsync(Guid scheduleId)
         {
             try
             {

@@ -14,13 +14,12 @@ namespace Repository.DTO.RequestDTO
         public Guid CarId { get; set; }
         public string PickupPlace { get; set; }
         public DateTime PickupTime { get; set; }
-
         public string DropoffPlace { get; set; }
         public DateTime DropoffTime { get; set; }
         [Range(15, double.MaxValue)]
         public double bookingFee { get; set; } = 15;
         public double carRentPrice { get; set; }
         public int rentime { get; set; }
-        public string rentType { get; set; } = "hour"; // hour, day, week, month
+        public string rentType { get; set; } = "Days"; // hour, day, week, month
     }
 }

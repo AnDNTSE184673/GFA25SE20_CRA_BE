@@ -87,8 +87,11 @@ namespace CRA_Self_drive_Rental.API
                 });
             });
             Log.Information("Added Swagger");
-
-            builder.Services.AddAuthentication(options => {
+            builder.Services.AddHttpClient();
+            builder.Services.AddTransient<System.Net.Http.HttpClient>(sp =>
+                sp.GetRequiredService<System.Net.Http.IHttpClientFactory>().CreateClient());
+            builder.Services.AddAuthentication(options =>
+            {
                 // A Google focused approach
                 //options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;   // used when call Challenge()
@@ -187,7 +190,7 @@ namespace CRA_Self_drive_Rental.API
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
-            app.UseCors("AllowAll");         
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();

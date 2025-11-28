@@ -24,5 +24,7 @@ namespace Repository.DTO.RequestDTO
         public string RentType { get; set; }
         [Required]
         public DateTime InvoiceDue { get; set; }
+        public bool IsHoliday { get; set; } = false;
+        public int DistanceInM { get; set; } = 0;
     }
 }

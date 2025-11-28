@@ -51,7 +51,11 @@ namespace Repository.Repositories
         public async Task<Invoice> CreateInvoice(InvoiceCreateRequest request)
         {
             var user = await _context.Cars.Where(c => c.Id == request.CarId)
-                .Include(u => u.Owner).FirstOrDefaultAsync();   
+                .Include(u => u.Owner).FirstOrDefaultAsync();
+            var rentalTotal = request.CarRate * request.RentTime;
+            if (request.IsHoliday == true) rentalTotal = (rentalTotal * 0.2) + rentalTotal;
+            var distanceFee = 0.0;
+            if (request.DistanceInM > 0) distanceFee = (request.DistanceInM / 1000) * 20000; // Example: 20K VND per km
             var newInvoice = new Invoice
             {
                 Id = Guid.NewGuid(),
@@ -59,7 +63,7 @@ namespace Repository.Repositories
                 IssueDate = DateTime.UtcNow,
                 DueDate = request.InvoiceDue,
                 SubTotal = (request.CarRate * request.RentTime) + request.Fees,
-                GrandTotal = (request.CarRate * request.RentTime),
+                GrandTotal = rentalTotal,
                 Note = request.RentType,
                 CreateDate = DateTime.UtcNow,
                 Status = ConstantEnum.Statuses.PENDING,
@@ -70,22 +74,22 @@ namespace Repository.Repositories
                     new InvoiceItem
                     {
                         Id = Guid.NewGuid(),
-                        Item = "Car Rental Total",
+                        Item = "Car Rental After returned",
                         Description = $"Rental for Car ID: {request.CarId} - {request.RentType}",
                         Quantity = request.RentTime,
                         UnitPrice = request.CarRate,
                         Note = $"{request.RentType} rental rate after fee",
-                        Total = (request.CarRate * request.RentTime) - (request.CarRate * request.RentTime*request.Fees)/100
+                        Total = rentalTotal - (rentalTotal *0.15 )
                     },
                     new InvoiceItem
                     {
                         Id = Guid.NewGuid(),
                         Item = "Booking Fees",
                         Description = "Booking Fees",
-                        Note = $"{request.Fees} % of Car Rental Total",
+                        Note = $"{request.Fees} % of Car Rental Total With/Without Transfer Fee",
                         Quantity = 1,
-                        UnitPrice = (request.CarRate * request.RentTime*request.Fees)/100,
-                        Total = (request.CarRate * request.RentTime*request.Fees)/100
+                        UnitPrice = rentalTotal*0.15,
+                        Total = (rentalTotal*0.15)+ distanceFee
                     }
                 }
             };
@@ -104,7 +108,7 @@ namespace Repository.Repositories
                 .Include(i => i.InvoiceItems)
                 .FirstOrDefaultAsync(i => i.Id == request.Id);
             if (invoice == null)
-                {
+            {
                 throw new Exception("Invoice not found");
             }
             invoice.Status = request.status.ToString();
