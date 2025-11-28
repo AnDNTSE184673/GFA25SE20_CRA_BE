@@ -14,9 +14,12 @@ namespace Repository.Data.Entities
         public int Id { get; set; }
         public double? DailyRate { get; set; }
         public double? HourlyRate { get; set; }
+
         public double? WeeklyDiscount { get; set; }
         public double? MonthlyDiscount { get; set; }
-        public double? OvertimeRate { get; set; }
+
+        public int? MaxDistancePerDay { get; set; }
+        public double? OvertravelRatePerKm { get; set; }
         public string Status { get; set; }
 
         public Guid CarId { get; set; }
