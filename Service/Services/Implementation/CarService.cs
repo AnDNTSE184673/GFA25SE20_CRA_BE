@@ -25,7 +25,7 @@ namespace Service.Services.Implementation
         private readonly UploadFile _upload;
 
         int expirationTimeinSeconds = 1800;
-        bool isPublic = false;
+        bool isPublic = true;
 
         public CarService(IMapper mapper, UnitOfWork unitOfWork, UploadFile upload)
         {

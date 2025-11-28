@@ -39,7 +39,7 @@ namespace Service.Services.Implementation
         private readonly ILogger<UserService> _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<UserService>();
 
         int expirationTimeSec = 1800;
-        bool isPublic = false;
+        bool isPublic = true;
 
         public UserService(UploadFile upload, UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email, ILogger<UserService> logger)
         {
