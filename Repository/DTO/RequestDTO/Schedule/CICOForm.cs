@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Repository.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,10 @@ namespace Repository.DTO.RequestDTO.Schedule
 {
     public class CICOForm
     {
-        public Guid UserId { get; set; }
-        public Guid CarId { get; set; }
         public Guid BookingId { get; set; }
+        public Guid ResponsibleStaffId { get; set; }
+        public string Description { get; set; }
+        [MaxFileCount(10)]
         public List<IFormFile> images { get; set; }
     }
 }

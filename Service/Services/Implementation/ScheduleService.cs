@@ -148,7 +148,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string status, ScheduleView view, CICOImageView image)> CheckInAsync(CICOForm form)
+        public async Task<(string status, ScheduleView view, CICOImageView image)> CheckInAsync(CICOForm form, string userAgent)
         {
             try
             {
@@ -160,8 +160,7 @@ namespace Service.Services.Implementation
                 var user = await _unitOfWork._userRepo.GetByIdAsync(booking.UserId);
                 var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
                 if (car == null || booking == null) throw new KeyNotFoundException("Car and user related to the booking not found");
-                if (!(car.Id.Equals(form.CarId)) || !(user.Id.Equals(form.UserId))) throw new InvalidDataException("Car and user is not related to this booking");
-
+               
                 var oldSchedules = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(booking.Id, ConstantEnum.ScheduleTypeConstants.Pickup);
                 if(oldSchedules == null) throw new KeyNotFoundException("Schedules for pick up not found");
                 oldSchedules.Status = ConstantEnum.Statuses.COMPLETED;
@@ -169,6 +168,30 @@ namespace Service.Services.Implementation
                 await _unitOfWork._scheduleRepo.UpdateScheduleAsync(oldSchedules);
 
                 var imageResult = await UploadImageWhenCheckInOutInnerService(booking.Id, form.images, true);
+
+                var newCarHandover = new CarHandoverAudit
+                {
+                    Id = Guid.NewGuid(),
+                    Type = ConstantEnum.ScheduleTypeConstants.Pickup,
+                    Description = form.Description,
+                    ScheduleId = oldSchedules.Id,
+                    ResponsibleStaffId = form.ResponsibleStaffId
+                };
+
+                var handoverResult = await _unitOfWork._carHandoverRepo.CreateCarHandoverAsync(newCarHandover);
+                if (handoverResult.status.Equals(ConstantEnum.RepoStatus.FAILURE)) throw new Exception("Creation of car handover log has failed!");
+
+                var newStaffLog = new StaffLogAudit
+                {
+                    Id = Guid.NewGuid(),
+                    Action = $"Schedules Check-in",
+                    UserAgent = userAgent,
+                    RelatedHandoverId = newCarHandover.Id,
+                    StaffId = form.ResponsibleStaffId
+                };
+
+                var staffLogResult = await _unitOfWork._staffLogRepo.CreateStaffLogAsync(newStaffLog);
+                if (staffLogResult.status.Equals(ConstantEnum.RepoStatus.FAILURE)) throw new Exception("Creation of car handover log has failed!");
 
                 var newSchedules = new CreateScheduleForm
                 {
@@ -212,7 +235,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string status, ScheduleView view, CICOImageView image)> CheckOutAsync(CICOForm form)
+        public async Task<(string status, ScheduleView view, CICOImageView image)> CheckOutAsync(CICOForm form, string userAgent)
         {
             try
             {
@@ -224,8 +247,7 @@ namespace Service.Services.Implementation
                 var user = await _unitOfWork._userRepo.GetByIdAsync(booking.UserId);
                 var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
                 if (car == null || booking == null) throw new KeyNotFoundException("Car and user related to the booking not found");
-                if (!(car.Id.Equals(form.CarId)) || !(user.Id.Equals(form.UserId))) throw new InvalidDataException("Car and user is not related to this booking");
-
+                
                 var oldSchedules = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(booking.Id, ConstantEnum.ScheduleTypeConstants.Return);
                 if (oldSchedules == null) throw new KeyNotFoundException("Schedules for pick up not found");
                 oldSchedules.Status = ConstantEnum.Statuses.COMPLETED;
@@ -233,6 +255,30 @@ namespace Service.Services.Implementation
                 var result1 = await _unitOfWork._scheduleRepo.UpdateScheduleAsync(oldSchedules);
 
                 var imageResult = await UploadImageWhenCheckInOutInnerService(booking.Id, form.images, false);
+
+                var newCarHandover = new CarHandoverAudit
+                {
+                    Id = Guid.NewGuid(),
+                    Type = ConstantEnum.ScheduleTypeConstants.Return,
+                    Description = form.Description,
+                    ScheduleId = oldSchedules.Id,
+                    ResponsibleStaffId = form.ResponsibleStaffId
+                };
+
+                var handoverResult = await _unitOfWork._carHandoverRepo.CreateCarHandoverAsync(newCarHandover);
+                if (handoverResult.status.Equals(ConstantEnum.RepoStatus.FAILURE)) throw new Exception("Creation of car handover log has failed!");
+
+                var newStaffLog = new StaffLogAudit
+                {
+                    Id = Guid.NewGuid(),
+                    Action = $"Schedules Check-out",
+                    UserAgent = userAgent,
+                    RelatedHandoverId = newCarHandover.Id,
+                    StaffId = form.ResponsibleStaffId
+                };
+
+                var staffLogResult = await _unitOfWork._staffLogRepo.CreateStaffLogAsync(newStaffLog);
+                if (staffLogResult.status.Equals(ConstantEnum.RepoStatus.FAILURE)) throw new Exception("Creation of car handover log has failed!");
 
                 await _unitOfWork.CommitTransactionAsync();
 

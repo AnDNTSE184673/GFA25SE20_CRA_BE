@@ -16,7 +16,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             _scheduleServ = scheduleService;
         }
 
-        [HttpGet("car")]
+        [HttpGet("car/{carId}")]
         public async Task<IActionResult> GetScheduleByCar(Guid carId)
         {
             try
@@ -38,7 +38,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("booking")]
+        [HttpGet("booking/{bookingId}")]
         public async Task<IActionResult> GetScheduleByBooking(Guid bookingId)
         {
             try
@@ -60,7 +60,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("user")]
+        [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetScheduleByUser(Guid userId)
         {
             try
@@ -109,7 +109,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
-                var result = await _scheduleServ.CheckInAsync(form);
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                var result = await _scheduleServ.CheckInAsync(form, userAgent);
                 return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {
@@ -135,7 +136,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
-                var result = await _scheduleServ.CheckOutAsync(form);
+                var userAgent = Request.Headers["User-Agent"].ToString();
+                var result = await _scheduleServ.CheckOutAsync(form, userAgent);
                 return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {

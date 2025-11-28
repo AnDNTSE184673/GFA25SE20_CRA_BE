@@ -18,6 +18,7 @@ using Service.Services.Implementation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace CRA_Self_drive_Rental.API
 {
@@ -180,6 +181,7 @@ namespace CRA_Self_drive_Rental.API
 
             //    await next();
             //});
+
             app.UseForwardedHeaders();
             app.UseCookiePolicy();
             app.UseSwagger();
