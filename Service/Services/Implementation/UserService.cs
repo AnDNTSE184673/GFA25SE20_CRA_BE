@@ -117,7 +117,7 @@ namespace Service.Services.Implementation
             if (update < 1)
                 _logger.LogError("Something broke when updating refresh token in DB");
         }
-
+        
         public async Task<LoginResponse> AuthenticateAsync(string email, string password)
         {
             var user = await _unitOfWork._userRepo.Authentication(email, password);
