@@ -554,20 +554,21 @@ namespace Service.Services.Implementation
                 var configSection = _config.GetSection("PayOS");
                 PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
                 var booking = await _unitOfWork._bookingRepo.GetByIdAsync(BookingId);
-                var invoice = await _unitOfWork._invoiceRepo.GetInvoiceById(booking.InvoiceId);
                 InvoiceItem newItem = new InvoiceItem
                 {
                     Id = Guid.NewGuid(),
+                    Item = "Additional Payment",
                     Description = Desc,
                     Quantity = 1,
                     UnitPrice = Amount,
-                    InvoiceId = invoice.Id,
+                    InvoiceId = booking.InvoiceId,
                     Note = "Additional Payment",
                     Total = Amount,
                 };
-                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(invoice.Id, newItem);
+                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newItem);
                 await _unitOfWork.SaveChangesAsync();
-                var addPayment = await _unitOfWork._paymentRepo.CreateNewPaymentForAdditionFee(booking.Id, Amount);
+                var invoice = await _unitOfWork._invoiceRepo.GetInvoiceById(booking.InvoiceId);
+                var addPayment = await _unitOfWork._paymentRepo.CreateNewPaymentForAdditionFee(invoice.Id, Amount);
                 await _unitOfWork.SaveChangesAsync();
                 var paymentRequest = new CreatePaymentLinkRequest
                 {
@@ -601,7 +602,7 @@ namespace Service.Services.Implementation
             catch (Exception ex)
             {
                 _unitOfWork.RollbackTransaction();
-                throw new Exception(ex.Message);
+                throw;
             }
         }
     }

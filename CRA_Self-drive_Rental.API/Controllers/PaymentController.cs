@@ -123,7 +123,10 @@ namespace CRA_Self_drive_Rental.API.Controllers
             var payment = await _paymentService.CreateNewAddPayFromBoooking(request.BookingId, request.Description, request.Amount);
             if (payment != null)
             {
-                return Ok(new {payment.Value.Item1, payment.Value.Item2, payment.Value.Item3});
+                return Ok(new {
+                    OrderCode = payment.Value.Item1, 
+                    PayOSLink = payment.Value.Item2,
+                    payment.Value.Item3});
             }
             return BadRequest("Failed to create additional payment.");
         }

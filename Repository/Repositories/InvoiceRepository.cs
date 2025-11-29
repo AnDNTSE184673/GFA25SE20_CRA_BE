@@ -140,15 +140,18 @@ namespace Repository.Repositories
                 .Include(i => i.InvoiceItems)
                 .FirstOrDefaultAsync(i => i.Id == invoiceId);
             if (invoice == null)
-                {
+            {
                 throw new Exception("Invoice not found");
             }
-            invoice.InvoiceItems.Add(newItem);
-            _context.SaveChanges();
-            var addedItem = await _context.Invoices
+            var InvoiceItem = newItem;
+            InvoiceItem.InvoiceId = invoiceId;
+            _context.InvoiceItems.Add(InvoiceItem);
+            invoice.InvoiceItems.Add(InvoiceItem);
+            await _context.SaveChangesAsync();
+            var updatedInvoice = await _context.Invoices
                 .Include(i => i.InvoiceItems)
                 .FirstOrDefaultAsync(i => i.Id == invoiceId);
-            return addedItem;
+            return invoice;
         }
     }
 }
