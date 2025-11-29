@@ -17,5 +17,6 @@ namespace Repository.Repositories.Interfaces
         Task<List<Invoice>?> GetAllInvoices();
         Task<Invoice> CreateInvoice(InvoiceCreateRequest request);
         Task<Invoice> UpdateInvoice(InvoiceUpdateRequest request);
+        Task<Invoice> AddNewInvoiceItem(Guid invoiceId, InvoiceItem newItem);
     }
 }

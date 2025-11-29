@@ -20,6 +20,30 @@ namespace Repository.Repositories
             _context = context;
         }
 
+        public async Task<PaymentHistory?> CreateNewPaymentForAdditionFee(Guid invoiceId, double fee)
+        {
+            var invoice = await  _context.Invoices.Include(i => i.InvoiceItems).Include(Booking => Booking.Booking)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
+            var newPayment = new PaymentHistory
+            {
+                Id = Guid.NewGuid(),
+                OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                InvoiceId = invoice.Id,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+                Status = "Pending",
+                PaidAmount = fee,
+                UserId = invoice.CustomerId,
+                Item = "Additional Fee",
+                PaymentProofUrl = "N/A",
+                PaymentMethod = "N/A",
+                Note = "Payment for additional fee",
+            };
+            await _context.PaymentHistories.AddAsync(newPayment);
+            await _context.SaveChangesAsync();
+            return await _context.PaymentHistories.FirstOrDefaultAsync(p => p.Id == newPayment.Id);
+        }
+
         public async Task<PaymentHistory?> CreateNewPaymentForBookingFee(Guid invoiceId)
         {
             var invoice = await _context.Invoices.Include(i => i.InvoiceItems).Include(Booking => Booking.Booking)
@@ -90,6 +114,16 @@ namespace Repository.Repositories
             await _context.PaymentHistories.AddAsync(newPayment);
             await _context.SaveChangesAsync();
             return await _context.PaymentHistories.FirstOrDefaultAsync(p => p.Id == newPayment.Id);
+        }
+
+        public async Task<PaymentHistory?> GetPaymentById(Guid paymentId)
+        {
+            var payment = await  _context.PaymentHistories.FirstOrDefaultAsync(p => p.Id == paymentId);
+            if (payment == null)
+            {
+                return null;
+            }
+            return payment;
         }
 
         public async Task<PaymentHistory?> GetPaymentByOrderCode(long orderCode)

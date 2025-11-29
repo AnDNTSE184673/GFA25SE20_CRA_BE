@@ -327,7 +327,7 @@ namespace Service.Services.Implementation
                             }
                         }
                     }
-                    
+
                 }
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -538,6 +538,65 @@ namespace Service.Services.Implementation
                 var updatedPayment = updatedPayments.Where(p => p.Item == "Fine Fee").ToList();
                 var paymentView = _mapper.Map<List<PaymentHistoryView>>(updatedPayment);
                 return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, double Amount)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var configSection = _config.GetSection("PayOS");
+                PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(BookingId);
+                var invoice = await _unitOfWork._invoiceRepo.GetInvoiceById(booking.InvoiceId);
+                InvoiceItem newItem = new InvoiceItem
+                {
+                    Id = Guid.NewGuid(),
+                    Description = Desc,
+                    Quantity = 1,
+                    UnitPrice = Amount,
+                    InvoiceId = invoice.Id,
+                    Note = "Additional Payment",
+                    Total = Amount,
+                };
+                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(invoice.Id, newItem);
+                await _unitOfWork.SaveChangesAsync();
+                var addPayment = await _unitOfWork._paymentRepo.CreateNewPaymentForAdditionFee(booking.Id, Amount);
+                await _unitOfWork.SaveChangesAsync();
+                var paymentRequest = new CreatePaymentLinkRequest
+                {
+                    OrderCode = addPayment.OrderCode,
+                    Amount = (long)(addPayment.PaidAmount),
+                    Description = $"{addPayment.OrderCode}",
+                    ReturnUrl = configSection["ReturnUrl"],
+                    CancelUrl = configSection["CancelUrl"],
+                    ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds(),
+                    Signature = GenerateSignature(
+                        amount: ((long)(addPayment.PaidAmount)).ToString(),
+                        cancelUrl: configSection["CancelUrl"],
+                        description: $"{addPayment.OrderCode}",
+                        orderCode: addPayment.OrderCode.ToString(),
+                        returnUrl: configSection["ReturnUrl"],
+                        //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
+                        checksumKey: configSection["CheckSumKey"]
+                    )
+                };
+                addPayment.Status = "Pending";
+                addPayment.Signature = paymentRequest.Signature;
+                addPayment.PaymentMethod = "PayOS";
+                await _unitOfWork._paymentRepo.UpdateAsync(addPayment);
+                CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(addPayment.Id);
+                var paymentView = _mapper.Map<PaymentHistoryView>(updatedPayment);
+                return (response.OrderCode, response.CheckoutUrl, paymentView);
             }
             catch (Exception ex)
             {

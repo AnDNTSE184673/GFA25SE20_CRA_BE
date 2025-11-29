@@ -133,5 +133,22 @@ namespace Repository.Repositories
             }
             return invoices;
         }
+
+        public async Task<Invoice> AddNewInvoiceItem(Guid invoiceId, InvoiceItem newItem)
+        {
+            var invoice = await _context.Invoices
+                .Include(i => i.InvoiceItems)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
+            if (invoice == null)
+                {
+                throw new Exception("Invoice not found");
+            }
+            invoice.InvoiceItems.Add(newItem);
+            _context.SaveChanges();
+            var addedItem = await _context.Invoices
+                .Include(i => i.InvoiceItems)
+                .FirstOrDefaultAsync(i => i.Id == invoiceId);
+            return addedItem;
+        }
     }
 }
