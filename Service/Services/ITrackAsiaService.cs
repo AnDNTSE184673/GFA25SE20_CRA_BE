@@ -9,6 +9,7 @@ namespace Service.Services
     public interface ITrackAsiaService
     {
         Task<(string, string)?> GetPlaceCoordinate(string address);
+        Task<(string, string)?> GetAddressFromCoordinate(string lat, string lon);
         Task<int?> GetDistanceBetween(string scCoord, string desCoord);
     }
 }

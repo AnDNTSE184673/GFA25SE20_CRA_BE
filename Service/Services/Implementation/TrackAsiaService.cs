@@ -17,6 +17,43 @@ namespace Service.Services.Implementation
             _config = config;
             _httpClient = httpClient;
         }
+
+        public async Task<(string, string)?> GetAddressFromCoordinate(string lat, string lon)
+        {
+            var apiKey = _config["TrackAsia:APIKEY"];
+            var requestUrl = $"https://maps.track-asia.com/api/v2/geocode/json?key={apiKey}&latlng={Uri.EscapeDataString(lat)}%2C{Uri.EscapeDataString(lon)}&new_admin=true&include_old_admin=true";
+            var response = await _httpClient.GetAsync(requestUrl);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to retrieve data from TrackAsia API");
+            }
+            await using var stream = await response.Content.ReadAsStreamAsync();
+            using var doc = await JsonDocument.ParseAsync(stream);
+            if (!doc.RootElement.TryGetProperty("results", out var results) || results.ValueKind != JsonValueKind.Array)
+            {
+                throw new Exception("Invalid response format from TrackAsia API");
+            }
+            var firstResult = results[0];
+
+            string? formatted = null;
+            if (firstResult.TryGetProperty("formatted_address", out var formattedProp) && formattedProp.ValueKind == JsonValueKind.String)
+            {
+                formatted = formattedProp.GetString();
+            }
+
+            string? oldFormatted = null;
+            if (firstResult.TryGetProperty("old_formatted_address", out var oldFormattedProp) && oldFormattedProp.ValueKind == JsonValueKind.String)
+            {
+                oldFormatted = oldFormattedProp.GetString();
+            }
+
+            // If neither exists, return null to indicate no usable address
+            if (formatted == null && oldFormatted == null)
+                return null;
+
+            return (formatted ?? string.Empty, oldFormatted ?? string.Empty);
+        }
+
         public async Task<int?> GetDistanceBetween(string scCoord, string desCoord)
         {
             var apiKey = _config["TrackAsia:APIKEY"];
