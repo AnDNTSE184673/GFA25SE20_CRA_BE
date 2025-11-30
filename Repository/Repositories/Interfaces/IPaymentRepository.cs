@@ -13,6 +13,8 @@ namespace Repository.Repositories.Interfaces
         Task<PaymentHistory?> CreateNewPaymentForBookingFee(Guid invoiceId);
         Task<PaymentHistory?> CreateNewPaymentForRentalFee(Guid invoiceId);
         Task<PaymentHistory?> CreateNewPaymentForFineFee(Guid invoiceId, double fine);
+        Task<PaymentHistory?> CreateNewPaymentForAdditionFee(Guid invoiceId, double fee);
+        Task<PaymentHistory?> GetPaymentById(Guid paymentId);
         Task<PaymentHistory?> UpdatePaymentStatusAndMethod(Guid paymentId, string status, string method);
         Task<List<PaymentHistory>?> GetPaymentsByUserId(Guid userId);
         Task<PaymentHistory?> GetPaymentByOrderCode(long orderCode);

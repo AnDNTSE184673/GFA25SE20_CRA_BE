@@ -6,6 +6,7 @@ using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.Schedule;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Schedule;
+using Repository.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,14 @@ namespace Service.Services.Implementation
         private readonly UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IScheduleService _scheduleServ;
+        private readonly ITrackAsiaService _trackAsiaService;
 
-        public BookingService(UnitOfWork unitOfWork, IMapper mapper, IScheduleService scheduleServ)
+        public BookingService(UnitOfWork unitOfWork, IMapper mapper, IScheduleService scheduleServ, ITrackAsiaService trackAsiaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _scheduleServ = scheduleServ;
+            _trackAsiaService = trackAsiaService;
         }
 
         public async Task<BookingView?> ChangeStatus(Guid bookingId, string status)
@@ -99,17 +102,31 @@ namespace Service.Services.Implementation
             try
             {
                 _unitOfWork.BeginTransaction();
-                var newInvoice = new InvoiceCreateRequest
+                var holidayChecker = new HolidayChecker();
+                var isHoliday = holidayChecker.IsHolidayInDateRange(request.PickupTime, request.DropoffTime);
+                var parkLot = await _unitOfWork._lotRepo.GetLotByNameAsync(request.PickupPlace);
+                int distance;
+                if (parkLot != null)
                 {
-                    CustomerId = request.CustomerId,
-                    VendorId = Guid.NewGuid(), // This should be set appropriately
-                    CarId = request.CarId,
-                    CarRate = request.carRentPrice,
-                    Fees = request.bookingFee,
-                    RentTime = request.rentime,
-                    InvoiceDue = request.DropoffTime,
-                    RentType = request.rentType
-                };
+                    distance = 0;
+                }
+                else
+                {
+                    distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, request.DropoffPlace);
+                }
+                    var newInvoice = new InvoiceCreateRequest
+                    {
+                        CustomerId = request.CustomerId,
+                        VendorId = Guid.NewGuid(), // This should be set appropriately
+                        CarId = request.CarId,
+                        CarRate = request.carRentPrice,
+                        Fees = request.bookingFee,
+                        RentTime = request.rentime,
+                        InvoiceDue = request.DropoffTime,
+                        RentType = request.rentType,
+                        IsHoliday = isHoliday,
+                        DistanceInM = distance
+                    };
                 var invoice = await _unitOfWork._invoiceRepo.CreateInvoice(newInvoice);
                 var newBooking = new Booking
                 {

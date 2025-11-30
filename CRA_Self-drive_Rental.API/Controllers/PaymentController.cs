@@ -117,6 +117,20 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payments created from the specified invoice.");
         }
 
+        [HttpPost("/CreateAdditionalPayment")]
+        public async Task<IActionResult> CreateAdditionalPayment([FromBody] CreateFromBookingOtherFee request)
+        {
+            var payment = await _paymentService.CreateNewAddPayFromBoooking(request.BookingId, request.Description, request.Amount);
+            if (payment != null)
+            {
+                return Ok(new {
+                    OrderCode = payment.Value.Item1, 
+                    PayOSLink = payment.Value.Item2,
+                    payment.Value.Item3});
+            }
+            return BadRequest("Failed to create additional payment.");
+        }
+
         [HttpPatch("/UpdatePayment/Booking/RentalPayment")]
         public async Task<IActionResult> UpdateRentalPayWithBooking([FromBody]UpdatePayUsingBooking request)
         {

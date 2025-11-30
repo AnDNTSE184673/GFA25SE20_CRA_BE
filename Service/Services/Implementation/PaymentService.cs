@@ -295,10 +295,10 @@ namespace Service.Services.Implementation
                 foreach (var payment in paymentHistories)
                 {
                     var payOSResponse = await GetPayOSPaymentResponse(payment.OrderCode);
-                    if (payment.Status != "Paid" || payment.Status != "Success" || payment.Status != "SUCCESS")
+                    if (payment.Status != "Paid" && payment.Status != "Success" && payment.Status != "SUCCESS")
                     {
                         payment.Status = payOSResponse.Status.ToString();
-                        payment.UpdateDate = DateTime.Now;
+                        payment.UpdateDate = DateTime.UtcNow;
                     }
                     await _unitOfWork._paymentRepo.UpdateAsync(payment);
 
@@ -316,18 +316,18 @@ namespace Service.Services.Implementation
                             if (updatedPayment.Status == "Cancelled" || updatedPayment.Status == "Expired")
                             {
                                 books.Status = "Cancelled";
-                                books.UpdateDate = DateTime.Now;
+                                books.UpdateDate = DateTime.UtcNow;
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                             else if (updatedPayment.Status == "Paid" || updatedPayment.Status == "Success" || updatedPayment.Status == "SUCCESS")
                             {
                                 books.Status = "Confirmed";
-                                books.UpdateDate = DateTime.Now;
+                                books.UpdateDate = DateTime.UtcNow;
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                         }
                     }
-                    
+
                 }
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -428,14 +428,18 @@ namespace Service.Services.Implementation
                 {
                     rentalPay.Status = ConstantEnum.Statuses.PAID;
                     rentalPay.PaymentMethod = "Cash On Delivery";
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
                 if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
                 {
                     rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
@@ -465,14 +469,18 @@ namespace Service.Services.Implementation
                 {
                     rentalPay.Status = ConstantEnum.Statuses.PAID;
                     rentalPay.PaymentMethod = "Cash On Delivery";
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
                 if (ConstantEnum.Statuses.CANCELLED.Equals(status, StringComparison.OrdinalIgnoreCase))
                 {
                     rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                    rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                    bookingTask.UpdateDate = DateTime.UtcNow;
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
@@ -504,7 +512,9 @@ namespace Service.Services.Implementation
                     {
                         rentalPay.Status = ConstantEnum.Statuses.PAID;
                         rentalPay.PaymentMethod = "Cash On Delivery";
+                        bookingTask.UpdateDate = DateTime.UtcNow;
                         bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
+                        bookingTask.UpdateDate = DateTime.UtcNow;
                         await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                         await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                     }
@@ -514,7 +524,9 @@ namespace Service.Services.Implementation
                     foreach (var rentalPay in FinePays)
                     {
                         rentalPay.Status = ConstantEnum.Statuses.CANCELLED;
+                        rentalPay.UpdateDate = DateTime.UtcNow;
                         bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
+                        bookingTask.UpdateDate = DateTime.UtcNow;
                         await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                         await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                     }
@@ -531,6 +543,66 @@ namespace Service.Services.Implementation
             {
                 _unitOfWork.RollbackTransaction();
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, double Amount)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var configSection = _config.GetSection("PayOS");
+                PayOSClient payOS = new PayOSClient(configSection["ClientId"], configSection["ApiKey"], configSection["CheckSumKey"]);
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(BookingId);
+                InvoiceItem newItem = new InvoiceItem
+                {
+                    Id = Guid.NewGuid(),
+                    Item = "Additional Payment",
+                    Description = Desc,
+                    Quantity = 1,
+                    UnitPrice = Amount,
+                    InvoiceId = booking.InvoiceId,
+                    Note = "Additional Payment",
+                    Total = Amount,
+                };
+                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newItem);
+                await _unitOfWork.SaveChangesAsync();
+                var invoice = await _unitOfWork._invoiceRepo.GetInvoiceById(booking.InvoiceId);
+                var addPayment = await _unitOfWork._paymentRepo.CreateNewPaymentForAdditionFee(invoice.Id, Amount);
+                await _unitOfWork.SaveChangesAsync();
+                var paymentRequest = new CreatePaymentLinkRequest
+                {
+                    OrderCode = addPayment.OrderCode,
+                    Amount = (long)(addPayment.PaidAmount),
+                    Description = $"{addPayment.OrderCode}",
+                    ReturnUrl = configSection["ReturnUrl"],
+                    CancelUrl = configSection["CancelUrl"],
+                    ExpiredAt = (int)DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds(),
+                    Signature = GenerateSignature(
+                        amount: ((long)(addPayment.PaidAmount)).ToString(),
+                        cancelUrl: configSection["CancelUrl"],
+                        description: $"{addPayment.OrderCode}",
+                        orderCode: addPayment.OrderCode.ToString(),
+                        returnUrl: configSection["ReturnUrl"],
+                        //returnUrl: AppDomain.CurrentDomain.BaseDirectory + "payment-return",
+                        checksumKey: configSection["CheckSumKey"]
+                    )
+                };
+                addPayment.Status = "Pending";
+                addPayment.Signature = paymentRequest.Signature;
+                addPayment.PaymentMethod = "PayOS";
+                await _unitOfWork._paymentRepo.UpdateAsync(addPayment);
+                CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(addPayment.Id);
+                var paymentView = _mapper.Map<PaymentHistoryView>(updatedPayment);
+                return (response.OrderCode, response.CheckoutUrl, paymentView);
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw;
             }
         }
     }
