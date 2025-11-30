@@ -39,5 +39,30 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
+        [HttpPost("GetCoordinateFromAddress")]
+        public async Task<IActionResult> GetCoordinate([FromBody] string address)
+        {
+            try
+            {
+                var coords = await _trackAsiaService.GetPlaceCoordinate(address);
+                if (coords != null)
+                {
+                    return Ok(new
+                    {
+                        Longitude = coords.Value.Item1,
+                        Latitude = coords.Value.Item2
+                    });
+                }
+                return NotFound("Address not found.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }
