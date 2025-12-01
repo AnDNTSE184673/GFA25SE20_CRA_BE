@@ -64,5 +64,33 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
+        [HttpPost("GetDistanceBetweenAddresses")]
+        public async Task<IActionResult> GetDistanceBetweenAddresses([FromBody] DistanceRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var distance = await _trackAsiaService.GetDistanceBetween(request.SourceAddress, request.DestinationAddress);
+                if (distance != null)
+                {
+                    return Ok(new
+                    {
+                        DistanceInMeters = distance.Value
+                    });
+                }
+                return NotFound("Unable to calculate distance between the specified addresses.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }

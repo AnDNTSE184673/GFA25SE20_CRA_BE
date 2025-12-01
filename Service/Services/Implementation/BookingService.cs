@@ -104,7 +104,9 @@ namespace Service.Services.Implementation
                 _unitOfWork.BeginTransaction();
                 var holidayChecker = new HolidayChecker();
                 var isHoliday = holidayChecker.IsHolidayInDateRange(request.PickupTime, request.DropoffTime);
+                var ca = await _unitOfWork._carRepo.GetByIdAsync(request.CarId);
                 var parkLot = await _unitOfWork._lotRepo.GetLotByNameAsync(request.PickupPlace);
+                var carParkLot = await _unitOfWork._lotRepo.GetByIdAsync(ca.PrefLotId);
                 int distance;
                 if (parkLot != null)
                 {
@@ -112,7 +114,7 @@ namespace Service.Services.Implementation
                 }
                 else
                 {
-                    distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, request.DropoffPlace);
+                    distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, carParkLot.Address);
                 }
                     var newInvoice = new InvoiceCreateRequest
                     {
