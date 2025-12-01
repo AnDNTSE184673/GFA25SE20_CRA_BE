@@ -115,6 +115,7 @@ namespace Service.Services.Implementation
                 else
                 {
                     distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, carParkLot.Address);
+                    distance += (int)await _trackAsiaService.GetDistanceBetween(carParkLot.Address, request.DropoffPlace);
                 }
                     var newInvoice = new InvoiceCreateRequest
                     {
@@ -209,6 +210,16 @@ namespace Service.Services.Implementation
                 throw new Exception("Booking not found");
             }
             return booking;
+        }
+
+        public async Task<BookingView?> GetBookingFromInvoice(Guid invoiceId)
+        {
+            var booking = await _unitOfWork._bookingRepo.GetLatestBookingFromInvoice(invoiceId);
+            if (booking == null)
+            {
+                return null;
+            }
+            return _mapper.Map<BookingView>(booking);
         }
 
         public async Task<List<Booking>?> GetBookingsFromCar(Guid carId)
