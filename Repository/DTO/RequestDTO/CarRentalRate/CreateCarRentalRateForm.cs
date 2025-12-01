@@ -12,12 +12,17 @@ namespace Repository.DTO.RequestDTO.CarRentalRate
         //infer one to another
         public double? DailyRate { get; set; }
         public double? HourlyRate { get; set; }
-        [Range(0, 100, ErrorMessage = "Weekly Discount must be between 0% and 100%.")]
+
+        [Range(0, 75, ErrorMessage = "Weekly Discount must be between 0% and 75%.")]
         public double? WeeklyDiscount { get; set; }
-        [Range(0, 100, ErrorMessage = "Monthly Discount must be between 0% and 100%.")]
+
+        [Range(0, 75, ErrorMessage = "Monthly Discount must be between 0% and 75%.")]
         public double? MonthlyDiscount { get; set; }
-        [Range(0, 100, ErrorMessage = "Overtime rate must be between 0% and 100%.")]
-        public double OvertimeRate { get; set; }
+
+        [Range(300, 500, ErrorMessage = "Max distance must be between 300km and 500km.")]
+        public int MaxDistancePerDay { get; set; }
+
+        public double OvertravelRatePerKmInDongperKM { get; set; }
 
         public Guid CarId { get; set; }
 

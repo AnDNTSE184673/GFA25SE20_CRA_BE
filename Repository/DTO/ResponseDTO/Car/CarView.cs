@@ -1,4 +1,5 @@
 ﻿using Repository.Data.Entities;
+using Repository.DTO.ResponseDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.User;
 using System;
@@ -27,6 +28,7 @@ namespace Repository.DTO.ResponseDTO.Car
 
         public UserView Owner { get; set; }
         public ParkingLotView PreferredLot { get; set; }
+        public CarRentalRateView RentalRate { get; set; }
 
         public List<string> ImageUrls { get; set; } = new List<string>();
     }
