@@ -12,6 +12,6 @@ namespace Service.Services
     {
         Task<(string status, CarHandoverAudit obj)> CreateCarHandoverInnerServiceAsync(CarHandoverAudit input);
         Task<List<CarHandoverView>> GetCarHandoversAsync();
-        Task<List<CarHandoverView>> GetCarHandoversBySchedulesAsync(Guid scheduleId);
+        Task<CarHandoverView> GetCarHandoverBySchedulesAsync(Guid scheduleId);
     }
 }

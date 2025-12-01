@@ -171,7 +171,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     })
                     : Ok(new
                     {
-                        Urls = result.signedUrl,
+                        //Urls = result.signedUrl,
                         View = result.view
                     });
             }

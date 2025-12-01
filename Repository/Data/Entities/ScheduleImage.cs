@@ -27,7 +27,7 @@ namespace Repository.Data.Entities
 
         public string Status { get; set; }
 
-        public Guid BookingId { get; set; }
+        public Guid BookingId { get; set; } //essentially booking + cIn/cOut = schedule
 
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; }

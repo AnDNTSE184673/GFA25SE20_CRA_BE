@@ -345,5 +345,34 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        //sent and authenticate (sent means send code, end authenticate to wait code, authenticate to continue)
+        //also reject
+        public Task<string> PreAuthenticateAsync(string givenCode, Guid userId)
+        {
+            try
+            {
+                var OtpSent = _unitOfWork._OtpRepo.FindSentOtpByUserAsync(userId);
+                if(OtpSent != null)
+                {
+                    //validate givenCode == OtpSent.OtpHash?
+                    //if(success) => return "authenticate"
+                    //else => return "reject"
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    //var otpObj = new OtpCode{};
+                    //await _unitOfWork._OtpRepo.CreateOtpCode(otpObj);
+                    //call email or sms messenging here with otp
+                    //return "sent"
+                    throw new NotImplementedException();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

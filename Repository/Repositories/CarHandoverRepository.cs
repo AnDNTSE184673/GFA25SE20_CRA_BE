@@ -42,12 +42,12 @@ namespace Repository.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<CarHandoverAudit>> GetCarHandoversByScheduleAsync(Guid scheduleId)
+        public async Task<CarHandoverAudit> GetCarHandoverByScheduleAsync(Guid scheduleId)
         {
             return await _dbContext.CarHandoverAudits
                 .AsNoTracking()
                 .Where(x => x.ScheduleId.Equals(scheduleId))
-                .ToListAsync();
+                .FirstOrDefaultAsync();
         }
     }
 }

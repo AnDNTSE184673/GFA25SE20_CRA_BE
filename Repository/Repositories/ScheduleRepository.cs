@@ -74,6 +74,17 @@ namespace Repository.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<Schedules>> GetSchedulesByBookingAndType(Guid bookingId, string typeString)
+        {
+            return await _dbContext.Schedules
+                .Where(x => x.BookingId.Equals(bookingId) && x.ScheduleType.Equals(typeString))
+                .Include(x => x.Car)
+                .Include(x => x.User)
+                .Include(x => x.Booking)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<List<Schedules>> GetSchedulesByBooking(Guid bookingId)
         {
             return await _dbContext.Schedules

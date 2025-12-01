@@ -16,10 +16,14 @@ namespace Repository.Data.Entities
 
         public Guid UserId { get; set; }
         public string OtpHash { get; set; }
+
         public DateTime ExpirationTime { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsUsed { get; set; } = false;
         public int AttemptCount { get; set; } = 0;
+
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; }
     }
 }
