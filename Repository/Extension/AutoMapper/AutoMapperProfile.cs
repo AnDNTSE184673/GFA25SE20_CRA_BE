@@ -64,14 +64,18 @@ namespace Repository.Extension.AutoMapper
             CreateMap<User, UserView>();
 
             CreateMap<CarInfoForm, Car>();
-            CreateMap<Car, CarView>();
+            CreateMap<Car, CarView>()
+                .ForMember(d => d.RentalRate, opt => opt.MapFrom(src => src.RentalRate));
 
             CreateMap<DriverLicense, DriverLicenseView>();
 
-            CreateMap<CreateCarRentalRateForm, CarRentalRate>();
+            CreateMap<CreateCarRentalRateForm, CarRentalRate>()
+                .ForMember(d => d.OvertravelRatePerKm, opt => opt.MapFrom(src => src.OvertravelRatePerKmInDongperKM));
             CreateMap<UpdateCarRentalRateForm, CarRentalRate>()
                 .ForMember(d => d.CarId, opt => opt.Ignore())
+                .ForMember(d => d.OvertravelRatePerKm, opt => opt.MapFrom(src => src.OvertravelRatePerKmInDongperKM))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<CarRentalRate, CarRentalRateView>();
 
             CreateMap<CreateScheduleForm, Schedules>();
             CreateMap<UpdateScheduleForm, Schedules>()
@@ -80,7 +84,7 @@ namespace Repository.Extension.AutoMapper
             CreateMap<Schedules, ScheduleView>();
             CreateMap<ScheduleImage, CICOImageView>();
 
-            CreateMap<CarRentalRate, CarRentalRateView>();
+            
 
             CreateMap<CarRegForm, CarRegistration>();
             CreateMap<CarRegistration, CarRegView>();

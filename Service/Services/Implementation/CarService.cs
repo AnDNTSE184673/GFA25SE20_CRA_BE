@@ -52,7 +52,11 @@ namespace Service.Services.Implementation
 
         public async Task<CarView> GetCarByIdAsync(Guid carId)
         {
-            var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", x => x.Owner, x => x.PreferredLot, x => x.Images);
+            var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", 
+                x => x.Owner,
+                x => x.PreferredLot, 
+                x => x.Images,
+                x => x.RentalRate);
             var urls = await Task.WhenAll(car.Images.Select(
                     img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
                     ));

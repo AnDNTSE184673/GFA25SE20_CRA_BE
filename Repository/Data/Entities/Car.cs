@@ -35,5 +35,6 @@ namespace Repository.Data.Entities
         public virtual ParkingLot PreferredLot { get; set; }
 
         public virtual ICollection<CarImage> Images { get; set; }
+        public virtual CarRentalRate RentalRate { get; set; }
     }
 }

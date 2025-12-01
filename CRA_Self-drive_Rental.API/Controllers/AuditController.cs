@@ -39,7 +39,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("staffLogs/{staffid}")]
+        [HttpGet("staffLogs/{staffId}")]
         public async Task<IActionResult> GetStaffLogsByStaffAsync(Guid staffId)
         {
             try

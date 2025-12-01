@@ -11,6 +11,7 @@ namespace Repository.Data.Entities
     public class CarRentalRate
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public double? DailyRate { get; set; }
         public double? HourlyRate { get; set; }
@@ -20,10 +21,15 @@ namespace Repository.Data.Entities
 
         public int? MaxDistancePerDay { get; set; }
         public double? OvertravelRatePerKm { get; set; }
+
         public string Status { get; set; }
 
         public Guid CarId { get; set; }
-
+        /*
+        public int CarPolicyId { get; set; }
+        [ForeignKey("CarPolicyId")]
+        public virtual CarRentalRatePolicy Policy { get; set; }
+        */
         [ForeignKey("CarId")]
         public virtual Car Car { get; set; }
     }

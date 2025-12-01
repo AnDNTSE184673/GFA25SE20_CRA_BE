@@ -98,7 +98,6 @@ namespace Service.Services.Implementation
                 else
                 {
                     var mapped = _mapper.Map<CarRentalRateView>(newRate);
-                    mapped.Car = _mapper.Map<CarView>(car);
                     return (result.status, mapped);
                 }
             }
