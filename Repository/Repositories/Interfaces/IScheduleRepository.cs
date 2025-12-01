@@ -10,6 +10,7 @@ namespace Repository.Repositories.Interfaces
 {
     public interface IScheduleRepository : IGenericRepository<Schedules>
     {
+        Task<List<Schedules>> GetSchedulesByBookingAndType(Guid bookingId, string typeString);
         Task<Schedules> GetLastScheduleByBookingAndType(Guid bookingId, string type);
         Task<List<Schedules>> GetSchedulesByCar(Guid carId);
         Task<List<Schedules>> GetSchedulesByUser(Guid userId);

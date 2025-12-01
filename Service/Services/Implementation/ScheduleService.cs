@@ -525,16 +525,41 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string[] signedUrl, List<CICOImageView> view)> GetCICOImageByBooking(CICOImageSearch form)
+        public async Task<(string[] signedUrl, CICOImageView view)> GetCICOImageByBooking(CICOImageSearch form)
         {
-            var rows = await _unitOfWork._scheduleRepo.GetScheduleImageByBookingAndState(form.BookingId, form.isCheckIn);
-            var uploadTasks = new List<Task<string>>();
-            foreach (var r in rows)
+            try
             {
-                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
+                var rows = await _unitOfWork._scheduleRepo.GetScheduleImageByBookingAndState(form.BookingId, form.isCheckIn);
+
+                string type = "";
+                if (form.isCheckIn) type = ConstantEnum.ScheduleTypeConstants.Pickup;
+                else type = ConstantEnum.ScheduleTypeConstants.Return;
+
+                var schedule = await _unitOfWork._scheduleRepo.GetLastScheduleByBookingAndType(form.BookingId, type);
+
+                var rows2 = await _unitOfWork._carHandoverRepo.GetCarHandoverByScheduleAsync(schedule.Id);
+
+                var uploadTasks = new List<Task<string>>();
+                foreach (var r in rows)
+                {
+                    uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
+                }
+                var uploadResults = await Task.WhenAll(uploadTasks);
+                var mapped = new CICOImageView
+                {
+                    BookingId = form.BookingId,
+                    Urls = uploadResults.ToList(),
+                    Description = rows2 != null ? rows2.Description : "There is no Car Handover Audit with this",
+                    CreateDate = rows.FirstOrDefault().CreateDate,
+                    Status = rows.FirstOrDefault().Status
+                };
+
+                return (uploadResults, mapped);
             }
-            var uploadResults = await Task.WhenAll(uploadTasks);
-            return (uploadResults, _mapper.Map<List<CICOImageView>>(rows));
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<(string status, CICOImageView regDoc)> UploadImageWhenCheckInOut(CheckInOutImages form)

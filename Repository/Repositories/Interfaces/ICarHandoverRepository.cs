@@ -12,6 +12,6 @@ namespace Repository.Repositories.Interfaces
     {
         Task<(string status, CarHandoverAudit obj)> CreateCarHandoverAsync(CarHandoverAudit input);
         Task<List<CarHandoverAudit>> GetCarHandoversAsync();
-        Task<List<CarHandoverAudit>> GetCarHandoversByScheduleAsync(Guid scheduleId);
+        Task<CarHandoverAudit> GetCarHandoverByScheduleAsync(Guid scheduleId);
     }
 }
