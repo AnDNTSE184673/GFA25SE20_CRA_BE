@@ -54,6 +54,18 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound();
         }
 
+        [HttpGet("GetBookingsByInvoice/{invoiceId}")]
+        public async Task<IActionResult> GetBookingsByInvoice(Guid invoiceId)
+        {
+            if (invoiceId == Guid.Empty) return BadRequest();
+            var bookings = await _bookingService.GetBookingFromInvoice(invoiceId);
+            if (bookings != null)
+            {
+                return Ok(bookings);
+            }
+            return NotFound();
+        }
+
         [HttpPost("CreateBooking")]
         public async Task<IActionResult> CreateBooking([FromBody]BookingCreateRequest request)
         {

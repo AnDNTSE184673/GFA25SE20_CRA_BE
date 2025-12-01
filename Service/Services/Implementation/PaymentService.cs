@@ -125,6 +125,28 @@ namespace Service.Services.Implementation
             if (paymentHis != null)
             {
                 paymentHis.Status = response.Status.ToString();
+                paymentHis.UpdateDate = DateTime.UtcNow;
+                var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(paymentHis.UserId);
+                var bknd = bookings.FirstOrDefault(x => x.InvoiceId == paymentHis.InvoiceId);
+                if (paymentHis.Status.Equals("Paid") || paymentHis.Status.Equals("PAID"))
+                {
+                    if (paymentHis.Item.Equals("Booking Fee"))
+                    {
+                        bknd.UpdateDate = DateTime.UtcNow;
+                        bknd.Status = ConstantEnum.Statuses.CONFIRMED;
+                    }
+                    else if (paymentHis.Item.Equals("Rental Fee"))
+                    {
+                        bknd.UpdateDate = DateTime.UtcNow;
+                        bknd.Status = ConstantEnum.Statuses.COMPLETED;
+                    }
+                }
+                else if (paymentHis.Status.Equals("CANCELLED") || paymentHis.Status.Equals("Cancelled") || paymentHis.Status.Equals("Expired") || paymentHis.Status.Equals("Expired"))
+                {
+                    bknd.UpdateDate = DateTime.UtcNow;
+                    bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                }
+                await _unitOfWork._bookingRepo.UpdateAsync(bknd);
                 await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
                 await _unitOfWork.SaveChangesAsync();
             }

@@ -186,14 +186,15 @@ namespace CRA_Self_drive_Rental.API
             //});
 
             app.UseForwardedHeaders();
+            app.UseHttpsRedirection();
             app.UseCookiePolicy();
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
-            app.UseCors("AllowAll");
-            app.UseHttpsRedirection();
+            app.UseCors("AllowAll");            
             app.UseAuthentication();
             app.UseAuthorization();
+            
             app.MapControllers();
 
             //navigate to this path to check environment

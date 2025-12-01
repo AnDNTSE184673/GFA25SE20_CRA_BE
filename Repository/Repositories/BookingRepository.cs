@@ -58,5 +58,13 @@ namespace Repository.Repositories
                 .ToListAsync();
             return bookings;
         }
+
+        public async Task<Booking?> GetLatestBookingFromInvoice(Guid invoiceId)
+        {
+            var booking = await _context.BookingHistories
+                .Where(b => b.InvoiceId == invoiceId)
+                .FirstOrDefaultAsync();
+            return booking;
+        }
     }
 }

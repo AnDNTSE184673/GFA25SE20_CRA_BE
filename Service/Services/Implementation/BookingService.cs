@@ -104,7 +104,9 @@ namespace Service.Services.Implementation
                 _unitOfWork.BeginTransaction();
                 var holidayChecker = new HolidayChecker();
                 var isHoliday = holidayChecker.IsHolidayInDateRange(request.PickupTime, request.DropoffTime);
+                var ca = await _unitOfWork._carRepo.GetByIdAsync(request.CarId);
                 var parkLot = await _unitOfWork._lotRepo.GetLotByNameAsync(request.PickupPlace);
+                var carParkLot = await _unitOfWork._lotRepo.GetByIdAsync(ca.PrefLotId);
                 int distance;
                 if (parkLot != null)
                 {
@@ -112,7 +114,8 @@ namespace Service.Services.Implementation
                 }
                 else
                 {
-                    distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, request.DropoffPlace);
+                    distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, carParkLot.Address);
+                    distance += (int)await _trackAsiaService.GetDistanceBetween(carParkLot.Address, request.DropoffPlace);
                 }
                     var newInvoice = new InvoiceCreateRequest
                     {
@@ -207,6 +210,16 @@ namespace Service.Services.Implementation
                 throw new Exception("Booking not found");
             }
             return booking;
+        }
+
+        public async Task<BookingView?> GetBookingFromInvoice(Guid invoiceId)
+        {
+            var booking = await _unitOfWork._bookingRepo.GetLatestBookingFromInvoice(invoiceId);
+            if (booking == null)
+            {
+                return null;
+            }
+            return _mapper.Map<BookingView>(booking);
         }
 
         public async Task<List<Booking>?> GetBookingsFromCar(Guid carId)
