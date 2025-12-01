@@ -11,6 +11,7 @@ namespace Repository.DTO.ResponseDTO.Schedule
         public Guid? BookingId { get; set; }
 
         public List<string> Urls { get; set; }
+        public string Description { get; set; }
         public DateTime CreateDate { get; set; }
 
         public string Status { get; set; }

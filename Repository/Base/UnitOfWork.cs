@@ -32,6 +32,7 @@ namespace Repository.Base
         public IScheduleRepository _scheduleRepo { get; }
         public IStaffLogRepository _staffLogRepo { get; }
         public ICarHandoverRepository _carHandoverRepo { get; }
+        public IOtpRepository _OtpRepo { get; }
 
         //no need to construct _transaction
 
@@ -50,6 +51,7 @@ namespace Repository.Base
             IScheduleRepository scheduleRepo,
             IStaffLogRepository staffLogRepo,
             ICarHandoverRepository carHandoverRepo,
+            IOtpRepository OtpRepo,
             IPaymentRepository paymentRepo)
         {
             _context = context;
@@ -68,6 +70,7 @@ namespace Repository.Base
             _paymentRepo = paymentRepo;
             _staffLogRepo = staffLogRepo;
             _carHandoverRepo = carHandoverRepo;
+            _OtpRepo = OtpRepo;
         }
 
         //no need to construct _transaction

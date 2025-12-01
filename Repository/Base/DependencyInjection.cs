@@ -59,6 +59,7 @@ namespace Repository.Base
             service.AddScoped<IDriverLicenseRepository, DriverLicenseRepository>();
             service.AddScoped<IScheduleRepository, ScheduleRepository>();
             service.AddScoped<IStaffLogRepository, StaffLogRepository>();
+            service.AddScoped<IOtpRepository, OtpRepository>();
             return service;
         }
     }

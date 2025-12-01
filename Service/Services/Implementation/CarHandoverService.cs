@@ -50,10 +50,10 @@ namespace Service.Services.Implementation
             return _mapper.Map<List<CarHandoverView>>(result);
         }
 
-        public async Task<List<CarHandoverView>> GetCarHandoversBySchedulesAsync(Guid scheduleId)
+        public async Task<CarHandoverView> GetCarHandoverBySchedulesAsync(Guid scheduleId)
         {
-            var result = await _unitOfWork._carHandoverRepo.GetCarHandoversByScheduleAsync(scheduleId);
-            return _mapper.Map<List<CarHandoverView>>(result);
+            var result = await _unitOfWork._carHandoverRepo.GetCarHandoverByScheduleAsync(scheduleId);
+            return _mapper.Map<CarHandoverView>(result);
         }
     }
 }

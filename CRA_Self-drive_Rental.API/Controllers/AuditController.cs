@@ -88,8 +88,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
-                var result = await _handoverServ.GetCarHandoversBySchedulesAsync(scheduleId);
-                return !result.Any()
+                var result = await _handoverServ.GetCarHandoverBySchedulesAsync(scheduleId);
+                return result == null
                     ? StatusCode(StatusCodes.Status404NotFound, new
                     {
                         Message = "Data fetch error, check log and form"
