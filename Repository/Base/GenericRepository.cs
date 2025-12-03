@@ -142,6 +142,11 @@ namespace Repository.Base
             return await _dbContext.SaveChangesAsync();
         }
 
+        public void CreateUoW(T entity)
+        {
+            Entities.Add(entity);
+        }
+
         public int Create(IEnumerable<T> entities)
         {
             Entities.AddRange(entities);
@@ -152,6 +157,11 @@ namespace Repository.Base
         {
             Entities.AddRange(entities);
             return await _dbContext.SaveChangesAsync();
+        }
+
+        public void CreateUoW(IEnumerable<T> entities)
+        {
+            Entities.AddRange(entities);
         }
 
         // ========== UPDATE ==========
@@ -174,6 +184,17 @@ namespace Repository.Base
             return entity;
         }
 
+        public void UpdateUoW(T entity)
+        {
+            _dbContext.Attach(entity).State = EntityState.Modified;
+        }
+
+        public T UpdateReturnItemUoW(T entity)
+        {
+            _dbContext.Attach(entity).State = EntityState.Modified;
+            return entity;
+        }
+
         // ========== DELETE ==========
         public bool Remove(T entity)
         {
@@ -189,5 +210,13 @@ namespace Repository.Base
             await _dbContext.SaveChangesAsync();
             return true;
         }
+
+        public bool RemoveUoW(T? entity)
+        {
+            if (entity == null) return false;
+            Entities.Remove(entity);
+            return true;
+        }
     }
 }
+

@@ -68,7 +68,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     {
                         Message = "Data fetch error, check log and form"
                     })
-                    : Ok(result);
+                    : Ok(new
+                    {
+                        Urls = result.signedUrl,
+                        View = result.view
+                    });
             }
             catch (Exception ex)
             {
