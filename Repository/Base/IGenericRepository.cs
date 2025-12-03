@@ -33,14 +33,21 @@ namespace Repository.Base
         int Create(IEnumerable<T> entities);
         Task<int> CreateAsync(IEnumerable<T> entities);
 
+        void CreateUoW(T entity);
+        void CreateUoW(IEnumerable<T> entities);
+
         // ========== UPDATE ==========
         int Update(T entity);
         Task<int> UpdateAsync(T entity);
         Task<T> UpdateAsyncReturnItem(T entity);
 
+        void UpdateUoW(T entity);
+        T UpdateReturnItemUoW(T entity);
+
         // ========== DELETE ==========
         bool Remove(T entity);
         Task<bool> RemoveAsync(T? entity);
+        bool RemoveUoW(T? entity);
     }
 
 }

@@ -150,5 +150,60 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
+        [HttpPatch("driverLicense/approve")]
+        public async Task<IActionResult> ApproveDocument(LicenseSearchForm form, bool isApproved)
+        {
+            try
+            {
+                var validation = form.IsValid();
+
+                if (!validation)
+                    throw new InvalidOperationException("Fill 1 of 2 complete pairs of data");
+
+                var result = await _licenseService.ApproveLicenseAsync(form, isApproved);
+
+                return result.status.Equals(ConstantEnum.RepoStatus.FAILURE)
+                    ? StatusCode(500, new
+                    {
+                        Message = "Data edit error, check log and form"
+                    })
+                    : Ok(result.view);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("driverLicense/all")]
+        public async Task<IActionResult> GetAllDocuments()
+        {
+            try
+            {
+                var result = await _licenseService.GetAllDocumentsAsync();
+                return !result.view.Any()
+                    ? StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Message = "Data fetch error, check log and form"
+                    })
+                    : Ok(new
+                    {
+                        Urls = result.signedUrl,
+                        View = result.view
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+
+        }
     }
 }
