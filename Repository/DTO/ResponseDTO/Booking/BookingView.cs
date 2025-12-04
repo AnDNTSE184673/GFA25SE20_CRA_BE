@@ -11,6 +11,7 @@ namespace Repository.DTO.ResponseDTO.Booking
     public class BookingView
     {
         public Guid Id { get; set; }
+        public string BookingNumber { get; set; }
         public string PickupPlace { get; set; }
         public DateTime PickupTime { get; set; }
         public string DropoffPlace { get; set; }

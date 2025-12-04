@@ -10,7 +10,7 @@ namespace Repository.Data.Entities
     public class Booking
     {
         public Guid Id { get; set; }
-
+        public string BookingNumber { get; set; }
         public string PickupPlace { get; set; }
         public DateTime PickupTime { get; set; }
        

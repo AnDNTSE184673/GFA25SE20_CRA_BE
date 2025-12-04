@@ -114,8 +114,7 @@ namespace Service.Services.Implementation
                 }
                 else
                 {
-                    distance = (int)await _trackAsiaService.GetDistanceBetween(request.PickupPlace, carParkLot.Address);
-                    distance += (int)await _trackAsiaService.GetDistanceBetween(carParkLot.Address, request.DropoffPlace);
+                    distance = (int)await _trackAsiaService.GetDistanceBetween(carParkLot.Address, request.PickupPlace);
                 }
                     var newInvoice = new InvoiceCreateRequest
                     {
@@ -134,6 +133,7 @@ namespace Service.Services.Implementation
                 var newBooking = new Booking
                 {
                     Id = Guid.NewGuid(),
+                    BookingNumber = $"BK{_unitOfWork._bookingRepo.GetAll().Count()}-{DateTime.UtcNow.ToString("dd-MM-yyyy")}",
                     CreateDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow,
                     PickupPlace = request.PickupPlace,
@@ -210,6 +210,16 @@ namespace Service.Services.Implementation
                 throw new Exception("Booking not found");
             }
             return booking;
+        }
+
+        public async Task<BookingView?> GetBookingFromBookingNumber(string bookingNum)
+        {
+            var booking = await _unitOfWork._bookingRepo.GetBookingFromBookingNum(bookingNum);
+            if (booking == null)
+            {
+                return null;
+            }
+            return _mapper.Map<BookingView>(booking);
         }
 
         public async Task<BookingView?> GetBookingFromInvoice(Guid invoiceId)
