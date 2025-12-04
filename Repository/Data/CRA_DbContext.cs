@@ -24,6 +24,8 @@ namespace Repository.Data
         public DbSet<CarImage> CarImages { get; set; }
         public DbSet<CarRegistration> CarRegistrations { get; set; }
         public DbSet<CarRentalRate> CarRentalRates { get; set; }
+        public DbSet<CarDetailsManufacturer> CarDetailsManufacturers { get; set; }
+        public DbSet<CarDetailsModel> CarDetailsModels { get; set; }
         //public DbSet<CarRentalRatePolicy> CarRentalRatePolicy { get; set; }
         public DbSet<CarHandoverAudit> CarHandoverAudits { get; set; }
         public DbSet<Contract> Contracts { get; set; }

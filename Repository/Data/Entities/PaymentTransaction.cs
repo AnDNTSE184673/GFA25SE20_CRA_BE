@@ -14,7 +14,7 @@ namespace Repository.Data.Entities
         public string TransactionId { get; set; }
         public string TransactionStatus { get; set; } 
         public string Signature { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
         public DateTime PaidDate { get; set; }
         public string ResponseData { get; set; }
 

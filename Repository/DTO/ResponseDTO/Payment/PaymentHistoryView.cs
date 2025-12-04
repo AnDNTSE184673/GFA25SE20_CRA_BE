@@ -11,7 +11,7 @@ namespace Repository.DTO.ResponseDTO.Payment
         public Guid Id { get; set; }
         public long OrderCode { get; set; }
         public string Item { get; set; }
-        public double PaidAmount { get; set; }
+        public decimal PaidAmount { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public string PaymentMethod { get; set; }

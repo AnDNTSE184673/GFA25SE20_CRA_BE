@@ -259,7 +259,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<PaymentHistoryView?> CreateNewFinePaymentFromInvoice(Guid InvoiceId, double fine)
+        public async Task<PaymentHistoryView?> CreateNewFinePaymentFromInvoice(Guid InvoiceId, decimal fine)
         {
             try
             {
@@ -568,7 +568,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, double Amount)
+        public async Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, decimal Amount)
         {
             try
             {

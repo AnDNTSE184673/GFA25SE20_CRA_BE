@@ -8,20 +8,14 @@ using System.Threading.Tasks;
 
 namespace Repository.Data.Entities
 {
-    public class CarRentalRatePolicy
+    public class CarDetailsManufacturer
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        // Late return
-        public int LateReturnGracePeriodMinutes { get; set; } = 15;
-        public decimal? LateReturnFeePerHour { get; set; }
 
-        public decimal HolidayDiscount { get; set; }
-
-        public int CarRateId { get; set; }
-
-        [ForeignKey("CarRateId")]
-        public virtual CarRentalRate Rate { get; set; }
+        [Required]
+        public string Manufacturer { get; set; }
+        public string Country { get; set; }
     }
 }

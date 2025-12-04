@@ -20,7 +20,7 @@ namespace Repository.Repositories
             _context = context;
         }
 
-        public async Task<PaymentHistory?> CreateNewPaymentForAdditionFee(Guid invoiceId, double fee)
+        public async Task<PaymentHistory?> CreateNewPaymentForAdditionFee(Guid invoiceId, decimal fee)
         {
             var invoice = await  _context.Invoices.Include(i => i.InvoiceItems).Include(Booking => Booking.Booking)
                 .FirstOrDefaultAsync(i => i.Id == invoiceId);
@@ -68,7 +68,7 @@ namespace Repository.Repositories
             return  await _context.PaymentHistories.FirstOrDefaultAsync(p => p.Id == newPayment.Id);
         }
 
-        public async Task<PaymentHistory?> CreateNewPaymentForFineFee(Guid invoiceId, double fine)
+        public async Task<PaymentHistory?> CreateNewPaymentForFineFee(Guid invoiceId, decimal fine)
         {
             var invoice = await _context.Invoices.Include(i => i.InvoiceItems).Include(Booking => Booking.Booking)
                 .FirstOrDefaultAsync(i => i.Id == invoiceId);

@@ -15,8 +15,8 @@ namespace Repository.Data.Entities
         public string InvoiceNo { get; set; }
         public DateTime IssueDate { get; set; }
         public DateTime DueDate { get; set; }
-        public double SubTotal { get; set; }
-        public double GrandTotal { get; set; }
+        public decimal SubTotal { get; set; }
+        public decimal GrandTotal { get; set; }
         public string? Note { get; set; }
         public DateTime CreateDate { get; set; }
 

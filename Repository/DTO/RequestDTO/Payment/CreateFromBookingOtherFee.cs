@@ -10,6 +10,6 @@ namespace Repository.DTO.RequestDTO.Payment
     {
         public Guid BookingId { get; set; }
         public string Description { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
     }
 }

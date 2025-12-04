@@ -30,7 +30,7 @@ namespace Service.Services
         Task<PaymentHistoryView?> UpdateBookingPayWithBooking(Guid bookingId, string status);
         Task<List<PaymentHistoryView>?> UpdateOtherPayWithBooking(Guid bookingId, string status);
         Task<List<PaymentHistoryView>?> CreatePaymentFromInvoice(Guid InvoiceId);
-        Task<PaymentHistoryView?> CreateNewFinePaymentFromInvoice(Guid InvoiceId, double fine);
-        Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, double Amount);
+        Task<PaymentHistoryView?> CreateNewFinePaymentFromInvoice(Guid InvoiceId, decimal fine);
+        Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, decimal Amount);
     }
 }

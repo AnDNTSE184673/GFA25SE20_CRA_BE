@@ -123,7 +123,7 @@ namespace Service.Services.Implementation
                         VendorId = Guid.NewGuid(), // This should be set appropriately
                         CarId = request.CarId,
                         CarRate = request.carRentPrice,
-                        Fees = request.bookingFee,
+                        Fees = (decimal)request.bookingFee,
                         RentTime = request.rentime,
                         InvoiceDue = request.DropoffTime,
                         RentType = request.rentType,
