@@ -71,14 +71,14 @@ namespace Service.Services.Implementation
 
                 if (form.IsValid().isHourly)
                 {
-                    if (!(form.DailyRate <= 0.0))
+                    if (!(form.DailyRate <= 0))
                     {
                         form.DailyRate = form.HourlyRate * 24;
                     }
                 }
                 else
                 {
-                    if (!(form.HourlyRate <= 0.0))
+                    if (!(form.HourlyRate <= 0))
                     {
                         form.HourlyRate = form.DailyRate / 24;
                     }

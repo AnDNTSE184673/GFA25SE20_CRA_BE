@@ -13,14 +13,14 @@ namespace Repository.Data.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public double? DailyRate { get; set; }
-        public double? HourlyRate { get; set; }
+        public decimal? DailyRate { get; set; }
+        public decimal? HourlyRate { get; set; }
 
         public double? WeeklyDiscount { get; set; }
         public double? MonthlyDiscount { get; set; }
 
         public int? MaxDistancePerDay { get; set; }
-        public double? OvertravelRatePerKm { get; set; }
+        public decimal? OvertravelRatePerKm { get; set; }
 
         public string Status { get; set; }
 

@@ -13,7 +13,7 @@ namespace Repository.Data.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long OrderCode { get; set; }
         public string Item { get; set; }
-        public double PaidAmount { get; set; }
+        public decimal PaidAmount { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public string PaymentProofUrl { get; set; }

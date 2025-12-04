@@ -59,9 +59,8 @@ namespace Repository.Repositories
             {
                 rentalTotal = request.CarRate * request.RentTime;
             }
-            
-            if (request.IsHoliday == true) rentalTotal = (rentalTotal * 0.2) + rentalTotal;
-            var distanceFee = 0.0;
+            if (request.IsHoliday == true) rentalTotal = (rentalTotal * 0.2m) + rentalTotal;
+            var distanceFee = 0.0m;
             if (request.DistanceInM > 0) distanceFee = (request.DistanceInM / 1000) * 20000; // Example: 20K VND per km
             var newInvoice = new Invoice
             {
@@ -70,12 +69,12 @@ namespace Repository.Repositories
                 IssueDate = DateTime.UtcNow,
                 DueDate = request.InvoiceDue,
                 SubTotal = (request.CarRate * request.RentTime) + request.Fees,
-                GrandTotal = (double)rentalTotal,
+                GrandTotal = rentalTotal ?? 0m,
                 Note = request.RentType,
                 CreateDate = DateTime.UtcNow,
                 Status = ConstantEnum.Statuses.PENDING,
                 CustomerId = request.CustomerId,
-                VendorId = user.Owner.Id,
+                VendorId = user?.Owner?.Id ?? Guid.Empty,
                 InvoiceItems = new List<InvoiceItem>
                 {
                     new InvoiceItem
@@ -86,7 +85,7 @@ namespace Repository.Repositories
                         Quantity = request.RentTime,
                         UnitPrice = request.CarRate,
                         Note = $"{request.RentType} rental rate after fee",
-                        Total = (double)(rentalTotal - (rentalTotal *0.15 ))
+                        Total = (decimal)(rentalTotal - (rentalTotal * 0.15m))
                     },
                     new InvoiceItem
                     {
@@ -95,8 +94,8 @@ namespace Repository.Repositories
                         Description = "Booking Fees",
                         Note = $"{request.Fees} % of Car Rental Total With/Without Transfer Fee",
                         Quantity = 1,
-                        UnitPrice = (double)(rentalTotal*0.15),
-                        Total = (double)((rentalTotal*0.15)+ distanceFee)
+                        UnitPrice = (decimal)(rentalTotal * 0.15m),
+                        Total = (decimal)((rentalTotal * 0.15m) + distanceFee)
                     }
                 }
             };

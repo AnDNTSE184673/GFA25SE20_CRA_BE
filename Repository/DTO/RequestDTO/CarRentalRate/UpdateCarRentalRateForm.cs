@@ -10,8 +10,8 @@ namespace Repository.DTO.RequestDTO.CarRentalRate
     public class UpdateCarRentalRateForm
     {
         //infer one to another
-        public double? DailyRate { get; set; }
-        public double? HourlyRate { get; set; }
+        public decimal? DailyRate { get; set; }
+        public decimal? HourlyRate { get; set; }
 
         [Range(0, 75, ErrorMessage = "Weekly Discount must be between 0% and 75%.")]
         public double? WeeklyDiscount { get; set; }
@@ -22,7 +22,7 @@ namespace Repository.DTO.RequestDTO.CarRentalRate
         [Range(300, 500, ErrorMessage = "Max distance must be between 300km and 500km.")]
         public int MaxDistancePerDay { get; set; }
 
-        public double OvertravelRatePerKmInDongperKM { get; set; }
+        public decimal OvertravelRatePerKmInDongperKM { get; set; }
 
         public Guid CarId { get; set; }
 

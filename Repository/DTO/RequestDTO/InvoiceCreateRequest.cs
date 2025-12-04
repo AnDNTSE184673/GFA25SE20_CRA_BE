@@ -15,9 +15,9 @@ namespace Repository.DTO.RequestDTO
         [Required]
         public Guid CarId { get; set; }
         [Required]
-        public double CarRate { get; set; }
+        public decimal CarRate { get; set; }
         [Required]
-        public double Fees { get; set; }
+        public decimal Fees { get; set; }
         [Required]
         public int RentTime { get; set; }
         [Required]
