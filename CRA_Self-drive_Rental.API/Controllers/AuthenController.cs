@@ -90,9 +90,33 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 if (response.login == null && response.register == null)
                     throw new Exception("Something went wrong, contact admin");
                 else if (response.login != null)
-                    return Ok(response.login);
+                {
+                    var json = System.Text.Json.JsonSerializer.Serialize(response.login);
+
+                    string html = $@"
+                    <script>
+                    // Send JSON back to the opener (your frontend)
+                    window.opener.postMessage({json}, '*');
+                    window.close();
+                    </script>";
+
+                    return Content(html, "text/html");
+                    //return Ok(response.login);
+                }
                 else if (response.register != null)
-                    return Ok(response.register);
+                {
+                    var json = System.Text.Json.JsonSerializer.Serialize(response.register);
+
+                    string html = $@"
+                    <script>
+                    // Send JSON back to the opener (your frontend)
+                    window.opener.postMessage({json}, '*');
+                    window.close();
+                    </script>";
+
+                    return Content(html, "text/html");
+                    //return Ok(response.register);
+                }
                 else
                     throw new Exception("Something went wrong, contact admin");
             }

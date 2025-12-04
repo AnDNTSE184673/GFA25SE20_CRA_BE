@@ -66,5 +66,14 @@ namespace Repository.Repositories
                 .FirstOrDefaultAsync();
             return booking;
         }
+
+        public async Task<Booking?> GetBookingFromBookingNum(string bookNum)
+        {
+            return await _context.BookingHistories.Where(b => b.BookingNumber == bookNum)
+                .Include(x => x.Invoice)
+                .Include(x => x.User)
+                .Include(x => x.Car)
+                .FirstOrDefaultAsync();
+        }
     }
 }
