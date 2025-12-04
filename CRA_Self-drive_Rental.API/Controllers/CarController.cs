@@ -350,5 +350,49 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
+        [HttpGet("lookup/Manufacturer")]
+        public async Task<IActionResult> GetManufacturerLookup()
+        {
+            try
+            {
+                var result = await _carServ.GetManufacturerLookup();
+                return !result.Any()
+                    ? StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Message = "Lookup table not found or have no data!"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("lookup/Model")]
+        public async Task<IActionResult> GetModelLookupOfManufacturer([FromQuery] string manufacturerName)
+        {
+            try
+            {
+                var result = await _carServ.GetModelLookupOfManufacturer(manufacturerName);
+                return !result.Any()
+                    ? StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Message = "Lookup table not found or have no data!"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }

@@ -65,6 +65,16 @@ namespace Service.Services.Implementation
             return carView;
         }
 
+        public Task<List<CarDetailsManufacturer>> GetManufacturerLookup()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(string manufacturerName)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form)
         {
             try
