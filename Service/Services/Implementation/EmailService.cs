@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Service.Implementation
+namespace Service.Services.Implementation
 {
     public class EmailService : IEmailService
     {
