@@ -19,7 +19,6 @@ using Repository.Constant;
 using Repositories.DTO.ResponseDTO.User;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 using Microsoft.Extensions.Configuration;
-using Services.Service;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Repository.CustomFunctions.SupabaseFileUploader;
@@ -62,6 +61,11 @@ namespace Service.Services.Implementation
             if (existing == null)
             {
                 var result = await GoogleRegister(email, name, googleId);
+                var user = _unitOfWork._userRepo.GetByEmail(result.user.Email);
+                var token = _jwtService.GenerateAccessToken(user);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+                await RefreshTokenAsync(refreshToken, user);
+                result.user.JwtToken = token.token;
                 return (null, result.user);
             }
             else
@@ -96,11 +100,11 @@ namespace Service.Services.Implementation
                 if (response.status.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
                     var body = _email.GenerateBodyRegisterSuccess(response.user.Username, response.user.Password, "S", "");
-                    _email.SendEmailAsync("YuuZone Account Registration", body, response.user.Email, response.user.Fullname);
+                    _email.SendEmailAsync("Morent Self-driving Rental", body, response.user.Email, response.user.Fullname);
                     return (response.status, _mapper.Map<UserPostRegView>(response.user));
                 }
                 else
-                    return (response.status, null);
+                    return (response.status, _mapper.Map<UserPostRegView>(response.user));
             }
             catch (Exception ex)
             {
