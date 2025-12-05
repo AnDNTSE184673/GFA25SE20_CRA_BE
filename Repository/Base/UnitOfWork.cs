@@ -33,14 +33,15 @@ namespace Repository.Base
         public IStaffLogRepository _staffLogRepo { get; }
         public ICarHandoverRepository _carHandoverRepo { get; }
         public IOtpRepository _OtpRepo { get; }
+        public ILookupRepository _lookupRepo { get; }
 
         //no need to construct _transaction
 
-        public UnitOfWork(CRA_DbContext context, 
-            IUserRepository userRepo, 
-            IParkingLotRepository lotRepo, 
-            ICarRepository carRepo, 
-            ICarRegRepository carRegRepo, 
+        public UnitOfWork(CRA_DbContext context,
+            IUserRepository userRepo,
+            IParkingLotRepository lotRepo,
+            ICarRepository carRepo,
+            ICarRegRepository carRegRepo,
             IBookingRepository bookingRepo,
             IInvoiceRepository invoiceRepo,
             IFeedbackRepository feedbackRepo,
@@ -52,6 +53,7 @@ namespace Repository.Base
             IStaffLogRepository staffLogRepo,
             ICarHandoverRepository carHandoverRepo,
             IOtpRepository OtpRepo,
+            ILookupRepository lookupRepo,
             IPaymentRepository paymentRepo)
         {
             _context = context;
@@ -71,6 +73,7 @@ namespace Repository.Base
             _staffLogRepo = staffLogRepo;
             _carHandoverRepo = carHandoverRepo;
             _OtpRepo = OtpRepo;
+            _lookupRepo = lookupRepo;
         }
 
         //no need to construct _transaction

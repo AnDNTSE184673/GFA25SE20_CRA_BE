@@ -11,7 +11,7 @@ namespace Repository.DTO.RequestDTO.Car
     public class UploadCarImages
     {
         [MaxFileCount(10)]
-        public List<IFormFile> images { get; set; }
+        public List<IFormFile> images { get; set; } = new List<IFormFile>();
         public Guid carId { get; set; }
     }
 }

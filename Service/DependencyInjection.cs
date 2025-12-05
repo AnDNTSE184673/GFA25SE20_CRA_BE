@@ -32,7 +32,7 @@ namespace Service
                 config.AddProfile<AutoMapperProfile>();
             });*/ //for automapper 15.0+
             service.AddAutoMapper(typeof(AutoMapperProfile));
-            service.AddSingleton<Supabase.Client>(o =>
+            service.AddScoped<Supabase.Client>(o =>
             {
                 var url = configuration["Supabase:Url"];
                 var key = configuration["Supabase:PrivateKey"];
@@ -77,6 +77,7 @@ namespace Service
             service.AddScoped<IStaffLogService, StaffLogService>();
             service.AddScoped<ICarHandoverService, CarHandoverService>();
             service.AddScoped<ITrackAsiaService, TrackAsiaService>();
+            service.AddScoped<IInquiryService, InquiryService>();
             return service;
         }
     }

@@ -243,5 +243,16 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+
+        public async Task<List<CarDetailsManufacturer>> GetManufacturerLookup()
+        {
+            return await _unitOfWork._lookupRepo.GetCarDetailsManufacturer();
+        }
+
+        public async Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId)
+        {
+            return await _unitOfWork._lookupRepo.GetCarDetailsModelByManufacturer(manufacturerId);
+        }
     }
 }

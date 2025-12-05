@@ -17,5 +17,7 @@ namespace Service.Services
         Task<CarView> UpdateCarImageAsync(List<IFormFile> images, Guid carId);
         Task<List<CarView>> GetAllCarsAsync();
         Task<CarView> GetCarByIdAsync(Guid carId);
+        Task<List<CarDetailsManufacturer>> GetManufacturerLookup();
+        Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId);
     }
 }
