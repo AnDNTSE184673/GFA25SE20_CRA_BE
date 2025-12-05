@@ -61,6 +61,11 @@ namespace Service.Services.Implementation
             if (existing == null)
             {
                 var result = await GoogleRegister(email, name, googleId);
+                var user = _unitOfWork._userRepo.GetByEmail(result.user.Email);
+                var token = _jwtService.GenerateAccessToken(user);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+                await RefreshTokenAsync(refreshToken, user);
+                result.user.JwtToken = token.token;
                 return (null, result.user);
             }
             else
