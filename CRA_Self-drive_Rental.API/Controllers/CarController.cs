@@ -374,11 +374,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("lookup/Model")]
-        public async Task<IActionResult> GetModelLookupOfManufacturer([FromQuery] string manufacturerName)
+        public async Task<IActionResult> GetModelLookupOfManufacturer([FromQuery] int manufacturerId)
         {
             try
             {
-                var result = await _carServ.GetModelLookupOfManufacturer(manufacturerName);
+                var result = await _carServ.GetModelLookupOfManufacturer(manufacturerId);
                 return !result.Any()
                     ? StatusCode(StatusCodes.Status404NotFound, new
                     {

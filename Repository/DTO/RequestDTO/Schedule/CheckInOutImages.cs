@@ -11,7 +11,7 @@ namespace Repository.DTO.RequestDTO.Schedule
     public class CheckInOutImages
     {
         [MaxFileCount(5)]
-        public List<IFormFile> images { get; set; }
+        public List<IFormFile> images { get; set; } = new List<IFormFile>();
         public Guid bookingId { get; set; }
         public bool isCheckIn { get; set; } //checkIn is true checkOut is false
     }

@@ -15,7 +15,7 @@ namespace Repository.DTO.RequestDTO.Feedback
         public string Content { get; set; }
 
         [MaxFileCount(5)]
-        public List<IFormFile> Medias { get; set; }
+        public List<IFormFile>? Medias { get; set; } = new List<IFormFile>();
 
         public Guid CarId { get; set; }
         public Guid BookingId { get; set; }

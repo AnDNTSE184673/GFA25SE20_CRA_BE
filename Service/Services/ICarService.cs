@@ -18,6 +18,6 @@ namespace Service.Services
         Task<List<CarView>> GetAllCarsAsync();
         Task<CarView> GetCarByIdAsync(Guid carId);
         Task<List<CarDetailsManufacturer>> GetManufacturerLookup();
-        Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(string manufacturerName);
+        Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId);
     }
 }

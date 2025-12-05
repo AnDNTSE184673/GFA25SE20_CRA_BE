@@ -60,6 +60,7 @@ namespace Repository.Base
             service.AddScoped<IScheduleRepository, ScheduleRepository>();
             service.AddScoped<IStaffLogRepository, StaffLogRepository>();
             service.AddScoped<IOtpRepository, OtpRepository>();
+            service.AddScoped<ILookupRepository, LookupRepository>();
             return service;
         }
     }

@@ -65,16 +65,6 @@ namespace Service.Services.Implementation
             return carView;
         }
 
-        public Task<List<CarDetailsManufacturer>> GetManufacturerLookup()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(string manufacturerName)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form)
         {
             try
@@ -252,6 +242,17 @@ namespace Service.Services.Implementation
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+
+        public async Task<List<CarDetailsManufacturer>> GetManufacturerLookup()
+        {
+            return await _unitOfWork._lookupRepo.GetCarDetailsManufacturer();
+        }
+
+        public async Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId)
+        {
+            return await _unitOfWork._lookupRepo.GetCarDetailsModelByManufacturer(manufacturerId);
         }
     }
 }
