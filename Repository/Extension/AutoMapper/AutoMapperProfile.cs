@@ -7,14 +7,17 @@ using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.RequestDTO.CarRentalRate;
 using Repository.DTO.RequestDTO.Feedback;
+using Repository.DTO.RequestDTO.Inquiry;
 using Repository.DTO.RequestDTO.ParkingLot;
 using Repository.DTO.RequestDTO.Schedule;
+using Repository.DTO.ResponseDTO.Audits;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.DTO.ResponseDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.DriverLicense;
 using Repository.DTO.ResponseDTO.Feedbacks;
+using Repository.DTO.ResponseDTO.Inquiry;
 using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Payment;
@@ -58,6 +61,11 @@ namespace Repository.Extension.AutoMapper
             CreateMap<EditFeedbackForm, Feedback>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
+            CreateMap<CreateInquiryForm, Inquiry>();
+            CreateMap<Inquiry, InquiryView>();
+            CreateMap<EditInquiryForm, Inquiry>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<CarRegistration,CarRegView>();
             CreateMap<CarRegistration, SingleRegData>();
 
@@ -84,7 +92,8 @@ namespace Repository.Extension.AutoMapper
             CreateMap<Schedules, ScheduleView>();
             CreateMap<ScheduleImage, CICOImageView>();
 
-            
+            CreateMap<StaffLogAudit, StaffLogView>();
+            CreateMap<CarHandoverAudit, CarHandoverView>();
 
             CreateMap<CarRegForm, CarRegistration>();
             CreateMap<CarRegistration, CarRegView>();

@@ -13,10 +13,13 @@ namespace Repository.DTO.RequestDTO.Inquiry
         public string Title { get; set; }
         public string Content { get; set; }
 
+        public bool isOpen { get; set; }
+
         [MaxFileCount(10)]
         public List<IFormFile> Medias { get; set; } = new List<IFormFile>();
 
         public Guid SenderId { get; set; }
         public Guid ReceiverId { get; set; }
+        public Guid? ParentInquiryId { get; set; }
     }
 }

@@ -33,6 +33,7 @@ namespace Repository.Data
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<FeedbackImage> FeedbackImages { get; set; }
         public DbSet<Inquiry> Inquiries { get; set; }
+        public DbSet<InquiryImages> InquiryImages { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
         public DbSet<OTPCode> OTPCodes { get; set; }

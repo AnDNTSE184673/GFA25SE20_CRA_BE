@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Data.Entities
+namespace Repository.DTO.ResponseDTO.Inquiry
 {
-    public class Inquiry
+    public class InquiryView
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -22,14 +21,7 @@ namespace Repository.Data.Entities
         public Guid ReceiverId { get; set; }
         public Guid? ParentInquiryId { get; set; }
 
-        [ForeignKey("SenderId")]
-        public virtual User Sender { get; set; }
-        [ForeignKey("ReceiverId")]
-        public virtual User Receiver { get; set; }
-        [ForeignKey("ParentInquiryId")]
-        public virtual Inquiry ParentInquiry { get; set; }
-
-        public virtual ICollection<InquiryImages> InquiryImages { get; set; }
-        public virtual ICollection<Inquiry> Replies { get; set; }
+        public List<string> ImageUrls { get; set; }
+        public List<InquiryView> PreviousInquiry { get; set; }
     }
 }
