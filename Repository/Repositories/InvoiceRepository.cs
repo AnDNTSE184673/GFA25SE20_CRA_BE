@@ -61,7 +61,11 @@ namespace Repository.Repositories
             }
             if (request.IsHoliday == true) rentalTotal = (rentalTotal * 0.2m) + rentalTotal;
             var distanceFee = 0.0m;
-            if (request.DistanceInM > 0) distanceFee = (request.DistanceInM / 1000) * 20000; // Example: 20K VND per km
+            if (request.DistanceInM > 0)
+            {
+                var kilometers = Convert.ToDecimal(request.DistanceInM) / 1000m;
+                distanceFee = kilometers * 20000m;
+            }
             var newInvoice = new Invoice
             {
                 Id = Guid.NewGuid(),
