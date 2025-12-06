@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Repository.CustomFunctions.TokenHandler;
 using Repository.DTO;
 using Repository.DTO.RequestDTO;
@@ -190,6 +192,42 @@ namespace CRA_Self_drive_Rental.API.Controllers
 
             return Ok(tokens);
 
+        }
+
+        [HttpPost("google-mobile/{token}")]
+        public async Task<IActionResult> GoogleMobileLogin(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token must be provided.");
+            }
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(token);
+                if (string.IsNullOrEmpty(payload.Email))
+                    return BadRequest("Token does not contain email.");
+
+                var email = payload.Email;
+                var name = payload.Name ?? payload.Email.Split('@')[0];
+                var googleId = payload.Subject; // 'sub' claim
+                var response = await _userService.GoogleLogin(email, name, googleId);
+                if (response.login == null && response.register == null)
+                    return StatusCode(500, new { message = "Internal error during Google login/registration." });
+
+                // return the same DTOs used by existing flows
+                if (response.login != null)
+                    return Ok(response.login);
+
+                return Ok(response.register);
+            }
+            catch (InvalidJwtException)
+            {
+                return Unauthorized("Invalid Google ID token.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
     }
 }
