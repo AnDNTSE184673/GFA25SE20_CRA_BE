@@ -10,10 +10,10 @@ namespace Service.Services
 {
     public interface IInquiryService
     {
-        Task<List<InquiryView>> GetInquiriesByReceiver(Guid receiverId);
-        Task<List<InquiryView>> GetInquiriesBySender(Guid senderId);
+        Task<List<InquiryView>> GetAllUniqueInquiriesByUser(Guid userId);
+        Task<List<InquiryView>> GetInquiryTreeByBothSides(Guid senderId, Guid receiverId);
         Task<(string status, InquiryView view)> LeaveCarInquiry(CreateInquiryForm form);
-        Task<(string status, InquiryView view)> AnswerCarInquiry(CreateInquiryForm form);
+        Task<(string status, InquiryView view)> AnswerCarInquiry(AnswerInquiryForm form);
         Task<InquiryView> EditCarInquiry(Guid id, EditInquiryForm form);
         Task<string> DeleteCarInquiry(Guid id);
     }

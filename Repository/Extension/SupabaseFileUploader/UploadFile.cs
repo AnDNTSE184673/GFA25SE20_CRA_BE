@@ -6,6 +6,7 @@ using Supabase;
 using Supabase.Storage;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -117,7 +118,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                             {
                                 CacheControl = "3600",
                                 ContentType = mimeType,
-                                Upsert = true
+                                Upsert = false
                             });
 
                 string folderPath = Path.GetDirectoryName(imagePath)?.Replace("\\", "/") + "/";
@@ -138,22 +139,38 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
         public async Task<string> GetPublicUrlAsync(string bucketName, string filePath)
         {
-            var bucket = _supabase.Storage.From(bucketName);
-            var result = bucket.GetPublicUrl(filePath);
-            Log.Information("Signed URL generated: {Url}", result);
-            if (result.EndsWith("?"))
-                result = result[..^1]; //remove the last character
-            return result;
+            try 
+            {
+                var bucket = _supabase.Storage.From(bucketName);
+                var result = bucket.GetPublicUrl(filePath);
+                Log.Information("Signed URL generated: {Url}", result);
+                if (result.EndsWith("?"))
+                    result = result[..^1]; //remove the last character
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Information($"Image failed to be retrieved: {ex.Message}");
+                return null;
+            }
         }
 
         public async Task<string> CreateSignedUrlAsync(string bucketName, string filePath, int expirySeconds)
         {
-            var bucket = _supabase.Storage.From(bucketName);
-            var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
-            Log.Information("Signed URL generated: {Url}", result);
-            if (result.EndsWith("?"))
-                result = result[..^1]; //remove the last character
-            return result;
+            try
+            {
+                var bucket = _supabase.Storage.From(bucketName);
+                var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
+                Log.Information("Signed URL generated: {Url}", result);
+                if (result.EndsWith("?"))
+                    result = result[..^1]; //remove the last character
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Information($"Image failed to be retrieved: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>

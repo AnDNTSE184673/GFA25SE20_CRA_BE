@@ -33,9 +33,37 @@ namespace Service.Services.Implementation
             _upload = upload;
         }
 
-        public Task<string> DeleteCarInquiry(Guid id)
+        public async Task<string> DeleteCarInquiry(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var exist = await _unitOfWork._inquiryRepo.GetByIdWithIncludeAsync(id, "Id", x => x.InquiryImages);
+
+                if (exist == null) throw new KeyNotFoundException("Inquiry not found!");
+
+                var convos = await _unitOfWork._inquiryRepo.GetAllConversationsBetween2Users(exist.SenderId, exist.ReceiverId);
+
+                var checkParent = convos.Where(x => x.ParentInquiryId.Equals(exist.Id)).ToList(); //whether it is the parent of another msg
+
+                await _unitOfWork.BeginTransactionAsync();
+
+                foreach (var msg in checkParent)
+                {
+                    msg.ParentInquiryId = exist.ParentInquiryId;
+                    await _unitOfWork._inquiryRepo.UpdateInquiryAsync(msg);
+                }
+
+                var result = await _unitOfWork._feedbackRepo.DeleteFeedbackAsync(id);
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<InquiryView> EditCarInquiry(Guid id, EditInquiryForm form)
@@ -63,9 +91,9 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<List<InquiryView>> GetAllUniqueInquiriesBySender(Guid customerId)
+        public async Task<List<InquiryView>> GetAllUniqueInquiriesByUser(Guid userId)
         {
-            var result = await _unitOfWork._inquiryRepo.GetInquiryByReceiver(receiverId);
+            var result = await _unitOfWork._inquiryRepo.GetUserConversations(userId);
             var inquiryViews = new List<InquiryView>();
             foreach (var inquiry in result)
             {
@@ -83,46 +111,7 @@ namespace Service.Services.Implementation
             return inquiryViews;
         }
 
-        public async Task<List<InquiryView>> GetInquiriesByReceiver(Guid receiverId)
-        {
-            var result = await _unitOfWork._inquiryRepo.GetInquiryByReceiver(receiverId);
-            var inquiryViews = new List<InquiryView>();
-            foreach (var inquiry in result)
-            {
-                //Task.WhenAll is to run all the url getting at once
-                var urls = await Task.WhenAll(inquiry.InquiryImages.Select(
-                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
-                    ));
-
-                var view = _mapper.Map<InquiryView>(inquiry);
-
-                view.ImageUrls = urls.ToList();
-
-                inquiryViews.Add(view);
-            }
-            return inquiryViews;
-        }
-
-        public async Task<List<InquiryView>> GetInquiriesBySender(Guid senderId)
-        {
-            var result = await _unitOfWork._inquiryRepo.GetInquiryBySender(senderId);
-            var inquiryViews = new List<InquiryView>();
-            foreach (var inquiry in result)
-            {
-                //Task.WhenAll is to run all the url getting at once
-                var urls = await Task.WhenAll(inquiry.InquiryImages.Select(
-                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
-                    ));
-
-                var view = _mapper.Map<InquiryView>(inquiry);
-
-                view.ImageUrls = urls.ToList();
-
-                inquiryViews.Add(view);
-            }
-            return inquiryViews;
-        }
-
+        //begin a chat
         public async Task<(string status, InquiryView view)> LeaveCarInquiry(CreateInquiryForm form)
         {
             try
@@ -139,37 +128,10 @@ namespace Service.Services.Implementation
                 var newInquiry = _mapper.Map<Inquiry>(form);
                 newInquiry.Id = Guid.NewGuid();
                 newInquiry.CreateDate = newInquiry.UpdateDate = DateTime.UtcNow;
-                newInquiry.Type = ConstantEnum.InquiryTypeConstants.Question; //customer side
-                if(form.isOpen) newInquiry.Status = ConstantEnum.InquiryStatusConstants.Open;
-                else newInquiry.Status = ConstantEnum.InquiryStatusConstants.Closed;
-
-                //If frontend provides a ParentInquiryId → use it (valid reply)
-                if (form.ParentInquiryId != null)
-                {
-                    var parent = await _unitOfWork._inquiryRepo.GetByIdAsync(form.ParentInquiryId.Value);
-
-                    if (parent == null)
-                        throw new Exception("Invalid ParentInquiryId");
-
-                    //attach parent
-                    newInquiry.ParentInquiryId = parent.Id;
-                }
-
-                //If ParentInquiryId is null, we need to find the thread root
-                var rootExist = await _unitOfWork._inquiryRepo.GetRootInquiryByBothUser(form.SenderId, form.ReceiverId);
-
-                if (rootExist == null)
-                {
-                    //set this as root
-                    newInquiry.ParentInquiryId = null;
-                }
-                else
-                {
-                    //find last msg in chain and continue from there
-                    var conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
-                    var last = conversation.LastOrDefault(); //get newest
-                    newInquiry.ParentInquiryId = last.Id;
-                }
+                newInquiry.Type = ConstantEnum.InquiryTypeConstants.Question; //redundant atm
+                newInquiry.Status = ConstantEnum.InquiryStatusConstants.Open;
+                
+                newInquiry.ParentInquiryId = null;
 
                 var result = await _unitOfWork._inquiryRepo.CreateInquiryAsync(newInquiry);
 
@@ -216,7 +178,7 @@ namespace Service.Services.Implementation
         }
 
 
-        public async Task<(string status, InquiryView view)> AnswerCarInquiry(CreateInquiryForm form)
+        public async Task<(string status, InquiryView view)> AnswerCarInquiry(AnswerInquiryForm form)
         {
             try
             {
@@ -232,22 +194,10 @@ namespace Service.Services.Implementation
                 var newInquiry = _mapper.Map<Inquiry>(form);
                 newInquiry.Id = Guid.NewGuid();
                 newInquiry.CreateDate = newInquiry.UpdateDate = DateTime.UtcNow;
-                newInquiry.Type = ConstantEnum.InquiryTypeConstants.Answer; //car owner side
+                newInquiry.Type = ConstantEnum.InquiryTypeConstants.Answer; //redundant atm
 
                 if (form.isOpen) newInquiry.Status = ConstantEnum.InquiryStatusConstants.Open;
                 else newInquiry.Status = ConstantEnum.InquiryStatusConstants.Closed;
-
-                //If form has parentId, use it
-                if (form.ParentInquiryId != null)
-                {
-                    var parent = await _unitOfWork._inquiryRepo.GetByIdAsync(form.ParentInquiryId.Value);
-
-                    if (parent == null)
-                        throw new Exception("Invalid ParentInquiryId");
-
-                    //attach parent
-                    newInquiry.ParentInquiryId = parent.Id;
-                }
 
                 //else find root from user FKs
                 var rootExist = await _unitOfWork._inquiryRepo.GetRootInquiryByBothUser(form.SenderId, form.ReceiverId);
@@ -259,10 +209,25 @@ namespace Service.Services.Implementation
                 }
                 else
                 {
-                    //find last msg in chain and continue from there
-                    var conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
-                    var last = conversation.LastOrDefault(); //get newest
-                    newInquiry.ParentInquiryId = last.Id;
+                    //If form has parentId, use it
+                    //Else find last msg in chain and continue from there
+                    if (form.ParentInquiryId != null)
+                    {
+                        var parent = await _unitOfWork._inquiryRepo.GetByIdAsync(form.ParentInquiryId.Value);
+
+                        if (parent == null) throw new Exception("Invalid ParentInquiryId");
+
+                        var conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
+                        var checkCorrectChat = conversation.Where(x => x.ParentInquiryId.Equals(form.ParentInquiryId) || x.Id.Equals(form.ParentInquiryId));
+                        if (!checkCorrectChat.Any()) throw new Exception("This parent doesn't belong in this conversation!");
+                        else { newInquiry.ParentInquiryId = form.ParentInquiryId; }
+                    }
+                    else 
+                    {
+                        var conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
+                        var last = conversation.LastOrDefault(); //get newest
+                        newInquiry.ParentInquiryId = last.Id;
+                    }
                 }
 
                 var result = await _unitOfWork._inquiryRepo.CreateInquiryAsync(newInquiry);
@@ -343,6 +308,29 @@ namespace Service.Services.Implementation
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<InquiryView>> GetInquiryTreeByBothSides(Guid senderId, Guid receiverId)
+        {
+            var root = await _unitOfWork._inquiryRepo.GetRootInquiryByBothUser(senderId, receiverId);
+
+            var tree = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(root.Id);
+
+            var inquiryViews = new List<InquiryView>();
+            foreach (var inquiry in tree)
+            {
+                //Task.WhenAll is to run all the url getting at once
+                var urls = await Task.WhenAll(inquiry.InquiryImages.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+
+                var view = _mapper.Map<InquiryView>(inquiry);
+
+                view.ImageUrls = urls.ToList();
+
+                inquiryViews.Add(view);
+            }
+            return inquiryViews.OrderByDescending(x => x.CreateDate).ToList();
         }
     }
 }

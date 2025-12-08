@@ -13,6 +13,8 @@ namespace Repository.Repositories.Interfaces
         Task<(string status, Inquiry obj)> CreateInquiryAsync(Inquiry newInquiry);
         Task<Inquiry> GetRootInquiryByBothUser(Guid senderId, Guid receiverId);
         Task<List<Inquiry>> GetInquiryTreeFromRoot(Guid rootInquiryId);
+        Task<List<Inquiry>> GetUserConversations(Guid userId);
         Task<Inquiry> UpdateInquiryAsync(Inquiry inquiry);
+        Task<List<Inquiry>> GetAllConversationsBetween2Users(Guid senderId, Guid receiverId);
     }
 }

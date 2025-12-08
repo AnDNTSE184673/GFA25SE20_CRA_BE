@@ -21,7 +21,7 @@ namespace Repository.DTO.ResponseDTO.Inquiry
         public Guid ReceiverId { get; set; }
         public Guid? ParentInquiryId { get; set; }
 
-        public List<string> ImageUrls { get; set; }
-        public List<InquiryView> PreviousInquiry { get; set; }
+        public List<string> ImageUrls { get; set; } = new List<string>();
+        public List<InquiryView> PreviousInquiry { get; set; } = new List<InquiryView>();
     }
 }

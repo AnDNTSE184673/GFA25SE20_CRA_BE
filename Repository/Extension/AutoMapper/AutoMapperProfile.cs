@@ -62,6 +62,7 @@ namespace Repository.Extension.AutoMapper
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<CreateInquiryForm, Inquiry>();
+            CreateMap<AnswerInquiryForm, Inquiry>();
             CreateMap<Inquiry, InquiryView>();
             CreateMap<EditInquiryForm, Inquiry>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
@@ -76,6 +77,7 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(d => d.RentalRate, opt => opt.MapFrom(src => src.RentalRate));
 
             CreateMap<DriverLicense, DriverLicenseView>();
+            CreateMap<DriverLicense, SingleLicenseData>();
 
             CreateMap<CreateCarRentalRateForm, CarRentalRate>()
                 .ForMember(d => d.OvertravelRatePerKm, opt => opt.MapFrom(src => src.OvertravelRatePerKmInDongperKM));
@@ -94,7 +96,6 @@ namespace Repository.Extension.AutoMapper
 
             CreateMap<StaffLogAudit, StaffLogView>();
             CreateMap<CarHandoverAudit, CarHandoverView>();
-            CreateMap<DriverLicense, SingleLicenseData>();
 
             CreateMap<CarRegForm, CarRegistration>();
             CreateMap<CarRegistration, CarRegView>();

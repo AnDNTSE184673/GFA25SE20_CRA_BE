@@ -62,8 +62,10 @@ namespace Repository.Repositories
         {
             return await _dbContext.Inquiries
                 .Where(x => x.ParentInquiryId == null)
-                .Where(x => x.ReceiverId.Equals(receiverId) && x.SenderId.Equals(senderId))
-                .FirstOrDefaultAsync();
+                .Where(x => 
+                (x.ReceiverId.Equals(receiverId) && x.SenderId.Equals(senderId))
+                || (x.SenderId.Equals(receiverId) && x.ReceiverId.Equals(senderId))
+                ).FirstOrDefaultAsync();
         }
 
         public async Task<List<Inquiry>> GetInquiryTreeFromRoot(Guid rootInquiryId)
@@ -76,8 +78,8 @@ namespace Repository.Repositories
                         SELECT c.* FROM ""Inquiries"" c
                         INNER JOIN Thread p ON c.""ParentInquiryId"" = p.""Id""
                     )
-                    SELECT * FROM Thread ORDER BY ""CreateDate"";
-                ").ToListAsync();
+                    SELECT * FROM Thread ORDER BY ""CreateDate""
+                ").Include(x => x.InquiryImages).ToListAsync();
             return result;
         }
 
@@ -85,6 +87,7 @@ namespace Repository.Repositories
         {
             var convos = await _dbContext.Inquiries
                 .Where(x => x.SenderId == userId || x.ReceiverId == userId)
+                .Include(x => x.InquiryImages)
                 .Select(x => new
                 {
                     Inquiry = x, //original rows
@@ -105,7 +108,19 @@ namespace Repository.Repositories
             return conversations;
         }
 
-        public async Task<Inquiry> UpdateInquiryAsync(Inquiry inquiry)
+        public async Task<List<Inquiry>> GetAllConversationsBetween2Users(Guid senderId, Guid receiverId)
+        {
+            var convos = await _dbContext.Inquiries
+                .Where(x =>
+                (x.ReceiverId.Equals(receiverId) && x.SenderId.Equals(senderId))
+                || (x.SenderId.Equals(receiverId) && x.ReceiverId.Equals(senderId))
+                )
+                .Include(x => x.InquiryImages)
+                .ToListAsync();
+            return convos;
+        }
+
+            public async Task<Inquiry> UpdateInquiryAsync(Inquiry inquiry)
         {
             try
             {

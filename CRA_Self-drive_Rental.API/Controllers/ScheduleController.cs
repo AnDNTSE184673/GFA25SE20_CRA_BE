@@ -158,7 +158,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
-        [HttpGet("checkIn/images")]
+        [HttpGet("checkInOut/info")]
         public async Task<IActionResult> GetCICOImages([FromQuery] CICOImageSearch form)
         {
             try

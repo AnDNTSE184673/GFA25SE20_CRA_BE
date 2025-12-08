@@ -8,7 +8,7 @@ namespace Repository.DTO.RequestDTO.Inquiry
 {
     public class EditInquiryForm
     {
-        public string Title { get; set; }
-        public string Content { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
     }
 }
