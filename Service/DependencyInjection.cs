@@ -47,7 +47,7 @@ namespace Service
                     new SupabaseOptions
                     {
                         AutoRefreshToken = true,
-                        AutoConnectRealtime = true,
+                        AutoConnectRealtime = false,
                         StorageUrlFormat = $"{url}/storage/v1",
                     }
                 );
@@ -61,8 +61,6 @@ namespace Service
             service.AddScoped<IJWTService, JWTService>();
             service.AddScoped<IBookingService, BookingService>();
             service.AddScoped<IInvoiceService, InvoiceService>();
-            //service.AddScoped<ICarService, CarService>();
-            //service.AddScoped<IParkingLotService, ParkingLotService>();
             service.AddScoped<ICarService, CarService>();
             service.AddScoped<ICarRegService, CarRegService>();
             service.AddScoped<ICarRentalService, CarRentalService>();

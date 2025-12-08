@@ -20,6 +20,8 @@ namespace Repository.Base
         public IUserRepository _userRepo { get; }
         public IBookingRepository _bookingRepo { get; }
         public IInvoiceRepository _invoiceRepo { get; }
+        public IInquiryRepository _inquiryRepo { get; }
+        public IInquiryImageRepository _inquiryImageRepo { get; }
         public IParkingLotRepository _lotRepo { get; }
         public ICarRepository _carRepo { get; }
         public ICarRegRepository _carRegRepo { get; }
@@ -44,6 +46,8 @@ namespace Repository.Base
             ICarRegRepository carRegRepo,
             IBookingRepository bookingRepo,
             IInvoiceRepository invoiceRepo,
+            IInquiryRepository inquiryRepo,
+            IInquiryImageRepository inquiryImageRepo,
             IFeedbackRepository feedbackRepo,
             IFeedbackImageRepository feedbackImgRepo,
             ICarImageRepository carImgRepo,
@@ -60,6 +64,8 @@ namespace Repository.Base
             _userRepo = userRepo;
             _bookingRepo = bookingRepo;
             _invoiceRepo = invoiceRepo;
+            _inquiryRepo = inquiryRepo;
+            _inquiryImageRepo = inquiryImageRepo;
             _feedbackRepo = feedbackRepo;
             _feedbackImageRepo = feedbackImgRepo;
             _carImageRepo = carImgRepo;

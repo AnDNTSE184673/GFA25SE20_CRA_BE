@@ -6,6 +6,7 @@ using Supabase;
 using Supabase.Storage;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,34 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
         public UploadFile(Supabase.Client supabase)
         {
             _supabase = supabase;
+        }
+
+        public Task InitializeAsync()
+        => _supabase.InitializeAsync();
+
+        public Supabase.Storage.Interfaces.IStorageFileApi<Supabase.Storage.FileObject>
+        GetBucket(string bucket)
+        => _supabase.Storage.From(bucket);
+
+        private bool _initialized = false;
+        private readonly SemaphoreSlim _initLock = new(1, 1);
+
+        public async Task EnsureInitializedAsync()
+        {
+            if (_initialized) return;
+
+            await _initLock.WaitAsync();
+            try
+            {
+                if (_initialized) return;
+
+                await _supabase.InitializeAsync();
+                _initialized = true;
+            }
+            finally
+            {
+                _initLock.Release();
+            }
         }
 
         public async Task<byte[]> DownloadImageAsync(string prefix, string username, string subject, string folderName, string targetBucket)
@@ -54,6 +83,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
         /// <summary>
         /// Make sure the fileName already has the correct extension appended to the end of its name else the uploaded file will have no extension
+        /// Also call InitializeAsync() before calling this
         /// </summary>
         public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec, bool isPublic)
         {
@@ -71,7 +101,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                     throw new InvalidOperationException($"File type '{extension}' is not supported.");
                 }
 
-                await _supabase.InitializeAsync();
+                //await _supabase.InitializeAsync();
 
                 var storageStatus = _supabase.Storage == null ? "NULL (NOT INITIALIZED)" : "OK (READY)";
                 Log.Information("Supabase Storage initialization check: {Status}", storageStatus);
@@ -80,19 +110,19 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                 var mimeType = MimeTypeHelper.GetMimeType(extension);
 
-                await _supabase.Storage.From(targetBucket)
-                  .Upload(bytes,
+                var bucket = _supabase.Storage.From(targetBucket);
+
+                await bucket.Upload(bytes,
                             imagePath,
                             new Supabase.Storage.FileOptions
                             {
                                 CacheControl = "3600",
                                 ContentType = mimeType,
-                                Upsert = true
+                                Upsert = false
                             });
 
                 string folderPath = Path.GetDirectoryName(imagePath)?.Replace("\\", "/") + "/";
 
-                var bucket = _supabase.Storage.From(targetBucket);
                 var files = await bucket.List(path: folderPath); // or the folder containing your file
                 if (files.Any(f => f.Name.Equals(fileName)))
                 {
@@ -103,28 +133,44 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
             }
             catch (Exception ex)
             {
-                return "\nDetail: " + ex.Message;
+                throw new Exception(ex.Message);
             }
         }
 
         public async Task<string> GetPublicUrlAsync(string bucketName, string filePath)
         {
-            var bucket = _supabase.Storage.From(bucketName);
-            var result = bucket.GetPublicUrl(filePath);
-            Log.Information("Signed URL generated: {Url}", result);
-            if (result.EndsWith("?"))
-                result = result[..^1]; //remove the last character
-            return result;
+            try 
+            {
+                var bucket = _supabase.Storage.From(bucketName);
+                var result = bucket.GetPublicUrl(filePath);
+                Log.Information("Signed URL generated: {Url}", result);
+                if (result.EndsWith("?"))
+                    result = result[..^1]; //remove the last character
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Information($"Image failed to be retrieved: {ex.Message}");
+                return null;
+            }
         }
 
         public async Task<string> CreateSignedUrlAsync(string bucketName, string filePath, int expirySeconds)
         {
-            var bucket = _supabase.Storage.From(bucketName);
-            var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
-            Log.Information("Signed URL generated: {Url}", result);
-            if (result.EndsWith("?"))
-                result = result[..^1]; //remove the last character
-            return result;
+            try
+            {
+                var bucket = _supabase.Storage.From(bucketName);
+                var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
+                Log.Information("Signed URL generated: {Url}", result);
+                if (result.EndsWith("?"))
+                    result = result[..^1]; //remove the last character
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Information($"Image failed to be retrieved: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>

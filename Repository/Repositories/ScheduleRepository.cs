@@ -70,6 +70,7 @@ namespace Repository.Repositories
                 .Include(x => x.Car)
                 .Include(x => x.User)
                 .Include(x => x.Booking)
+                .OrderByDescending(x => x.CreateDate)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }

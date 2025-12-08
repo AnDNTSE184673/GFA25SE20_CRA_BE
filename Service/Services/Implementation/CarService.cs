@@ -36,6 +36,8 @@ namespace Service.Services.Implementation
 
         public async Task<List<CarView>> GetAllCarsAsync()
         {
+            await _upload.EnsureInitializedAsync();
+
             var cars = await _unitOfWork._carRepo.GetAllCars();
             var carViews = new List<CarView>();
             foreach(var car in cars)
@@ -52,6 +54,7 @@ namespace Service.Services.Implementation
 
         public async Task<CarView> GetCarByIdAsync(Guid carId)
         {
+            await _upload.EnsureInitializedAsync();
             var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", 
                 x => x.Owner,
                 x => x.PreferredLot, 
@@ -115,6 +118,8 @@ namespace Service.Services.Implementation
                 var uploadTasks = new List<Task<(string url, CarImage obj)>>();
                 int count = 1;
 
+                await _upload.EnsureInitializedAsync();
+
                 foreach (var file in form.Medias)
                 {
                     uploadTasks.Add(UploadCarImagesAsync(file, newCar.Id, count));
@@ -171,6 +176,8 @@ namespace Service.Services.Implementation
 
                 var uploadTasks = new List<Task<(string url, CarImage obj)>>();
                 int count = existImage.Count();
+
+                await _upload.EnsureInitializedAsync();
 
                 foreach (var file in images)
                 {
@@ -253,6 +260,11 @@ namespace Service.Services.Implementation
         public async Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId)
         {
             return await _unitOfWork._lookupRepo.GetCarDetailsModelByManufacturer(manufacturerId);
+        }
+
+        public Task<List<CarView>> SearchCarAsync(SearchCarForm searchParam)
+        {
+            throw new NotImplementedException();
         }
     }
 }

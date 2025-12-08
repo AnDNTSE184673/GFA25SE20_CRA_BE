@@ -80,6 +80,7 @@ namespace Service.Services.Implementation
         {
             var result = await _unitOfWork._feedbackRepo.GetFeedbacksByCar(carId);
             var feedbackViews = new List<FeedbackView>();
+            await _upload.EnsureInitializedAsync();
             foreach (var feedback in result)
             {
                 //Task.WhenAll is to run all the url getting at once
@@ -128,7 +129,7 @@ namespace Service.Services.Implementation
 
                 //File IO is parallel
                 var uploadTasks = new List<Task<(string url, FeedbackImage obj)>>();
-
+                await _upload.EnsureInitializedAsync();
                 foreach (var file in form.Medias)
                 {
                     uploadTasks.Add(UploadFeedbackImagesAsync(file, newFeedback.Id));
