@@ -76,6 +76,22 @@ namespace Repository.Constant
             public const string InfoSearch = "info";
         }
 
+        public static class InquiryTypeConstants
+        {
+            public const string Question = "Question";
+            public const string Answer = "Answer";
+        }
+        
+        public static class InquiryStatusConstants
+        {
+            public const string Open = "Open";
+            public const string Answered = "Answered";
+            public const string Closed = "Closed";
+        }
+
+        public enum InquiryMessageType { Question, Answer }
+        public enum InquiryStatus { Open, Answered, Closed }
+
         public static class ScheduleTypeConstants
         {
             public const string Booking = "Booking";

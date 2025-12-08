@@ -75,7 +75,7 @@ namespace Service.Services.Implementation
                     }
                 }
 
-                var result1 = await _unitOfWork._scheduleRepo.CreateScheduleAsync(schedule);
+                var result1 = await _unitOfWork._scheduleRepo.CreateScheduleAsync(schedule); //update
 
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -451,6 +451,7 @@ namespace Service.Services.Implementation
                 else folder = "CheckOut";
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
+                await _upload.EnsureInitializedAsync();
                 foreach (var file in images)
                 {
                     uploadTasks.Add(UploadCICOImagesAsync(file, bookingId, count, folder, isCheckIn));
@@ -540,21 +541,27 @@ namespace Service.Services.Implementation
                 var rows2 = await _unitOfWork._carHandoverRepo.GetCarHandoverByScheduleAsync(schedule.Id);
 
                 var uploadTasks = new List<Task<string>>();
+                await _upload.EnsureInitializedAsync();
                 foreach (var r in rows)
                 {
                     uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
                 }
-                var uploadResults = await Task.WhenAll(uploadTasks);
+
                 var mapped = new CICOImageView
                 {
                     BookingId = form.BookingId,
-                    Urls = uploadResults.ToList(),
                     Description = rows2 != null ? rows2.Description : "There is no Car Handover Audit with this",
                     CreateDate = rows.FirstOrDefault().CreateDate,
                     Status = rows.FirstOrDefault().Status
                 };
 
-                return (uploadResults, mapped);
+                try 
+                { 
+                    var uploadResults = await Task.WhenAll(uploadTasks);
+                    mapped.Urls = uploadResults.ToList();
+                    return (uploadResults, mapped);
+                }
+                catch { return (null, mapped); } 
             }
             catch (Exception ex)
             {
@@ -577,6 +584,7 @@ namespace Service.Services.Implementation
                 else folder = "CheckOut";
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
+                await _upload.EnsureInitializedAsync();
                 foreach (var file in form.images)
                 {
                     uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count, folder, form.isCheckIn));

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Ocsp;
 using PayOS.Exceptions;
 using Repository.Base;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Service.Services.Implementation
 {
@@ -36,6 +38,7 @@ namespace Service.Services.Implementation
             _mapper = mapper;
             _upload = file;
         }
+
 
         public async Task<(string status, ApproveRegView view)> ApproveDocumentsAsync(DocumentSearchForm form, bool isApproved)
         {
@@ -117,6 +120,9 @@ namespace Service.Services.Implementation
         {
             var result = await _unitOfWork._carRegRepo.GetCarRegsAsync();
             var uploadTasks = new List<Task<string>>();
+
+            await _upload.EnsureInitializedAsync();
+
             foreach (var r in result)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
@@ -129,7 +135,10 @@ namespace Service.Services.Implementation
         {
             var rows = await _unitOfWork._carRegRepo.FindCarRegById(form.CarId.Value, form.UserId.Value);
             var uploadTasks = new List<Task<string>>();
-            foreach(var r in rows)
+
+            await _upload.EnsureInitializedAsync();
+
+            foreach (var r in rows)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
             }
@@ -141,6 +150,9 @@ namespace Service.Services.Implementation
         {
             var rows = await _unitOfWork._carRegRepo.FindCarRegByInfo(form.LicensePlate, form.Email);
             var uploadTasks = new List<Task<string>>();
+
+            await _upload.EnsureInitializedAsync();
+
             foreach (var r in rows)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
@@ -153,6 +165,9 @@ namespace Service.Services.Implementation
         {
             var rows = await _unitOfWork._carRegRepo.FindCarRegByPath(form.FilePath, form.Bucket);
             var uploadTasks = new List<Task<string>>();
+
+            await _upload.EnsureInitializedAsync();
+
             foreach (var r in rows)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
@@ -175,7 +190,10 @@ namespace Service.Services.Implementation
 
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, CarRegistration obj)>>();
-                foreach(var file in form.images)
+
+                await _upload.EnsureInitializedAsync();
+
+                foreach (var file in form.images)
                 {
                     uploadTasks.Add(UploadRegDocsAsync(file, form.CarId, form.UserId, count));
                     count++;

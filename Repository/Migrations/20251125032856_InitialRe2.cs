@@ -88,7 +88,7 @@ namespace Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: true),
                     Content = table.Column<string>(type: "text", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

@@ -46,6 +46,8 @@ namespace Repository.Base
             service.AddScoped<IUserRepository, UserRepository>();
             service.AddScoped<IBookingRepository, BookingRepository>();
             service.AddScoped<IInvoiceRepository, InvoiceRepository>();
+            service.AddScoped<IInquiryImageRepository, InquiryImageRepository>();
+            service.AddScoped<IInquiryRepository, InquiryRepository>();
             service.AddScoped<IParkingLotRepository, ParkingLotRepository>();
             service.AddScoped<ICarRepository, CarRepository>();
             service.AddScoped<ICarImageRepository, CarImageRepository>();
