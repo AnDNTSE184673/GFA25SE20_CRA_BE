@@ -108,6 +108,9 @@ namespace Service.Services.Implementation
         {
             var result = await _unitOfWork._driverLicenseRepo.GetAllAsync();
             var uploadTasks = new List<Task<string>>();
+
+            await _upload.EnsureInitializedAsync();
+
             foreach (var r in result)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
@@ -128,6 +131,7 @@ namespace Service.Services.Implementation
                 result = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(user.Id);
             }
             var uploadTasks = new List<Task<string>>();
+            await _upload.EnsureInitializedAsync();
             foreach (var r in result)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
@@ -150,6 +154,7 @@ namespace Service.Services.Implementation
 
                 var uploadTasks = new List<Task<(string url, DriverLicense obj)>>();
                 int count = 1;
+                await _upload.EnsureInitializedAsync();
                 foreach (var file in images)
                 {
                     uploadTasks.Add(UploadDriverLicenseAsync(file, userId, count));

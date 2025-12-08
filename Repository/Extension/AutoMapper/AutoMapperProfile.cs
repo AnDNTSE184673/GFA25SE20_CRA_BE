@@ -94,6 +94,7 @@ namespace Repository.Extension.AutoMapper
 
             CreateMap<StaffLogAudit, StaffLogView>();
             CreateMap<CarHandoverAudit, CarHandoverView>();
+            CreateMap<DriverLicense, SingleLicenseData>();
 
             CreateMap<CarRegForm, CarRegistration>();
             CreateMap<CarRegistration, CarRegView>();

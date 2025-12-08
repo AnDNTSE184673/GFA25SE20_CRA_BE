@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Services.Service;
-using Services.Service.Implementation;
 using Supabase;
 using Repository.CustomFunctions.SupabaseFileUploader;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -49,7 +47,7 @@ namespace Service
                     new SupabaseOptions
                     {
                         AutoRefreshToken = true,
-                        AutoConnectRealtime = true,
+                        AutoConnectRealtime = false,
                         StorageUrlFormat = $"{url}/storage/v1",
                     }
                 );
