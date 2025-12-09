@@ -19,6 +19,7 @@ namespace Service.Services
         Task<BookingView?> GetBookingFromInvoice(Guid invoiceId);
         Task<BookingView?> GetBookingFromBookingNumber(string bookingNum);
         Task<(BookingView? booking, ScheduleView schedule)> CreateBooking(BookingCreateRequest request);
+        Task<(BookingView? booking, ScheduleView schedule)> ExtendBooking(BookingExtensionRequest request);
         Task<BookingView?> ChangeStatus(Guid bookingId, string status);
     }
 }

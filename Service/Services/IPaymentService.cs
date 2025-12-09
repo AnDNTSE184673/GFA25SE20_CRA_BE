@@ -32,5 +32,7 @@ namespace Service.Services
         Task<List<PaymentHistoryView>?> CreatePaymentFromInvoice(Guid InvoiceId);
         Task<PaymentHistoryView?> CreateNewFinePaymentFromInvoice(Guid InvoiceId, decimal fine);
         Task<(long, string, PaymentHistoryView)?> CreateNewAddPayFromBoooking(Guid BookingId, string Desc, decimal Amount);
+        Task<PaymentHistoryView?> CreateNewPayFromBooking(Guid BookingId, string Desc, decimal Amount);
+        Task<PaymentHistoryView?> UpdatePayment(UpdatePaymentRequest request);
     }
 }

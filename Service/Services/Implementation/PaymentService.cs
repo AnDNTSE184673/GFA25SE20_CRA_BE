@@ -627,5 +627,124 @@ namespace Service.Services.Implementation
                 throw;
             }
         }
+
+        public async Task<PaymentHistoryView?> CreateNewPayFromBooking(Guid BookingId, string Desc, decimal Amount)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(BookingId);
+                if (booking == null)
+                {
+                    throw new Exception("Booking not found");
+                }
+                var invoice = await _unitOfWork._invoiceRepo.GetInvoiceById(booking.InvoiceId);
+                var invoiceExte = invoice.InvoiceItems.Where(x => x.Item.Contains("Extension")).FirstOrDefault();
+                if (invoiceExte == null)
+                {
+                    throw new Exception("No extension item found in the invoice");
+                }
+                var newPayment = new PaymentHistory
+                {
+                    Id = Guid.NewGuid(),
+                    OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Item = invoiceExte.Item,
+                    PaidAmount = invoiceExte.Total,
+                    CreateDate = DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow,
+                    Status = "Pending",
+                    InvoiceId = invoice.Id,
+                    UserId = booking.UserId,
+                    PaymentProofUrl = "N/A",
+                    PaymentMethod = "N/A",
+                    Note = "Payment for extension booking fee",
+                };
+                await _unitOfWork._paymentRepo.CreateAsync(newPayment);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var paymentView = _mapper.Map<PaymentHistoryView>(newPayment);
+                return paymentView;
+
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw;
+            }
+        }
+
+        public async Task<PaymentHistoryView?> UpdatePayment(UpdatePaymentRequest request)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var payment = await _unitOfWork._paymentRepo.GetByIdAsync(request.PaymentId);
+                if (payment == null)
+                {
+                    throw new InvalidOperationException($"Payment with Id {request.PaymentId} not found");
+                }
+
+                var incoming = request.Status?.Trim();
+                if (string.IsNullOrEmpty(incoming))
+                {
+                    throw new InvalidOperationException($"Invalid status value: {request.Status}");
+                }
+
+                // Define which statuses this method accepts (canonical constants)
+                var allowedStatuses = new[]
+                {
+                    ConstantEnum.Statuses.PAID,
+                    ConstantEnum.Statuses.CANCELLED
+                };
+
+                var matched = allowedStatuses
+                    .FirstOrDefault(s => s.Equals(incoming, StringComparison.OrdinalIgnoreCase));
+
+                if (matched == null)
+                {
+                    throw new InvalidOperationException($"Invalid status value: {request.Status}");
+                }
+
+                // Use canonical constant instead of arbitrary casing
+                payment.Status = matched;
+
+                if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                {
+                    var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                    var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                    if (bknd != null)
+                    {
+                        bknd.UpdateDate = DateTime.UtcNow;
+                        bknd.Status = ConstantEnum.Statuses.COMPLETED;
+                        await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                    }
+                    payment.UpdateDate = DateTime.UtcNow;
+                    payment.PaymentMethod = "Cash On Delivery";
+                }
+
+                if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                {
+                    var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                    var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                    if (bknd != null)
+                    {
+                        bknd.UpdateDate = DateTime.UtcNow;
+                        bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                        await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                    }
+                    payment.UpdateDate = DateTime.UtcNow;
+                }
+                await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var paymentView = _mapper.Map<PaymentHistoryView>(payment);
+                return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

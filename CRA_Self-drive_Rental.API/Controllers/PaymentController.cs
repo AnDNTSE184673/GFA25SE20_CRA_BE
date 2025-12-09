@@ -123,16 +123,18 @@ namespace CRA_Self_drive_Rental.API.Controllers
             var payment = await _paymentService.CreateNewAddPayFromBoooking(request.BookingId, request.Description, request.Amount);
             if (payment != null)
             {
-                return Ok(new {
-                    OrderCode = payment.Value.Item1, 
+                return Ok(new
+                {
+                    OrderCode = payment.Value.Item1,
                     PayOSLink = payment.Value.Item2,
-                    payment.Value.Item3});
+                    payment.Value.Item3
+                });
             }
             return BadRequest("Failed to create additional payment.");
         }
 
         [HttpPatch("/UpdatePayment/Booking/RentalPayment")]
-        public async Task<IActionResult> UpdateRentalPayWithBooking([FromBody]UpdatePayUsingBooking request)
+        public async Task<IActionResult> UpdateRentalPayWithBooking([FromBody] UpdatePayUsingBooking request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var payment = await _paymentService.UpdateRentalPayWithBooking(request.BookingId, request.status);
@@ -144,7 +146,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/BookingPayment")]
-        public async Task<IActionResult> UpdateBookingPayWithBooking([FromBody]UpdatePayUsingBooking request)
+        public async Task<IActionResult> UpdateBookingPayWithBooking([FromBody] UpdatePayUsingBooking request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var payment = await _paymentService.UpdateBookingPayWithBooking(request.BookingId, request.status);
@@ -153,6 +155,18 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 return Ok(payment);
             }
             return NotFound("No payment found to update for the specified booking ID.");
+        }
+
+        [HttpPatch("/UpdatePayment/Booking/Payment")]
+        public async Task<IActionResult> UpdatePay([FromBody] UpdatePaymentRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var payments = await _paymentService.UpdatePayment(request);
+            if (payments != null)
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found to update for the specified booking ID.");
         }
     }
 }

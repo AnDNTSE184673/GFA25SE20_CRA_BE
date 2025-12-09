@@ -89,6 +89,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return BadRequest();
         }
 
+        [HttpPatch("Booking/ExtendBooking")]
+        public async Task<IActionResult> ExtendBooking([FromBody]BookingExtensionRequest request)
+        {
+            if(!ModelState.IsValid) return BadRequest();
+            var resultView = await _bookingService.ExtendBooking(request);
+            var payment = await _paymentService.CreateNewPayFromBooking(resultView.booking.Id, "Extension Payment", 0);
+            if (resultView.booking != null) return Ok(new { booking = resultView.booking, schedule = resultView.schedule, payment = payment });
+            return BadRequest();
+        }
+
+
         [HttpPatch("UpdateBooking")]
         public async Task<IActionResult> UpdateBooking([FromBody]BookingUpdateRequest request)
         {

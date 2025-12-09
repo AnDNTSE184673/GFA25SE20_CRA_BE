@@ -197,6 +197,64 @@ namespace Service.Services.Implementation
             }
         }
 
+        public async Task<(BookingView? booking, ScheduleView schedule)> ExtendBooking(BookingExtensionRequest request)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var booking = await _unitOfWork._bookingRepo.GetByIdAsync(request.BookingId);
+                if (booking == null)
+                {
+                    throw new Exception("Booking not found");
+                }
+                booking.DropoffTime = booking.DropoffTime.AddDays(request.TimeExtInDays);
+                booking.UpdateDate =  DateTime.UtcNow;
+                var schedules = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);
+                var dropoffSchedule = schedules.FirstOrDefault(s => s.ScheduleType == ConstantEnum.ScheduleTypeConstants.Return);
+                if (dropoffSchedule != null)
+                {
+                    dropoffSchedule.EndDate = booking.DropoffTime;
+                    dropoffSchedule.UpdateDate = DateTime.UtcNow;
+                    _unitOfWork._scheduleRepo.Update(dropoffSchedule);
+                }
+                var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
+                if (invoice == null)
+                {
+                    throw new Exception("Invoice not found for the booking");
+                }
+                var carRate = await _unitOfWork._carRentalRateRepo.GetRateByCarAsync(booking.CarId);
+                if (carRate == null)
+                {
+                    throw new Exception("Car rate not found for the booking");
+                }
+                invoice.DueDate = booking.DropoffTime;
+                var newInvoiceItem = new InvoiceItem
+                {
+                    Id = Guid.NewGuid(),
+                    InvoiceId = invoice.Id,
+                    Item = "Booking Extension",
+                    Description = $"Extension for {request.TimeExtInDays} days",
+                    Quantity = request.TimeExtInDays,
+                    UnitPrice = (decimal)carRate.DailyRate,
+                    Total = (decimal)(carRate.DailyRate * request.TimeExtInDays),
+                    Note = "Auto-generated for booking extension"
+                };
+                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork._bookingRepo.Update(booking);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);
+                var scheduleUpdate = await _unitOfWork._scheduleRepo.GetByIdAsync(dropoffSchedule.Id);
+                return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate));
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<List<Booking>> GetAllBooking()
         {
             return (List<Booking>)await _unitOfWork._bookingRepo.GetAllAsync();
