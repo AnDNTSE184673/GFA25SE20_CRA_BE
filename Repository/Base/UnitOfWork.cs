@@ -17,6 +17,7 @@ namespace Repository.Base
         private IDbContextTransaction? _transaction = null;
 
         //only allow external code to consume, not change
+        //Service locator/facade pateern
         public IUserRepository _userRepo { get; }
         public IBookingRepository _bookingRepo { get; }
         public IInvoiceRepository _invoiceRepo { get; }

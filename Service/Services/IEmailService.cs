@@ -10,5 +10,6 @@ namespace Service.Services
     {
         Task<bool> SendEmailAsync(string subject, string body, string receiverMail, string receiverName);
         string GenerateBodyRegisterSuccess(string username, string password, string productName, string? contactInfo);
+        string GenerateBodyOtpCode(string username, string? otpCode, string productName, string? contactInfo);
     }
 }

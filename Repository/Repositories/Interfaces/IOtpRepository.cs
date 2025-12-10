@@ -10,6 +10,7 @@ namespace Repository.Repositories.Interfaces
 {
     public interface IOtpRepository : IGenericRepository<OTPCode>
     {
-        object FindSentOtpByUserAsync(Guid userId);
+        Task<(string status, OTPCode obj)> CreateOtpAsync(OTPCode otp);
+        Task<OTPCode> FindSentOtpByUserAsync(Guid userId);
     }
 }
