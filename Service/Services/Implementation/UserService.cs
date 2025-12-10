@@ -36,11 +36,12 @@ namespace Service.Services.Implementation
         private readonly IConfiguration _config;
         private readonly IEmailService _email;
         private readonly ILogger<UserService> _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<UserService>();
+        private readonly IOTPService _otp;
 
         int expirationTimeSec = 1800;
         bool isPublic = true;
 
-        public UserService(UploadFile upload, UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email, ILogger<UserService> logger)
+        public UserService(UploadFile upload, UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email, ILogger<UserService> logger, IOTPService otp)
         {
             _upload = upload;
             _unitOfWork = unitOfWork;
@@ -49,6 +50,7 @@ namespace Service.Services.Implementation
             _config = config;
             _email = email;
             _logger = logger;
+            _otp = otp;
         }
 
         public async Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId)
@@ -121,20 +123,71 @@ namespace Service.Services.Implementation
             if (update < 1)
                 _logger.LogError("Something broke when updating refresh token in DB");
         }
-        
-        public async Task<LoginResponse> AuthenticateAsync(string email, string password)
+
+        public async Task<LoginResponse?> ReturnTokensAsync(User user)
+        {
+            var result = _jwtService.GenerateAccessToken(user);
+            return new LoginResponse
+            {
+                Token = result.token,
+                Expiration = result.expire
+            };
+        }
+
+        public async Task<(string msg, LoginResponse token)> AuthenticateAsync(string email, string password)
         {
             var user = await _unitOfWork._userRepo.Authentication(email, password);
-            if (user != null)
+            if (user == null) return (ConstantEnum.RepoStatus.FAILURE, null!);
+            if (user.RoleId == (int)ConstantEnum.RoleID.ADMIN || user.RoleId == (int)ConstantEnum.RoleID.STAFF)
             {
-                var result = _jwtService.GenerateAccessToken(user);
-                return new LoginResponse
-                {
-                    Token = result.token,
-                    Expiration = result.expire
-                };
+                var OtpCode = await _otp.SendOTPCodes(user.Id);
+
+                var body = _email.GenerateBodyOtpCode(user.Username, OtpCode, "Morent", null);
+                _email.SendEmailAsync("Morent Self-driving Rental", body, user.Email, user.Fullname);
+                return ("Check your email for a verification code!", null!);
             }
-            return null!;
+            var token = await ReturnTokensAsync(user);
+            return ("Login successful!", token);
+        }
+
+        public async Task<LoginResponse?> OTPVerificationAsync(string OTPCode, string email)
+        {
+            try
+            {
+                var user = _unitOfWork._userRepo.GetByEmail(email);
+                if (user == null) throw new KeyNotFoundException("User not found!");
+                var result = await _otp.SubmitOTPCodes(user.Id, OTPCode);
+                var otpStatus = await _unitOfWork._OtpRepo.FindSentOtpByUserAsync(user.Id);
+                if (result.Equals(ConstantEnum.Statuses.APPROVED))
+                {
+                    
+                    otpStatus.IsUsed = true;
+                    user.Status = ConstantEnum.Statuses.ACTIVE;
+
+                    await _unitOfWork.BeginTransactionAsync();
+                    await _unitOfWork._userRepo.UpdateAsync(user);
+                    await _unitOfWork._OtpRepo.UpdateAsync(otpStatus);
+                    await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.CommitTransactionAsync();
+
+                    return await ReturnTokensAsync(user);
+                }
+                else
+                {
+                    await _unitOfWork.BeginTransactionAsync();
+                    otpStatus.AttemptCount++;
+                    await _unitOfWork._OtpRepo.UpdateAsync(otpStatus);
+                    await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.CommitTransactionAsync();
+
+                    return null!;
+                }
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }       
         }
 
         public async Task<User> CreateOwner(RegisterOwnerRequest request)
@@ -174,17 +227,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<List<User>> GetAllUsers()
-        {
-            return (List<User>)await _unitOfWork._userRepo.GetAllAsync();
-        }
-
-        public async Task<User?> GetUserById(Guid userId)
-        {
-            return await _unitOfWork._userRepo.GetByIdAsync(userId);
-        }
-
-        public async Task<LoginResponse?> RegisterCustomer(RegisterRequest request)
+        public async Task RegisterCustomer(RegisterRequest request)
         {
             var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(u => u.Email == request.Email);
             if (knownUser != null)
@@ -193,6 +236,7 @@ namespace Service.Services.Implementation
             }
             User newUser = new User()
             {
+                Id = Guid.NewGuid(),
                 Username = request.Username,
                 Password = request.Password,
                 Email = request.Email,
@@ -203,7 +247,7 @@ namespace Service.Services.Implementation
                 RoleId = (int)ConstantEnum.RoleID.CUSTOMER, //Customer role
                 IsGoogle = false,
                 IsVerified = false,
-                Status = "Pending",
+                Status = ConstantEnum.Statuses.PENDING,
             };
             try
             {
@@ -215,15 +259,23 @@ namespace Service.Services.Implementation
             catch
             {
                 _unitOfWork.RollbackTransaction();
-                return null;
             }
+
             User newlyCtUser = _unitOfWork._userRepo.GetByEmail(newUser.Email);
-            var result = _jwtService.GenerateAccessToken(newlyCtUser);
-            return new LoginResponse
-            {
-                Token = result.token,
-                Expiration = result.expire
-            };
+            var OtpCode = await _otp.SendOTPCodes(newlyCtUser.Id);
+
+            var body = _email.GenerateBodyOtpCode(newlyCtUser.Username, OtpCode, "Morent", null);
+            _email.SendEmailAsync("Morent Self-driving Rental", body, newlyCtUser.Email, newlyCtUser.Fullname);
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            return (List<User>)await _unitOfWork._userRepo.GetAllAsync();
+        }
+
+        public async Task<User?> GetUserById(Guid userId)
+        {
+            return await _unitOfWork._userRepo.GetByIdAsync(userId);
         }
 
         public async Task<User?> UpdateToCarOwner(Guid userId)
@@ -343,35 +395,6 @@ namespace Service.Services.Implementation
 
                 return url;
 
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        //sent and authenticate (sent means send code, end authenticate to wait code, authenticate to continue)
-        //also reject
-        public Task<string> PreAuthenticateAsync(string givenCode, Guid userId)
-        {
-            try
-            {
-                var OtpSent = _unitOfWork._OtpRepo.FindSentOtpByUserAsync(userId);
-                if(OtpSent != null)
-                {
-                    //validate givenCode == OtpSent.OtpHash?
-                    //if(success) => return "authenticate"
-                    //else => return "reject"
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    //var otpObj = new OtpCode{};
-                    //await _unitOfWork._OtpRepo.CreateOtpCode(otpObj);
-                    //call email or sms messenging here with otp
-                    //return "sent"
-                    throw new NotImplementedException();
-                }
             }
             catch (Exception ex)
             {

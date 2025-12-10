@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Repository.Constant;
 using Repository.CustomFunctions.TokenHandler;
 using Repository.DTO;
 using Repository.DTO.RequestDTO;
@@ -33,11 +34,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 return BadRequest("Email and password must be provided.");
             }
             var response = await _userService.AuthenticateAsync(request.Email.Trim(), request.Password);
-            if (response == null)
+            if (response.token == null)
             {
-                return Unauthorized("Invalid email or password.");
+                if (response.msg.Equals(ConstantEnum.RepoStatus.FAILURE))
+                    return Unauthorized("Invalid email or password.");
+                else
+                    return Ok(new
+                    {
+                        Message = response.msg
+                    });
             }
-            return Ok(response);
+            return Ok(response.token);
         }
 
         [HttpPost("SignUp")]
@@ -51,7 +58,18 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
                 });
             }
-            var response = await _userService.RegisterCustomer(register);
+            await _userService.RegisterCustomer(register);
+            // Implementation for user sign-up goes here
+            return Ok(new
+            {
+                Message = "Check your email for a verification code!"
+            });
+        }
+
+        [HttpPost("otp/verify")]
+        public async Task<IActionResult> OTPVerification(string email, string OTPCode)
+        {
+            var response = await _userService.OTPVerificationAsync(OTPCode, email);
             // Implementation for user sign-up goes here
             return Ok(response);
         }

@@ -78,15 +78,15 @@ namespace Service.Services.Implementation
 
             StringBuilder mailBody = new StringBuilder();
 
-            mailBody.AppendLine("<div style='font-family: Arial, sans-serif; color: #000000;'>");
-            mailBody.AppendLine("<h1 style='color: #000000;'>Account Confirmation</h1>");
+            mailBody.AppendLine("<div style='font-family: Arial, sans-serif; color: #1a1a1a;'>");
+            mailBody.AppendLine("<h1 style='color: #1a1a1a;'>Account Confirmation</h1>");
 
-            mailBody.AppendLine($"<p style='color: #000000;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been successfully registered on {productName}.</p>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been successfully registered on {productName}.</p>");
             mailBody.AppendLine("<br/>");
-            mailBody.AppendLine($"<h3 style='color: #000000;'>Account Information:</h3>");
-            mailBody.AppendLine($"<h4 style='color: #000000;'>NOTE: If the password box is empty, that usually means this account was created via Google</h4>");
-            mailBody.AppendLine($"<p style='color: #000000;'> Username: <strong>{username}</strong> </p>");
-            mailBody.AppendLine($"<p style='color: #000000;'> Password (highlight to view): <span style='background-color: black; color: transparent;'>{password}</span> </p>");
+            mailBody.AppendLine($"<h3 style='color: #1a1a1a;'>Account Information:</h3>");
+            mailBody.AppendLine($"<h4 style='color: #1a1a1a;'>NOTE: If the password box is empty, that usually means this account was created via Google</h4>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> Username: <strong>{username}</strong> </p>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> Password (highlight to view): <span style='background-color: black; color: transparent;'>{password}</span> </p>");
             
 
             //put email verifying jwt here
@@ -94,8 +94,52 @@ namespace Service.Services.Implementation
             mailBody.AppendLine("Confirm Email");
             mailBody.AppendLine("</a>");*/
 
-            mailBody.AppendLine($"<p style='color: #000000;'> If you didn't create this account, please contact us via our email: {contactInfo ?? "support@example.com"}. </p>");
-            mailBody.AppendLine($"<h5 style='color: #000000;'>Best regards,<br>{productName} Team</h5>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> If you didn't create this account, please contact us via our email: {contactInfo ?? "support@example.com"}. </p>");
+            mailBody.AppendLine($"<h5 style='color: #1a1a1a;'>Best regards,<br>{productName} Team</h5>");
+            mailBody.AppendLine("</div>");
+
+            return mailBody.ToString();
+
+        }
+
+        /// <summary>
+        /// productName is the name of the product or company
+        /// contactInfo can be left empty, in which case the placeholder "support@example.com" will be used
+        /// </summary>
+        public string GenerateBodyOtpCode(string username, string? otpCode, string productName, string? contactInfo)
+        {
+
+
+            StringBuilder mailBody = new StringBuilder();
+
+            mailBody.AppendLine("<div style='font-family: Arial, sans-serif; color: #1a1a1a;'>");
+            mailBody.AppendLine("<h1 style='color: #1a1a1a;'>One-Time Password</h1>");
+
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been registered on {productName}.</p>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'>This OTP is to verify that this email has been used to register to {productName}</p>");
+            mailBody.AppendLine("<br/>");
+            mailBody.AppendLine($"<h3 style='color: #1a1a1a;'>Account Information:</h3>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> Your Verification Code: </p>");
+
+            // Steam-like OTP box
+            mailBody.AppendLine($@"
+            <div style='
+                background-color: #f2f3f5;
+                padding: 20px;
+                text-align: center;
+                border-radius: 10px;
+                font-size: 32px;
+                letter-spacing: 8px;
+                font-weight: bold;
+                color: #1a1a1a;
+                width: 240px;
+                margin: 0 auto;
+                border: 1px solid #d8d8d8;
+            '>{otpCode}</div>
+            ");
+
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> If you didn't create this account, please ignore this message. </p>");
+            mailBody.AppendLine($"<h5 style='color: #1a1a1a;'>Best regards,<br>{productName} Team</h5>");
             mailBody.AppendLine("</div>");
 
             return mailBody.ToString();
@@ -108,26 +152,26 @@ namespace Service.Services.Implementation
 
             StringBuilder mailBody = new StringBuilder();
 
-            mailBody.AppendLine("<div style='font-family: Arial, sans-serif; color: #000000;'>");
-            mailBody.AppendLine("<h1 style='color: #000000;'>Account Confirmation</h1>");
+            mailBody.AppendLine("<div style='font-family: Arial, sans-serif; color: #1a1a1a;'>");
+            mailBody.AppendLine("<h1 style='color: #1a1a1a;'>Account Confirmation</h1>");
 
-            mailBody.AppendLine($"<p style='color: #000000;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been successfully registered on YuuZone</p>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'>Hi <strong>{username}</strong>, you've received this email because an account with this email has been successfully registered on YuuZone</p>");
             mailBody.AppendLine("<br/>");
-            mailBody.AppendLine($"<h4 style='color: #000000;'>Account Information:</h4>");
-            mailBody.AppendLine($"<p style='color: #000000;'> Username: <strong>{username}</strong> </p>");
-            mailBody.AppendLine($"<p style='color: #000000;'> Password (highlight to view): <span style='background-color: black; color: transparent;'>{password}</span> </p>");
+            mailBody.AppendLine($"<h4 style='color: #1a1a1a;'>Account Information:</h4>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> Username: <strong>{username}</strong> </p>");
+            mailBody.AppendLine($"<p style='color: #1a1a1a;'> Password (highlight to view): <span style='background-color: black; color: transparent;'>{password}</span> </p>");
             
 
             //put email verifying jwt here
             /*mailBody.AppendLine($"<a href='[url]' style=' display: block; text-align: center; font-weight: bold; background-color: #008CBA; font-size: 16px; border-radius: 10px; color: #ffffff; cursor: pointer; width: 50%; padding: 10px; text-decoration: none;'>");
             mailBody.AppendLine("Confirm Email");
             mailBody.AppendLine("</a>");*/
-            /*
-            mailBody.AppendLine("<p style='color: #000000;'> If you didn't create this account, please contact us via our email (contact here) </p>");
-            mailBody.AppendLine("<h5 style='color: #000000;'>Best regards,<br>YuuZone Team</h5>");
-            mailBody.AppendLine("</div>");
-            return mailBody.ToString();
+        /*
+        mailBody.AppendLine("<p style='color: #1a1a1a;'> If you didn't create this account, please contact us via our email (contact here) </p>");
+        mailBody.AppendLine("<h5 style='color: #1a1a1a;'>Best regards,<br>YuuZone Team</h5>");
+        mailBody.AppendLine("</div>");
+        return mailBody.ToString();
 
-    }*/
+}*/
     }
 }
