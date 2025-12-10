@@ -15,5 +15,6 @@ namespace Repository.Repositories.Interfaces
         Task<Car> UpdateCarAsync(Car car);
         Task<string> DeleteCarAsync(Guid id);
         Task<List<Car?>> GetAllCars();
+        Task<List<Car>> GetAllActiveCars();
     }
 }

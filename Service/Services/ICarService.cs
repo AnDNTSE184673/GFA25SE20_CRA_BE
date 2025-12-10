@@ -16,6 +16,7 @@ namespace Service.Services
         Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form);
         Task<CarView> UpdateCarImageAsync(List<IFormFile> images, Guid carId);
         Task<List<CarView>> GetAllCarsAsync();
+        Task<List<CarView>> GetActiveCarsAsync();
         Task<CarView> GetCarByIdAsync(Guid carId);
         Task<List<CarView>> SearchCarAsync(SearchCarForm searchParam);
         Task<List<CarDetailsManufacturer>> GetManufacturerLookup();
