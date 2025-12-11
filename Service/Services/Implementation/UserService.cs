@@ -138,14 +138,14 @@ namespace Service.Services.Implementation
         {
             var user = await _unitOfWork._userRepo.Authentication(email, password);
             if (user == null) return (ConstantEnum.RepoStatus.FAILURE, null!);
-            //if (user.RoleId == (int)ConstantEnum.RoleID.ADMIN || user.RoleId == (int)ConstantEnum.RoleID.STAFF)
-            //{
-            //    var OtpCode = await _otp.SendOTPCodes(user.Id);
+            /*if (user.RoleId == (int)ConstantEnum.RoleID.ADMIN || user.RoleId == (int)ConstantEnum.RoleID.STAFF)
+            {
+                var OtpCode = await _otp.SendOTPCodes(user.Id);
 
-            //    var body = _email.GenerateBodyOtpCode(user.Username, OtpCode, "Morent", null);
-            //    _email.SendEmailAsync("Morent Self-driving Rental", body, user.Email, user.Fullname);
-            //    return ("Check your email for a verification code!", null!);
-            //}
+                var body = _email.GenerateBodyOtpCode(user.Username, OtpCode, "Morent", null);
+                _email.SendEmailAsync("Morent Self-driving Rental", body, user.Email, user.Fullname);
+                return ("Check your email for a verification code!", null!);
+            }*/
             var token = await ReturnTokensAsync(user);
             return ("Login successful!", token);
         }

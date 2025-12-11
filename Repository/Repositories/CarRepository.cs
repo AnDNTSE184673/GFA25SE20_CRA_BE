@@ -34,6 +34,17 @@ namespace Repository.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+        
+        public async Task<List<Car>> GetAllActiveCars()
+        {
+            return await _dbContext.Cars
+                .Include(x => x.Owner)
+                .Include(x => x.PreferredLot)
+                .Include(x => x.Images)
+                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE))
+                .AsNoTracking()
+                .ToListAsync();
+        }
 
         public async Task<Car> UpdateCarAsync(Car car)
         {

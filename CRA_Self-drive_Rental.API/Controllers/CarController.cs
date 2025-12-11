@@ -238,6 +238,23 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableCars()
+        {
+            try
+            {
+                var cars = await _carServ.GetActiveCarsAsync();
+                return Ok(cars);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
         [HttpGet("{carId}")]
         public async Task<IActionResult> GetCarById(Guid carId)
         {
