@@ -197,7 +197,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(BookingView? booking, ScheduleView schedule)> ExtendBooking(BookingExtensionRequest request)
+        public async Task<(BookingView? booking, ScheduleView? schedule)> ExtendBooking(BookingExtensionRequest request)
         {
             try
             {
@@ -245,7 +245,8 @@ namespace Service.Services.Implementation
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);
-                var scheduleUpdate = await _unitOfWork._scheduleRepo.GetByIdAsync(dropoffSchedule.Id);
+                var scheduleUpdate = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);
+                if ( scheduleUpdate == null || scheduleUpdate.Count == 0) return (_mapper.Map<BookingView>(updatedBooking), null);
                 return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate));
             }
             catch (Exception ex)
