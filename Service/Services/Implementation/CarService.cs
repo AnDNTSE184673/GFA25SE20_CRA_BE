@@ -52,6 +52,24 @@ namespace Service.Services.Implementation
             return carViews;
         }
 
+        public async Task<List<CarView>> GetActiveCarsAsync()
+        {
+            await _upload.EnsureInitializedAsync();
+
+            var cars = await _unitOfWork._carRepo.GetAllActiveCars();
+            var carViews = new List<CarView>();
+            foreach (var car in cars)
+            {
+                var urls = await Task.WhenAll(car.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+                var carView = _mapper.Map<CarView>(car);
+                carView.ImageUrls.AddRange(urls);
+                carViews.Add(carView);
+            }
+            return carViews;
+        }
+
         public async Task<CarView> GetCarByIdAsync(Guid carId)
         {
             await _upload.EnsureInitializedAsync();

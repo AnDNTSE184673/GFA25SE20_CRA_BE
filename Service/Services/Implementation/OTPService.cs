@@ -60,6 +60,46 @@ namespace Service.Services.Implementation
             }
         }
 
+        public async Task<string> ResendOTPCodes(Guid userId)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                var exist = await _unitOfWork._userRepo.GetByIdAsync(userId);
+                if (exist == null) throw new KeyNotFoundException("User doesn't exist");
+                var OtpSent = await _unitOfWork._OtpRepo.FindSentOtpByUserAsync(userId);
+                if(OtpSent != null)
+                {
+
+                }
+
+                var code = GenerateOtp();
+
+                var newOtp = new OTPCode
+                {
+                    UserId = exist.Id,
+                    OtpHash = BCrypt.Net.BCrypt.HashPassword(code),
+                    ExpirationTime = DateTime.UtcNow.AddMinutes(10),
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                var result = await _unitOfWork._OtpRepo.CreateAsync(newOtp);
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                if (result.Equals(ConstantEnum.RepoStatus.FAILURE))
+                    return null;
+                else
+                    return code;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<string> SubmitOTPCodes(Guid userId, string unhashedCode)
         {
             try
