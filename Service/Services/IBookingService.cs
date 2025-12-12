@@ -12,8 +12,8 @@ namespace Service.Services
 {
     public interface IBookingService
     {
-        Task<List<Booking>> GetAllBooking();
-        Task<Booking> GetBooking(Guid id);
+        Task<List<BookingView>> GetAllBooking();
+        Task<BookingView> GetBooking(Guid id);
         Task<List<Booking>?> GetBookingsFromCustomer(Guid customerId);
         Task<List<Booking>?> GetBookingsFromCar(Guid carId);
         Task<BookingView?> GetBookingFromInvoice(Guid invoiceId);
