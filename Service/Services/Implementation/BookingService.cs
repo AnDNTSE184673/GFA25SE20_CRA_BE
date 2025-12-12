@@ -252,7 +252,7 @@ namespace Service.Services.Implementation
                 {
                     throw new Exception("Car rate not found for the booking");
                 }
-                invoice.DueDate = booking.DropoffTime;
+                invoice.DueDate = booking.DropoffTime;                
                 var newInvoiceItem = new InvoiceItem
                 {
                     Id = Guid.NewGuid(),
@@ -264,6 +264,7 @@ namespace Service.Services.Implementation
                     Total = (decimal)(carRate.DailyRate * request.TimeExtInDays),
                     Note = "Auto-generated for booking extension"
                 };
+                _unitOfWork._invoiceRepo.Update(invoice);
                 await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork._bookingRepo.Update(booking);
@@ -272,7 +273,7 @@ namespace Service.Services.Implementation
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);
                 var scheduleUpdate = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);
                 if ( scheduleUpdate == null || scheduleUpdate.Count == 0) return (_mapper.Map<BookingView>(updatedBooking), null);
-                return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate));
+                return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate.FirstOrDefault(s => s.ScheduleType == ConstantEnum.ScheduleTypeConstants.Return)));
             }
             catch (Exception ex)
             {
