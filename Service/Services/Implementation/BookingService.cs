@@ -265,7 +265,7 @@ namespace Service.Services.Implementation
 
         public async Task<BookingView> GetBooking(Guid id)
         {
-            var booking = await _unitOfWork._bookingRepo.GetByIdWithIncludeAsync(id, "Id", x=> x.User, x=> x.Car, x=> x.Invoice);
+            var booking = await _unitOfWork._bookingRepo.GetByIdWithIncludeAsync(id, "Id", x=> x.User, x=> x.Car, x=> x.Invoice, x => x.Car.Owner);
             var bookingView = _mapper.Map<BookingView>(booking);
             if (booking == null)
             {
