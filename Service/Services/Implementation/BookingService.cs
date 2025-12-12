@@ -256,19 +256,22 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<List<Booking>> GetAllBooking()
+        public async Task<List<BookingView>> GetAllBooking()
         {
-            return (List<Booking>)await _unitOfWork._bookingRepo.GetAllAsync();
+            var bookings = await _unitOfWork._bookingRepo.GetAllBookings();
+            bookings = bookings.OrderByDescending(b => b.UpdateDate).ToList();
+            return _mapper.Map<List<BookingView>>(bookings);
         }
 
-        public async Task<Booking> GetBooking(Guid id)
+        public async Task<BookingView> GetBooking(Guid id)
         {
-            var booking = await _unitOfWork._bookingRepo.GetByIdAsync(id);
+            var booking = await _unitOfWork._bookingRepo.GetByIdWithIncludeAsync(id, "Id", x=> x.User, x=> x.Car, x=> x.Invoice);
+            var bookingView = _mapper.Map<BookingView>(booking);
             if (booking == null)
             {
                 throw new Exception("Booking not found");
             }
-            return booking;
+            return bookingView;
         }
 
         public async Task<BookingView?> GetBookingFromBookingNumber(string bookingNum)

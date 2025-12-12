@@ -75,5 +75,13 @@ namespace Repository.Repositories
                 .Include(x => x.Car)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<Booking>?> GetAllBookings()
+        {
+            return await _context.BookingHistories.Include(x => x.User)
+                .Include(x => x.Car)
+                .Include(x => x.Invoice)
+                .ToListAsync();
+        }
     }
 }
