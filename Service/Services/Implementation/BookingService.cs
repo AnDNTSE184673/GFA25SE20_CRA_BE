@@ -73,10 +73,35 @@ namespace Service.Services.Implementation
                     var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
                     foreach (var payment in payments)
                     {
-                        payment.Status = ConstantEnum.Status.Success.ToString();
-                        payment.UpdateDate = DateTime.UtcNow;
-                        payment.PaymentMethod = "Cash on Delivery";
-                        _unitOfWork._paymentRepo.Update(payment);
+                        if (payment.Item.Contains("Booking Fee"))
+                        {
+                            payment.Status = ConstantEnum.Status.Success.ToString();
+                            payment.UpdateDate = DateTime.UtcNow;
+                            payment.PaymentMethod = "Cash on Delivery";
+                            _unitOfWork._paymentRepo.Update(payment);
+                        }
+                    }
+                    var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
+                    existCar.Status = ConstantEnum.Statuses.RESERVED;
+                    await _unitOfWork._carRepo.UpdateCarAsync(existCar);
+                    _unitOfWork.SaveChanges();
+                }
+                if (ConstantEnum.Statuses.COMPLETED.ToLower().Equals(status.ToLower()))
+                {
+                    var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
+                    if (invoice == null)
+                    {
+                        throw new Exception("Invoice not found for the booking");
+                    }
+                    invoice.Status = ConstantEnum.Status.Completed.ToString();
+                    _unitOfWork._invoiceRepo.Update(invoice);
+                    var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
+                    foreach (var payment in payments)
+                    {                        
+                            payment.Status = ConstantEnum.Status.Success.ToString();
+                            payment.UpdateDate = DateTime.UtcNow;
+                            payment.PaymentMethod = "Cash on Delivery";
+                            _unitOfWork._paymentRepo.Update(payment);
                     }
                     var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
                     existCar.Status = ConstantEnum.Statuses.RESERVED;
