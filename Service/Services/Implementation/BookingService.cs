@@ -73,10 +73,35 @@ namespace Service.Services.Implementation
                     var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
                     foreach (var payment in payments)
                     {
-                        payment.Status = ConstantEnum.Status.Success.ToString();
-                        payment.UpdateDate = DateTime.UtcNow;
-                        payment.PaymentMethod = "Cash on Delivery";
-                        _unitOfWork._paymentRepo.Update(payment);
+                        if (payment.Item.Contains("Booking Fee"))
+                        {
+                            payment.Status = ConstantEnum.Status.Success.ToString();
+                            payment.UpdateDate = DateTime.UtcNow;
+                            payment.PaymentMethod = "Cash on Delivery";
+                            _unitOfWork._paymentRepo.Update(payment);
+                        }
+                    }
+                    var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
+                    existCar.Status = ConstantEnum.Statuses.RESERVED;
+                    await _unitOfWork._carRepo.UpdateCarAsync(existCar);
+                    _unitOfWork.SaveChanges();
+                }
+                if (ConstantEnum.Statuses.COMPLETED.ToLower().Equals(status.ToLower()))
+                {
+                    var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
+                    if (invoice == null)
+                    {
+                        throw new Exception("Invoice not found for the booking");
+                    }
+                    invoice.Status = ConstantEnum.Status.Completed.ToString();
+                    _unitOfWork._invoiceRepo.Update(invoice);
+                    var payments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
+                    foreach (var payment in payments)
+                    {                        
+                            payment.Status = ConstantEnum.Status.Success.ToString();
+                            payment.UpdateDate = DateTime.UtcNow;
+                            payment.PaymentMethod = "Cash on Delivery";
+                            _unitOfWork._paymentRepo.Update(payment);
                     }
                     var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
                     existCar.Status = ConstantEnum.Statuses.RESERVED;
@@ -227,7 +252,7 @@ namespace Service.Services.Implementation
                 {
                     throw new Exception("Car rate not found for the booking");
                 }
-                invoice.DueDate = booking.DropoffTime;
+                invoice.DueDate = booking.DropoffTime;                
                 var newInvoiceItem = new InvoiceItem
                 {
                     Id = Guid.NewGuid(),
@@ -239,6 +264,7 @@ namespace Service.Services.Implementation
                     Total = (decimal)(carRate.DailyRate * request.TimeExtInDays),
                     Note = "Auto-generated for booking extension"
                 };
+                _unitOfWork._invoiceRepo.Update(invoice);
                 await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork._bookingRepo.Update(booking);
@@ -247,7 +273,7 @@ namespace Service.Services.Implementation
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);
                 var scheduleUpdate = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);
                 if ( scheduleUpdate == null || scheduleUpdate.Count == 0) return (_mapper.Map<BookingView>(updatedBooking), null);
-                return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate));
+                return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate.FirstOrDefault(s => s.ScheduleType == ConstantEnum.ScheduleTypeConstants.Return)));
             }
             catch (Exception ex)
             {

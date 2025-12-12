@@ -125,7 +125,6 @@ namespace Service.Services.Implementation
             if (paymentHis != null)
             {
                 paymentHis.Status = response.Status.ToString();
-                paymentHis.UpdateDate = DateTime.UtcNow;
                 var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(paymentHis.UserId);
                 var bknd = bookings.FirstOrDefault(x => x.InvoiceId == paymentHis.InvoiceId);
                 if (paymentHis.Status.Equals("Paid") || paymentHis.Status.Equals("PAID"))
