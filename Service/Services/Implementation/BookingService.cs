@@ -234,13 +234,17 @@ namespace Service.Services.Implementation
                 }
                 booking.DropoffTime = booking.DropoffTime.AddDays(request.TimeExtInDays);
                 booking.UpdateDate =  DateTime.UtcNow;
-                var schedules = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);
+                await _unitOfWork._bookingRepo.UpdateAsync(booking);
+                var schedules = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);                
                 var dropoffSchedule = schedules.FirstOrDefault(s => s.ScheduleType == ConstantEnum.ScheduleTypeConstants.Return);
                 if (dropoffSchedule != null)
                 {
                     dropoffSchedule.EndDate = booking.DropoffTime;
                     dropoffSchedule.UpdateDate = DateTime.UtcNow;
-                    _unitOfWork._scheduleRepo.Update(dropoffSchedule);
+                    dropoffSchedule.Booking = null;
+                    dropoffSchedule.Car = null;
+                    dropoffSchedule.User = null;
+                    await _unitOfWork._scheduleRepo.UpdateAsync(dropoffSchedule);
                 }
                 var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
                 if (invoice == null)
@@ -264,10 +268,8 @@ namespace Service.Services.Implementation
                     Total = (decimal)(carRate.DailyRate * request.TimeExtInDays),
                     Note = "Auto-generated for booking extension"
                 };
-                _unitOfWork._invoiceRepo.Update(invoice);
-                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);
-                await _unitOfWork.SaveChangesAsync();
-                _unitOfWork._bookingRepo.Update(booking);
+                await _unitOfWork._invoiceRepo.UpdateAsync(invoice);
+                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);       
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);
