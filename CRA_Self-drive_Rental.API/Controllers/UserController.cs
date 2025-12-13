@@ -59,6 +59,38 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return Ok(response);
         }
 
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetUserPassword([FromBody] UpdatePasswordRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid update password data",
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+            var response = await _userService.UpdateUserPasswordAsync(request);
+            return Ok(new
+            {
+                Message = response
+            });
+        }
+
+        [HttpPost("reset-password/verify")]
+        public async Task<IActionResult> OTPVerification(string email, string OTPCode)
+        {
+            var response = await _userService.AuthorizeUpdateUserPasswordAsync(email, OTPCode);
+            if (response == null) return BadRequest(new
+            {
+                Message = "Incorrect OTP code!"
+            });
+            return Ok(new
+            {
+                Message = response
+            });
+        }
+
         [HttpPatch("upload-avatar/{userId}")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>

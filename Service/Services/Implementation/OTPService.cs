@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using Repository.Base;
 using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.ResponseDTO;
+using Supabase.Gotrue.Mfa;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +28,7 @@ namespace Service.Services.Implementation
             _email = email;
         }
 
-        public async Task<string> SendOTPCodes(Guid userId)
+        public async Task<string> SendOTPCodes(Guid userId, string? additionalInfo)
         {
             try
             {
@@ -42,6 +45,7 @@ namespace Service.Services.Implementation
                     OtpHash = BCrypt.Net.BCrypt.HashPassword(code),
                     ExpirationTime = DateTime.UtcNow.AddMinutes(10),
                     CreatedAt = DateTime.UtcNow,
+                    AdditionalInfo = !additionalInfo.IsNullOrEmpty() ? additionalInfo : null
                 };
 
                 var result = await _unitOfWork._OtpRepo.CreateAsync(newOtp);
@@ -60,18 +64,20 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<string> ResendOTPCodes(Guid userId)
+        public async Task<string> ResendOTPCodes(Guid userId, string? additionalInfo)
         {
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
-
                 var exist = await _unitOfWork._userRepo.GetByIdAsync(userId);
                 if (exist == null) throw new KeyNotFoundException("User doesn't exist");
                 var OtpSent = await _unitOfWork._OtpRepo.FindSentOtpByUserAsync(userId);
                 if(OtpSent != null)
                 {
+                    OtpSent.IsUsed = true;
 
+                    await _unitOfWork.BeginTransactionAsync();
+                    await _unitOfWork._OtpRepo.UpdateAsync(OtpSent);
+                    await _unitOfWork.CommitTransactionAsync();
                 }
 
                 var code = GenerateOtp();
@@ -82,6 +88,7 @@ namespace Service.Services.Implementation
                     OtpHash = BCrypt.Net.BCrypt.HashPassword(code),
                     ExpirationTime = DateTime.UtcNow.AddMinutes(10),
                     CreatedAt = DateTime.UtcNow,
+                    AdditionalInfo = additionalInfo.IsNullOrEmpty() ? additionalInfo : null
                 };
 
                 var result = await _unitOfWork._OtpRepo.CreateAsync(newOtp);
@@ -100,7 +107,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<string> SubmitOTPCodes(Guid userId, string unhashedCode)
+        public async Task<(OTPCode entry, string message)> SubmitOTPCodes(Guid userId, string unhashedCode)
         {
             try
             {
@@ -109,8 +116,8 @@ namespace Service.Services.Implementation
                 {
                     bool verify = BCrypt.Net.BCrypt.Verify(unhashedCode, OtpSent.OtpHash);
                     if (!verify)
-                        return ConstantEnum.Statuses.DENIED;
-                    return ConstantEnum.Statuses.APPROVED;
+                        return (OtpSent, ConstantEnum.Statuses.DENIED);
+                    return (OtpSent, ConstantEnum.Statuses.APPROVED);
                 }
                 else if (OtpSent == null)
                 {
@@ -127,6 +134,43 @@ namespace Service.Services.Implementation
             }
             catch (Exception ex)
             {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(OTPCode entry, string message)> OTPVerificationAsync(string OTPCode, string email)
+        {
+            try
+            {
+                var user = _unitOfWork._userRepo.GetByEmail(email);
+                if (user == null) throw new KeyNotFoundException("User not found!");
+                var result = await SubmitOTPCodes(user.Id, OTPCode);
+                var otpStatus = result.entry;
+                if (result.message.Equals(ConstantEnum.Statuses.APPROVED))
+                {
+
+                    otpStatus.IsUsed = true;
+
+                    await _unitOfWork.BeginTransactionAsync();
+                    await _unitOfWork._OtpRepo.UpdateAsync(otpStatus);
+                    await _unitOfWork.CommitTransactionAsync();
+
+                    return (otpStatus, ConstantEnum.RepoStatus.SUCCESS);
+                }
+                else
+                {
+                    otpStatus.AttemptCount++;
+
+                    await _unitOfWork.BeginTransactionAsync();
+                    await _unitOfWork._OtpRepo.UpdateAsync(otpStatus);
+                    await _unitOfWork.CommitTransactionAsync();
+
+                    return (otpStatus, ConstantEnum.RepoStatus.FAILURE);
+                }
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
                 throw new Exception(ex.Message);
             }
         }
