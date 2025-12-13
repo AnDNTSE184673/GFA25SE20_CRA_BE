@@ -16,5 +16,6 @@ namespace Repository.DTO.RequestDTO
         [Required]
         [Range(1, 30, ErrorMessage = "Extension time must be between 1 and 30 days.")]
         public int TimeExtInDays { get; set; }
+        public string? Note { get; set; }
     }
 }

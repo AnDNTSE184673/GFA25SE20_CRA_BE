@@ -118,7 +118,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                             {
                                 CacheControl = "3600",
                                 ContentType = mimeType,
-                                Upsert = false
+                                Upsert = true
                             });
 
                 string folderPath = Path.GetDirectoryName(imagePath)?.Replace("\\", "/") + "/";
@@ -214,7 +214,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
 
                     await _supabase.Storage
                         .From(targetBucket)
-                        .Upload(memoryStream.ToArray(), imagePath, new Supabase.Storage.FileOptions { CacheControl = "3600", ContentType = mimeType, Upsert = false });
+                        .Upload(memoryStream.ToArray(), imagePath, new Supabase.Storage.FileOptions { CacheControl = "3600", ContentType = mimeType, Upsert = true });
                 }
 
                 //make sure the bucket you're connecting to is a public bucket (dropdown and make public)

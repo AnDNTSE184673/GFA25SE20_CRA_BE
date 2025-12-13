@@ -232,6 +232,8 @@ namespace Service.Services.Implementation
                 {
                     throw new Exception("Booking not found");
                 }
+                if (string.IsNullOrEmpty(booking.Note) != true) throw new Exception("Booking has existing extension, cannot extend booking");
+                booking.Note = request.Note;
                 booking.DropoffTime = booking.DropoffTime.AddDays(request.TimeExtInDays);
                 booking.UpdateDate =  DateTime.UtcNow;
                 await _unitOfWork._bookingRepo.UpdateAsync(booking);
