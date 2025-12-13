@@ -197,7 +197,7 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(BookingView? booking, ScheduleView schedule)> ExtendBooking(BookingExtensionRequest request)
+        public async Task<(BookingView? booking, ScheduleView? schedule)> ExtendBooking(BookingExtensionRequest request)
         {
             try
             {
@@ -245,7 +245,8 @@ namespace Service.Services.Implementation
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);
-                var scheduleUpdate = await _unitOfWork._scheduleRepo.GetByIdAsync(dropoffSchedule.Id);
+                var scheduleUpdate = await _unitOfWork._scheduleRepo.GetSchedulesByBooking(booking.Id);
+                if ( scheduleUpdate == null || scheduleUpdate.Count == 0) return (_mapper.Map<BookingView>(updatedBooking), null);
                 return (_mapper.Map<BookingView>(updatedBooking), _mapper.Map<ScheduleView>(scheduleUpdate));
             }
             catch (Exception ex)
@@ -255,19 +256,22 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<List<Booking>> GetAllBooking()
+        public async Task<List<BookingView>> GetAllBooking()
         {
-            return (List<Booking>)await _unitOfWork._bookingRepo.GetAllAsync();
+            var bookings = await _unitOfWork._bookingRepo.GetAllBookings();
+            bookings = bookings.OrderByDescending(b => b.UpdateDate).ToList();
+            return _mapper.Map<List<BookingView>>(bookings);
         }
 
-        public async Task<Booking> GetBooking(Guid id)
+        public async Task<BookingView> GetBooking(Guid id)
         {
-            var booking = await _unitOfWork._bookingRepo.GetByIdAsync(id);
+            var booking = await _unitOfWork._bookingRepo.GetByIdWithIncludeAsync(id, "Id", x=> x.User, x=> x.Car, x=> x.Invoice, x => x.Car.Owner);
+            var bookingView = _mapper.Map<BookingView>(booking);
             if (booking == null)
             {
                 throw new Exception("Booking not found");
             }
-            return booking;
+            return bookingView;
         }
 
         public async Task<BookingView?> GetBookingFromBookingNumber(string bookingNum)
