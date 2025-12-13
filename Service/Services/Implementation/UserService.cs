@@ -24,6 +24,8 @@ using Microsoft.AspNetCore.Http;
 using Repository.CustomFunctions.SupabaseFileUploader;
 using Repository.Extension.SupabaseFileUploader;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Repository.DTO.RequestDTO.User;
+using System.Net.NetworkInformation;
 
 namespace Service.Services.Implementation
 {
@@ -150,44 +152,28 @@ namespace Service.Services.Implementation
             return ("Login successful!", token);
         }
 
-        public async Task<LoginResponse?> OTPVerificationAsync(string OTPCode, string email)
+        public async Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string email)
         {
             try
             {
                 var user = _unitOfWork._userRepo.GetByEmail(email);
-                if (user == null) throw new KeyNotFoundException("User not found!");
-                var result = await _otp.SubmitOTPCodes(user.Id, OTPCode);
-                var otpStatus = await _unitOfWork._OtpRepo.FindSentOtpByUserAsync(user.Id);
-                if (result.Equals(ConstantEnum.Statuses.APPROVED))
+                var result = await _otp.OTPVerificationAsync(OTPCode, email);
+                if (result.message.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
-                    
-                    otpStatus.IsUsed = true;
                     user.Status = ConstantEnum.Statuses.ACTIVE;
-
                     await _unitOfWork.BeginTransactionAsync();
                     await _unitOfWork._userRepo.UpdateAsync(user);
-                    await _unitOfWork._OtpRepo.UpdateAsync(otpStatus);
                     await _unitOfWork.SaveChangesAsync();
                     await _unitOfWork.CommitTransactionAsync();
-
                     return await ReturnTokensAsync(user);
                 }
-                else
-                {
-                    await _unitOfWork.BeginTransactionAsync();
-                    otpStatus.AttemptCount++;
-                    await _unitOfWork._OtpRepo.UpdateAsync(otpStatus);
-                    await _unitOfWork.SaveChangesAsync();
-                    await _unitOfWork.CommitTransactionAsync();
-
-                    return null!;
-                }
+                else return null!;
             }
             catch (Exception ex)
             {
                 _unitOfWork.RollbackTransaction();
                 throw new Exception(ex.Message);
-            }       
+            }
         }
 
         public async Task<User> CreateOwner(RegisterOwnerRequest request)
@@ -262,7 +248,7 @@ namespace Service.Services.Implementation
             }
 
             User newlyCtUser = _unitOfWork._userRepo.GetByEmail(newUser.Email);
-            var OtpCode = await _otp.SendOTPCodes(newlyCtUser.Id);
+            var OtpCode = await _otp.SendOTPCodes(newlyCtUser.Id, null);
 
             var body = _email.GenerateBodyOtpCode(newlyCtUser.Username, OtpCode, "Morent", null);
             _email.SendEmailAsync("Morent Self-driving Rental", body, newlyCtUser.Email, newlyCtUser.Fullname);
@@ -398,6 +384,54 @@ namespace Service.Services.Implementation
             }
             catch (Exception ex)
             {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateUserPasswordAsync(UpdatePasswordRequest request)
+        {
+            try
+            {
+                var exist = _unitOfWork._userRepo.GetByEmail(request.Email);
+
+                if (exist == null) throw new KeyNotFoundException("User with this email doesn't exist");
+
+                //var hashedPass = BCrypt.Net.BCrypt.HashPassword(request.ConfirmPassword);
+                var hashedPass = request.ConfirmPassword;
+
+                var OtpCode = await _otp.SendOTPCodes(exist.Id, hashedPass);
+
+                var body = _email.GenerateBodyOtpCode(exist.Username, OtpCode, "Morent", null);
+                _email.SendEmailAsync("Morent Self-driving Rental", body, exist.Email, exist.Fullname);
+                return "Check your email for a verification code!";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> AuthorizeUpdateUserPasswordAsync(string email, string OtpCode)
+        {
+            try
+            {
+                var user = _unitOfWork._userRepo.GetByEmail(email);
+                var result = await _otp.OTPVerificationAsync(OtpCode, email);
+                if (result.message.Equals(ConstantEnum.RepoStatus.SUCCESS))
+                {
+                    if (result.entry.AdditionalInfo.IsNullOrEmpty()) 
+                        throw new Exception("The database is missing the new password, please restart the sequence!");
+                    user.Password = result.entry.AdditionalInfo;
+                    await _unitOfWork.BeginTransactionAsync();
+                    await _unitOfWork._userRepo.UpdateAsync(user);
+                    await _unitOfWork.CommitTransactionAsync();
+                    return ConstantEnum.RepoStatus.SUCCESS;
+                }
+                else return ConstantEnum.RepoStatus.FAILURE;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
                 throw new Exception(ex.Message);
             }
         }

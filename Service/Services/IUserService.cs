@@ -2,6 +2,7 @@
 using Repositories.DTO.ResponseDTO.User;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
+using Repository.DTO.RequestDTO.User;
 using Repository.DTO.ResponseDTO;
 using Repository.DTO.ResponseDTO.User;
 using System;
@@ -17,11 +18,13 @@ namespace Service.Services
         Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId);
         Task<(string status, UserPostRegView? user)> GoogleRegister(string email, string name, string googleId);
         Task<(string msg, LoginResponse token)> AuthenticateAsync(string email, string password);
-        Task<LoginResponse?> OTPVerificationAsync(string OTPCode, string email);
+        Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string email);
         Task RegisterCustomer(RegisterRequest request);
         Task<User> CreateOwner(RegisterOwnerRequest request);
         Task<User?> UpdateToCarOwner(Guid userId);
         Task<User?> UpdateUserInfo(UserUpdateRequest request);
+        Task<string> UpdateUserPasswordAsync(UpdatePasswordRequest request);
+        Task<string> AuthorizeUpdateUserPasswordAsync(string email, string OtpCode);
         Task<List<User>> GetAllUsers();
         Task<User?> GetUserById(Guid userId);
         Task<User?> GetUserWithToken(Guid userId);

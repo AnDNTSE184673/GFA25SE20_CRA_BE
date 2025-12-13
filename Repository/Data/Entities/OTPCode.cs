@@ -23,6 +23,8 @@ namespace Repository.Data.Entities
         public bool IsUsed { get; set; } = false;
         public int AttemptCount { get; set; } = 0;
 
+        public string? AdditionalInfo { get; set; }
+
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
     }
