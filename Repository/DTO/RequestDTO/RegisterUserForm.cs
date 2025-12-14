@@ -28,6 +28,7 @@ namespace Repository.DTO.RequestDTO
         [EmailAddress]
         public string Email { get; set; }
         public string? Fullname { get; set; }
+        public DateTime? DateOfBirth { get; set; } = DateTime.UtcNow;
         public int? RoleId { get; set; } = (int)ConstantEnum.RoleID.CUSTOMER;
         [Required]
         public int? GenderId { get; set; } = (int)ConstantEnum.GenderID.OTHER;

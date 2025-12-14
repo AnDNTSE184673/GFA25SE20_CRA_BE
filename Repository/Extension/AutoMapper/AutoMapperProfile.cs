@@ -105,6 +105,7 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.Password, opt => opt.Condition(src => src.Password != null))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.Condition(src => src.PhoneNumber != null))
                 .ForMember(dest => dest.Fullname, opt => opt.Condition(src => src.Fullname != null))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.Condition(src => src.DateOfBirth != null))
                 .ForMember(dest => dest.Address, opt => opt.Condition(src => src.Address != null))
                 .ForMember(dest => dest.ImageAvatar, opt => opt.Condition(src => src.ImageAvatar != null))
                 .ForMember(dest => dest.Status, opt => opt.Condition(src => src.Status != null))
@@ -121,6 +122,7 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.GoogleId, opt => opt.MapFrom(src => src.GoogleId))
                 .ForMember(dest => dest.Fullname, opt => opt.MapFrom(src => src.Fullname))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth))
                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.GenderId));
             CreateMap<User, UserPostRegView>();
