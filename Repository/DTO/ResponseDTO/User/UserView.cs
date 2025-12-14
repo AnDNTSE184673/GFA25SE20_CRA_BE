@@ -14,6 +14,7 @@ namespace Repository.DTO.ResponseDTO.User
         public string? PhoneNumber { get; set; }
         public string Email { get; set; }
         public string? Fullname { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public string? ImageAvatar { get; set; }
         public bool IsGoogle { get; set; }
