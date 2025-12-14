@@ -157,6 +157,8 @@ namespace Repository.Repositories
             InvoiceItem.InvoiceId = invoiceId;
             _context.InvoiceItems.Add(InvoiceItem);
             invoice.InvoiceItems.Add(InvoiceItem);
+            invoice.GrandTotal += InvoiceItem.Total;
+            _context.Update(invoice);
             await _context.SaveChangesAsync();
             var updatedInvoice = await _context.Invoices
                 .Include(i => i.InvoiceItems)

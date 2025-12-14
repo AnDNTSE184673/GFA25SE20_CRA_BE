@@ -22,6 +22,7 @@ namespace Repository.DTO.ResponseDTO.Booking
         public Guid UserId { get; set; }
         public Guid CarId { get; set; }
         public string Status { get; set; }
+        public string? Note { get; set; }
         public string InvoiceNo { get; set; } //This should be InvoiceView
 
         public UserView User { get; set; }
