@@ -298,7 +298,10 @@ namespace Service.Services.Implementation
             try
             {
                 user.Fullname = request.Fullname;
-                user.Password = request.Password;
+                if (!string.IsNullOrWhiteSpace(request.Password))
+                {
+                    user.Password = request.Password;
+                }
                 user.PhoneNumber = request.PhoneNumber;
                 user.Address = request.Address;
                 user.ImageAvatar = request.ImageAvatar;
