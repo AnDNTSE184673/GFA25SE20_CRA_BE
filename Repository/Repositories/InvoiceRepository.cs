@@ -69,7 +69,7 @@ namespace Repository.Repositories
             var newInvoice = new Invoice
             {
                 Id = Guid.NewGuid(),
-                InvoiceNo = "INV-" + DateTime.UtcNow,
+                InvoiceNo = "INV-" + DateTime.UtcNow.AddHours(7),
                 IssueDate = DateTime.UtcNow,
                 DueDate = request.InvoiceDue,
                 SubTotal = (request.CarRate * request.RentTime) + request.Fees,

@@ -174,7 +174,7 @@ namespace Service.Services.Implementation
             try
             {
                 string bucket = ConstantEnum.SupabaseBucket.FeedbackImages;
-                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+                string uploadDate = DateTime.UtcNow.AddHours(7).ToString("ddMMyyyy");
                 string noExt = Path.GetFileNameWithoutExtension(file.FileName);
 
                 string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
@@ -190,7 +190,7 @@ namespace Service.Services.Implementation
                     FilePath = imagePath,
                     FileName = fileName,
                     Bucket = bucket,
-                    CreateDate = DateTime.UtcNow,
+                    CreateDate = DateTime.  ,
                     MimeType = MimeTypeHelper.GetMimeType(originalExt),
                     FileSize = file.Length,
                     Status = ConstantEnum.Statuses.ACTIVE,

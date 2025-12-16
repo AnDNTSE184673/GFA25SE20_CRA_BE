@@ -37,6 +37,7 @@ namespace Repository.Base
         public ICarHandoverRepository _carHandoverRepo { get; }
         public IOtpRepository _OtpRepo { get; }
         public ILookupRepository _lookupRepo { get; }
+        public INotifyRepository _notifyRepository { get; set; }
 
         //no need to construct _transaction
 
@@ -59,7 +60,8 @@ namespace Repository.Base
             ICarHandoverRepository carHandoverRepo,
             IOtpRepository OtpRepo,
             ILookupRepository lookupRepo,
-            IPaymentRepository paymentRepo)
+            IPaymentRepository paymentRepo,
+            INotifyRepository notifyRepository)
         {
             _context = context;
             _userRepo = userRepo;
@@ -81,6 +83,7 @@ namespace Repository.Base
             _carHandoverRepo = carHandoverRepo;
             _OtpRepo = OtpRepo;
             _lookupRepo = lookupRepo;
+            _notifyRepository = notifyRepository;
         }
 
         //no need to construct _transaction

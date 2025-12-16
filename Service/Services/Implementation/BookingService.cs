@@ -54,7 +54,7 @@ namespace Service.Services.Implementation
                     foreach (var payment in payments)
                     {
                         payment.Status = ConstantEnum.Status.Cancelled.ToString();
-                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.UpdateDate = DateTime.UtcNow;   
                         _unitOfWork._paymentRepo.Update(payment);
                     }
                     _unitOfWork._invoiceRepo.Update(invoice);
@@ -158,7 +158,7 @@ namespace Service.Services.Implementation
                 var newBooking = new Booking
                 {
                     Id = Guid.NewGuid(),
-                    BookingNumber = $"BK{_unitOfWork._bookingRepo.GetAll().Count()}-{DateTime.UtcNow.ToString("dd-MM-yyyy")}",
+                    BookingNumber = $"BK{_unitOfWork._bookingRepo.GetAll().Count()}-{DateTime.UtcNow.AddHours(7).ToString("dd-MM-yyyy")}",
                     CreateDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow,
                     PickupPlace = request.PickupPlace,
