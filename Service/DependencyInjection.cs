@@ -75,6 +75,7 @@ namespace Service
             service.AddScoped<ITrackAsiaService, TrackAsiaService>();
             service.AddScoped<IInquiryService, InquiryService>();
             service.AddScoped<IOTPService, OTPService>();
+            service.AddScoped<IFPTAIService, FPTAIService>();
             return service;
         }
     }
