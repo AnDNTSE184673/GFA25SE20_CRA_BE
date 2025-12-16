@@ -279,7 +279,7 @@ namespace Service.Services.Implementation
             try
             {
                 string bucket = ConstantEnum.SupabaseBucket.InquiryImages;
-                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+                string uploadDate = DateTime.UtcNow.AddHours(7).ToString("ddMMyyyy");
                 string noExt = Path.GetFileNameWithoutExtension(file.FileName);
 
                 string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();

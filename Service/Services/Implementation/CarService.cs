@@ -238,7 +238,7 @@ namespace Service.Services.Implementation
             try
             {
                 string bucket = ConstantEnum.SupabaseBucket.CarImages;
-                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+                string uploadDate = DateTime.UtcNow.AddHours(7).ToString("ddMMyyyy");
 
                 string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
                 string fileName = $"image{count}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png

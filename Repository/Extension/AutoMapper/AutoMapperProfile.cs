@@ -10,6 +10,7 @@ using Repository.DTO.RequestDTO.Feedback;
 using Repository.DTO.RequestDTO.Inquiry;
 using Repository.DTO.RequestDTO.ParkingLot;
 using Repository.DTO.RequestDTO.Schedule;
+using Repository.DTO.ResponseDTO;
 using Repository.DTO.ResponseDTO.Audits;
 using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
@@ -128,6 +129,7 @@ namespace Repository.Extension.AutoMapper
             CreateMap<User, UserPostRegView>();
             CreateMap<User, UserLoginView>();
             CreateMap<Schedules, ScheduleView>();
+            CreateMap<PersistNotif, PersitNotifyReturn>();
         }
     }
 }
