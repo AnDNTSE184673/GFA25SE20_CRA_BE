@@ -190,7 +190,7 @@ namespace Service.Services.Implementation
                     FilePath = imagePath,
                     FileName = fileName,
                     Bucket = bucket,
-                    CreateDate = DateTime.  ,
+                    CreateDate = DateTime.UtcNow,
                     MimeType = MimeTypeHelper.GetMimeType(originalExt),
                     FileSize = file.Length,
                     Status = ConstantEnum.Statuses.ACTIVE,
