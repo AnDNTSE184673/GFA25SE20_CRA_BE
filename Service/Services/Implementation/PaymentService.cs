@@ -133,17 +133,24 @@ namespace Service.Services.Implementation
                     {
                         bknd.UpdateDate = DateTime.UtcNow;
                         bknd.Status = ConstantEnum.Statuses.CONFIRMED;
+                        var car = await _unitOfWork._carRepo.GetByIdAsync(bknd.CarId);
+                        car.Status = ConstantEnum.Statuses.RESERVED;
                     }
                     else if (paymentHis.Item.Equals("Rental Fee"))
                     {
                         bknd.UpdateDate = DateTime.UtcNow;
                         bknd.Status = ConstantEnum.Statuses.COMPLETED;
+                        var car = await _unitOfWork._carRepo.GetByIdAsync(bknd.CarId);
+                        car.Status = ConstantEnum.Statuses.ACTIVE;
                     }
                 }
                 else if (paymentHis.Status.Equals("CANCELLED") || paymentHis.Status.Equals("Cancelled") || paymentHis.Status.Equals("Expired") || paymentHis.Status.Equals("Expired"))
                 {
                     bknd.UpdateDate = DateTime.UtcNow;
                     bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                    var car = await _unitOfWork._carRepo.GetByIdAsync(bknd.CarId);
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                    await _unitOfWork._carRepo.UpdateAsync(car);
                 }
                 await _unitOfWork._bookingRepo.UpdateAsync(bknd);
                 await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
@@ -338,12 +345,18 @@ namespace Service.Services.Implementation
                             {
                                 books.Status = "Cancelled";
                                 books.UpdateDate = DateTime.UtcNow;
+                                var car = await _unitOfWork._carRepo.GetByIdAsync(books.CarId);
+                                car.Status = ConstantEnum.Statuses.ACTIVE;
+                                await _unitOfWork._carRepo.UpdateAsync(car);
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                             else if (updatedPayment.Status == "Paid" || updatedPayment.Status == "Success" || updatedPayment.Status == "SUCCESS")
                             {
                                 books.Status = "Confirmed";
                                 books.UpdateDate = DateTime.UtcNow;
+                                var car = await _unitOfWork._carRepo.GetByIdAsync(books.CarId);
+                                car.Status = ConstantEnum.Statuses.RESERVED;
+                                await _unitOfWork._carRepo.UpdateAsync(car);
                                 await _unitOfWork._bookingRepo.UpdateAsync(books);
                             }
                         }
@@ -452,6 +465,9 @@ namespace Service.Services.Implementation
                     rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.COMPLETED;
                     bookingTask.UpdateDate = DateTime.UtcNow;
+                    var car = await _unitOfWork._carRepo.GetByIdAsync(bookingTask.CarId);
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                    await _unitOfWork._carRepo.UpdateAsync(car);
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
@@ -461,6 +477,9 @@ namespace Service.Services.Implementation
                     rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
                     bookingTask.UpdateDate = DateTime.UtcNow;
+                    var car = await _unitOfWork._carRepo.GetByIdAsync(bookingTask.CarId);
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                    await _unitOfWork._carRepo.UpdateAsync(car);
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
@@ -502,6 +521,9 @@ namespace Service.Services.Implementation
                     rentalPay.UpdateDate = DateTime.UtcNow;
                     bookingTask.Status = ConstantEnum.Statuses.CANCELLED;
                     bookingTask.UpdateDate = DateTime.UtcNow;
+                    var car = await _unitOfWork._carRepo.GetByIdAsync(bookingTask.CarId);
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                    await _unitOfWork._carRepo.UpdateAsync(car);
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }

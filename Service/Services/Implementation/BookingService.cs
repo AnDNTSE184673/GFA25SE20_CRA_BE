@@ -57,6 +57,9 @@ namespace Service.Services.Implementation
                         payment.UpdateDate = DateTime.UtcNow;   
                         _unitOfWork._paymentRepo.Update(payment);
                     }
+                    var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                    await _unitOfWork._carRepo.UpdateCarAsync(car);
                     _unitOfWork._invoiceRepo.Update(invoice);
                     _unitOfWork.SaveChanges();
 
@@ -104,7 +107,7 @@ namespace Service.Services.Implementation
                             _unitOfWork._paymentRepo.Update(payment);
                     }
                     var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
-                    existCar.Status = ConstantEnum.Statuses.RESERVED;
+                    existCar.Status = ConstantEnum.Statuses.ACTIVE;
                     await _unitOfWork._carRepo.UpdateCarAsync(existCar);
                     _unitOfWork.SaveChanges();
                 }
