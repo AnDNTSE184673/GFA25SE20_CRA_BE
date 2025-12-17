@@ -189,7 +189,11 @@ namespace CRA_Self_drive_Rental.API
             app.UseHttpsRedirection();
             app.UseCookiePolicy();
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                // Use a relative path so it works regardless of the domain/HTTPS setup
+                c.SwaggerEndpoint("v1/swagger.json", "CRA_CarRental V1");
+            });
             app.UseRouting();
             app.UseCors("AllowAll");            
             app.UseAuthentication();
