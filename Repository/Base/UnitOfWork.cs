@@ -62,9 +62,8 @@ namespace Repository.Base
             IOtpRepository OtpRepo,
             ILookupRepository lookupRepo,
             IPaymentRepository paymentRepo,
-            INotifyRepository notifyRepository)
-            IReportRepository reportRepo,
-            IPaymentRepository paymentRepo)
+            INotifyRepository notifyRepository,
+            IReportRepository reportRepo)
         {
             _context = context;
             _userRepo = userRepo;
