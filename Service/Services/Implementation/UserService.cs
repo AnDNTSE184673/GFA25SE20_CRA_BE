@@ -222,7 +222,6 @@ namespace Service.Services.Implementation
             }
             User newUser = new User()
             {
-                Id = Guid.NewGuid(),
                 Username = request.Username,
                 Password = request.Password,
                 Email = request.Email,

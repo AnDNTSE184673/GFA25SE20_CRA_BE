@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Medo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Repository.Base;
@@ -110,7 +111,7 @@ namespace Service.Services.Implementation
                 }
 
                 var newFeedback = _mapper.Map<Feedback>(form);
-                newFeedback.Id = Guid.NewGuid();
+                newFeedback.Id = Uuid7.NewGuid();
                 newFeedback.CreateDate = DateTime.UtcNow;
 
                 var result = await _unitOfWork._feedbackRepo.CreateFeedbackAsync(newFeedback);

@@ -20,5 +20,23 @@ namespace Repository.DTO.ResponseDTO.DriverLicense
         public int DateOfIssueProbability { get; set; }
         public string DateOfExpiry { get; set; }
         public int DateOfExpiryProbability { get; set; }
+
+        public int CheckValidation()
+        {
+            var score =
+                IdProbability * 0.25 +
+                DateOfExpiryProbability * 0.20 +
+                DateOfBirthProbability * 0.15 +
+                NameProbability * 0.20 +
+                DateOfIssueProbability * 0.15 +
+                ClassProbability * 0.05;
+            int result = 0;
+            if (score < 75) result = -1;
+            else if (score >= 75 && score <= 90) result = 0;
+            else result = 1;
+
+            return result;
+        }
     }
+
 }

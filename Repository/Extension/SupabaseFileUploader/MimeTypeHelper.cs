@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Repository.Extension.SupabaseFileUploader
 {
+    //NOTE: This class is a pair with another helper class named FileValidationToMimeType
+
     public static class MimeTypeHelper
     {
         // -----------------------------
@@ -115,7 +117,7 @@ namespace Repository.Extension.SupabaseFileUploader
         /// <summary>
         /// Validates file by comparing its header ("magic bytes") with known safe signatures.
         /// </summary>
-        public static bool IsValidFile(IFormFile file)
+        public static bool IsValidFileDeprecated(IFormFile file)
         {
             var ext = Normalize(Path.GetExtension(file.FileName));
 
@@ -138,6 +140,31 @@ namespace Repository.Extension.SupabaseFileUploader
 
             return false;
         }
+        
+        /// <summary>
+        /// Validates file by comparing its header ("magic bytes") with known safe signatures.
+        /// </summary>
+        public static bool IsValidFile(IFormFile file)
+        {
+            var ext = Normalize(Path.GetExtension(file.FileName));
+
+            if (!_signatures.TryGetValue(ext, out var signatures))
+                return false;
+
+            using var stream = file.OpenReadStream();
+            using var reader = new BinaryReader(stream);
+
+            foreach (var sig in signatures)
+            {
+                stream.Position = 0;
+                var header = reader.ReadBytes(sig.Length);
+
+                if (header.SequenceEqual(sig))
+                    return true;
+            }
+
+            return false;
+        }
 
         private static string Normalize(string ext)
         {
@@ -146,5 +173,11 @@ namespace Repository.Extension.SupabaseFileUploader
 
             return ext.StartsWith(".") ? ext.ToLower() : "." + ext.ToLower();
         }
+
+        /// <summary>
+        /// Exposes the big list of mime types for use outside of helper
+        /// </summary>
+        public static IReadOnlySet<string> SupportedExtensions =>
+            _mappings.Keys.ToHashSet();
     }
 }

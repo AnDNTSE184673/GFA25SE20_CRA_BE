@@ -51,22 +51,19 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     ".mp4", ".mov", ".avi", ".mkv"
                 };
 
-                string ext = "";
+                var maxFileSizeInMBs = 50;
 
-                foreach (var file in form.Medias)
+                var imageValidationOptions = FileValidationPolicyFactory
+                    .CreateFromExtensions(
+                        allowedExtensions,
+                        maxFileSizeInMBs
+                );
+
+                foreach(var i in form.Medias)
                 {
-                    ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-                    if (!allowedExtensions.Contains(ext))
-                        return BadRequest($"Unsupported file extension: {ext}");
-
-                    var mime = MimeTypeHelper.GetMimeType(ext);
-
-                    if (mime == "application/octet-stream")
-                        return BadRequest("Unsupported file extension.");
-
-                    if (!MimeTypeHelper.IsValidFile(file))
-                        return BadRequest($"File signature doesn't match extension {ext}. This file may be unsafe.");
+                    var validateResult = FileValidationHelper.Validate(i, imageValidationOptions);
+                    if (!validateResult.IsValid)
+                        return BadRequest(validateResult.Error);
                 }
 
                 var result = await _feedbackServ.LeaveCarFeedback(form);

@@ -14,7 +14,7 @@ namespace Service.Services
 {
     public interface IDriverLicenseService
     {
-        Task<DriverLicenseView> UpdateDriverLicenseAsync(List<IFormFile> images, Guid userId);
+        Task<DriverLicenseView> UpdateDriverLicenseAsync(Guid userId, IFormFile backImage, IFormFile frontImage);
         Task<(string status, ApproveLicenseView view)> ApproveLicenseAsync(LicenseSearchForm form, bool isApproved);
         Task<(string[] signedUrl, List<DriverLicenseView> view)> GetAllDocumentsAsync();
         Task<(string[] signedUrl, List<DriverLicenseView> view)> GetDriverLicenseByUser(LicenseSearchForm form);

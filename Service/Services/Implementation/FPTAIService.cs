@@ -22,18 +22,23 @@ namespace Service.Services.Implementation
         }
         public async Task<DriverLincenseInfo> ExtractDriverLicenseInfo(IFormFile image)
         {
-            var key = _config["FPT_AI"];
+            var key = _config["FPT_AI:API_KEY"];
+            var url = _config["FPT_AI:Url"];
+
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Add("api-key", key);
-            var url = "https://api.fpt.ai/vision/dlr/vnm";
+            
             await using var imageStream = image.OpenReadStream();
             using var ImageContent = new StreamContent(imageStream);
             ImageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
             using var multipart = new MultipartFormDataContent();
             var filename = Path.GetFileName(image.FileName) ?? "image";
             multipart.Add(ImageContent, "image", image.FileName);
+
             using var response = await client.PostAsync(url, multipart);
             var responseString = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception($"FPT AI request failed: {(int)response.StatusCode} {response.ReasonPhrase}. Response: {responseString}");

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    partial class CRA_DbContextModelSnapshot : ModelSnapshot
+    [Migration("20251217102738_AddReports")]
+    partial class AddReports
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -436,29 +439,8 @@ namespace Repository.Migrations
                     b.Property<long?>("FileSize")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("LicenseClass")
-                        .HasColumnType("text");
-
-                    b.Property<DateOnly?>("LicenseDoB")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("LicenseExpiry")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("LicenseIssue")
-                        .HasColumnType("date");
-
-                    b.Property<string>("LicenseName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LicenseNumber")
-                        .HasColumnType("text");
-
                     b.Property<string>("MimeType")
                         .HasColumnType("text");
-
-                    b.Property<int>("Side")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Status")
                         .IsRequired()

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Medo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Repository.Base;
@@ -116,7 +117,7 @@ namespace Service.Services.Implementation
                 var newCar = _mapper.Map<Car>(form);
 
                 newCar.Status = ConstantEnum.Statuses.PENDING;
-                newCar.Id = Guid.NewGuid();
+                newCar.Id = Uuid7.NewGuid();
                 newCar.Rating = 0.0;
                 var result = await _unitOfWork._carRepo.RegisterCarAsync(newCar);
 

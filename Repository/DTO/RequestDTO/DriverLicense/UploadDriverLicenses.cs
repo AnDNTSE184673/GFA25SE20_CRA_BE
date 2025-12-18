@@ -10,8 +10,8 @@ namespace Repository.DTO.RequestDTO.DriverLicense
 {
     public class UploadDriverLicenses
     {
-        [MaxFileCount(5)]
-        public List<IFormFile> images { get; set; } = new List<IFormFile>();
+        public IFormFile frontDriverLicenseimg { get; set; }
+        public IFormFile backDriverLicenseimg { get; set; }
         public Guid userId { get; set; }
     }
 }

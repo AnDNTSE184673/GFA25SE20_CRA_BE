@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PayOS.Exceptions;
 using Repository.Base;
@@ -17,6 +18,7 @@ using Repository.DTO.ResponseDTO.User;
 using Repository.Extension.SupabaseFileUploader;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,15 +30,17 @@ namespace Service.Services.Implementation
         private readonly IMapper _mapper;
         private readonly UnitOfWork _unitOfWork;
         private readonly UploadFile _upload;
+        private readonly IFPTAIService _fptAI;
 
-        int expirationTimeinSeconds = 1800;
-        bool isPublic = false;
+        private int expirationTimeinSeconds = 1800;
+        private bool isPublic = false;
 
-        public DriverLicenseService(IMapper mapper, UnitOfWork unitOfWork, UploadFile upload)
+        public DriverLicenseService(IMapper mapper, UnitOfWork unitOfWork, UploadFile upload, IFPTAIService fptAI)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _upload = upload;
+            _fptAI = fptAI;
         }
 
         public async Task<(string status, ApproveLicenseView view)> ApproveLicenseAsync(LicenseSearchForm form, bool isApproved)
@@ -58,18 +62,28 @@ namespace Service.Services.Implementation
 
                 regs = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(user.Id);
 
+                var latestPerSideNeedsCheck = regs
+                .Where(r => r.Status.Equals(ConstantEnum.VerificationStatus.NEED_MANUAL_CHECK))
+                .GroupBy(r => r.Side)
+                .Select(g => g
+                    .OrderByDescending(r => r.CreateDate)
+                    .First())
+                .ToList();
+
+                if (!latestPerSideNeedsCheck.Any()) throw new KeyNotFoundException("There are no document needs approval!");
+
                 var mapped = new ApproveLicenseView();
 
                 foreach (var r in regs)
                 {
                     if (isApproved)
                     {
-                        r.Status = ConstantEnum.Statuses.APPROVED;
+                        r.Status = ConstantEnum.VerificationStatus.MANUAL_APPROVED;
                         user.IsVerified = true;
                     }
                     else
                     {
-                        r.Status = ConstantEnum.Statuses.DENIED;
+                        r.Status = ConstantEnum.VerificationStatus.REJECTED;
                         user.IsVerified = false;
                     }
 
@@ -109,6 +123,14 @@ namespace Service.Services.Implementation
             var result = await _unitOfWork._driverLicenseRepo.GetAllAsync();
             var uploadTasks = new List<Task<string>>();
 
+            var latestPerUserPerSide = result
+                .GroupBy(dl => new { dl.UserId, dl.Side })
+                .Select(g => g
+                    .OrderByDescending(dl => dl.CreateDate)
+                    .ThenByDescending(dl => dl.Id)
+                    .First())
+                .ToList();
+
             await _upload.EnsureInitializedAsync();
 
             foreach (var r in result)
@@ -116,12 +138,13 @@ namespace Service.Services.Implementation
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
             }
             var uploadResults = await Task.WhenAll(uploadTasks);
-            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(result));
+            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(latestPerUserPerSide));
         }
 
         public async Task<(string[] signedUrl, List<DriverLicenseView> view)> GetDriverLicenseByUser(LicenseSearchForm form)
         {
             List<DriverLicense> result = new List<DriverLicense>();
+
             if (!form.IsValid()) throw new InvalidDataException("Fill the given parameters!");
             if (form.UserId.HasValue) result = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(form.UserId.Value);
             else
@@ -131,16 +154,23 @@ namespace Service.Services.Implementation
                 result = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(user.Id);
             }
             var uploadTasks = new List<Task<string>>();
+
+            var latestPerSide = result
+                .GroupBy(r => r.Side)
+                .Select(g => g
+                    .OrderByDescending(r => r.CreateDate).First())
+                .ToList();
+
             await _upload.EnsureInitializedAsync();
-            foreach (var r in result)
+            foreach (var r in latestPerSide)
             {
                 uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
             }
             var uploadResults = await Task.WhenAll(uploadTasks);
-            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(result));
+            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(latestPerSide));
         }
 
-        public async Task<DriverLicenseView> UpdateDriverLicenseAsync(List<IFormFile> images, Guid userId)
+        public async Task<DriverLicenseView> UpdateDriverLicenseAsync(Guid userId, IFormFile backImage, IFormFile frontImage)
         {
             try
             {
@@ -153,13 +183,10 @@ namespace Service.Services.Implementation
                 }
 
                 var uploadTasks = new List<Task<(string url, DriverLicense obj)>>();
-                int count = 1;
+
                 await _upload.EnsureInitializedAsync();
-                foreach (var file in images)
-                {
-                    uploadTasks.Add(UploadDriverLicenseAsync(file, userId, count));
-                    count++;
-                }
+                uploadTasks.Add(UploadDriverLicenseAsync(frontImage, userId, (int)ConstantEnum.DriverLicenseSide.FrontSide));
+                uploadTasks.Add(UploadDriverLicenseAsync(backImage, userId, (int)ConstantEnum.DriverLicenseSide.BackSide));
 
                 var uploadResults = await Task.WhenAll(uploadTasks);
 
@@ -169,9 +196,13 @@ namespace Service.Services.Implementation
                     return r.url;
                 }).ToList();
 
+                var aiCheck = await AutoApproveLicenseAsync(frontImage);
+
                 //But ef core operation is sequential
                 foreach (var u in uploadResults)
                 {
+                    if (u.obj.Side == 1) _mapper.Map(aiCheck, u.obj);
+                    if (u.obj.Side == 2) u.obj.Status = aiCheck.Status;
                     await _unitOfWork._driverLicenseRepo.AddDriverLicenseAsync(u.obj);
                 }
                 var result = await _unitOfWork.SaveChangesAsync();
@@ -182,7 +213,7 @@ namespace Service.Services.Implementation
                     Urls = urls,
                     UserId = userId,
                     CreateDate = DateTime.UtcNow,
-                    Status = ConstantEnum.Statuses.PENDING
+                    Status = aiCheck.Status
                 };
                 return mapped;
             }
@@ -193,16 +224,21 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<(string url, DriverLicense obj)> UploadDriverLicenseAsync(IFormFile file, Guid userId, int count)
+        public async Task<(string url, DriverLicense obj)> UploadDriverLicenseAsync(IFormFile file, Guid userId, int side)
         {
             try
             {
                 string bucket = ConstantEnum.SupabaseBucket.DriverLicense;
                 string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
                 string noExt = Path.GetFileNameWithoutExtension(file.FileName);
+                string sideName = "";
+
+                if (side == 1) sideName = "Front";
+                if (side == 2) sideName = "Back";
+                if (side < 1 || side > 2) throw new InvalidOperationException("Only 1 or 2 for front and back!");
 
                 string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
-                string fileName = $"image{count}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png
+                string fileName = $"image{sideName}_{uploadDate}{originalExt}"; //abc-cde-def_01011990.png
                 string imagePath = $"{userId}/{fileName}"; //userid/carid_date.ext
 
                 var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeinSeconds, isPublic);
@@ -216,8 +252,9 @@ namespace Service.Services.Implementation
                     Bucket = bucket,
                     CreateDate = DateTime.UtcNow,
                     MimeType = MimeTypeHelper.GetMimeType(originalExt),
+                    Side = side,
                     FileSize = file.Length,
-                    Status = ConstantEnum.Statuses.ACTIVE,
+                    Status = ConstantEnum.Statuses.PENDING,
                     UserId = userId
                 };
 
@@ -228,5 +265,70 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<DriverLicense> AutoApproveLicenseAsync(IFormFile frontImage)
+        {
+            try
+            {
+                var AICheck = await _fptAI.ExtractDriverLicenseInfo(frontImage);
+                int aiCheckResult = AICheck.CheckValidation();
+
+                var license = new DriverLicense();
+
+                if(aiCheckResult == 1)
+                {
+                    license.Status = ConstantEnum.VerificationStatus.AUTO_APPROVED;
+                }
+                else if(aiCheckResult == 0)
+                {
+                    license.Status = ConstantEnum.VerificationStatus.NEED_MANUAL_CHECK;
+                }
+                else
+                {
+                    license.Status = ConstantEnum.VerificationStatus.REJECTED;
+                }
+                license.Side = 1;
+
+                license.LicenseNumber = AICheck.LicenseId;
+                license.LicenseName = AICheck.NameOnLicense;
+                license.LicenseDoB = ParseDate(AICheck.DateOfBirth);
+                license.LicenseClass = AICheck.Class;
+                license.LicenseIssue = ParseDate(AICheck.DateOfIssue);
+                license.LicenseExpiry = ParseDate(AICheck.DateOfExpiry);
+
+                return license;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private static DateOnly? ParseDate(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var formats = new[]
+            {
+                "dd/MM/yyyy",
+                "dd-MM-yyyy",
+                "yyyy-MM-dd",
+                "MM/dd/yyyy"
+            };
+
+            if (DateOnly.TryParseExact(
+                value,
+                formats,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var date))
+            {
+                return date;
+            }
+
+            return null;
+        }
+
     }
 }

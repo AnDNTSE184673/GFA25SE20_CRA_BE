@@ -20,6 +20,15 @@ namespace Repository.Data.Entities
         public long? FileSize { get; set; }
         public string? MimeType { get; set; }
 
+        public int Side { get; set; }
+
+        public string? LicenseNumber { get; set; }
+        public string? LicenseName { get; set; }
+        public DateOnly? LicenseDoB { get; set; }
+        public string? LicenseClass { get; set; }
+        public DateOnly? LicenseIssue { get; set; }
+        public DateOnly? LicenseExpiry { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public string Status { get; set; }

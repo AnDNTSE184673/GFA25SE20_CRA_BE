@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Medo;
 using Microsoft.Extensions.Hosting;
 using Repository.Base;
 using Repository.Constant;
@@ -43,7 +44,7 @@ namespace Service.Services.Implementation
 
                 var newLot = _mapper.Map<ParkingLot>(form);
 
-                newLot.Id = Guid.NewGuid();
+                newLot.Id = Uuid7.NewGuid();
                 newLot.Status = ConstantEnum.Statuses.ACTIVE;
 
                 var result = await _unitOfWork._lotRepo.CreateLotAsync(newLot);
