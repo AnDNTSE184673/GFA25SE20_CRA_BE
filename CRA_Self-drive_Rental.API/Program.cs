@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -8,17 +10,16 @@ using Microsoft.OpenApi.Models;
 using Repository;
 using Repository.Base;
 using Repository.Data;
-using Microsoft.EntityFrameworkCore;
 using Repository.Extension.AutoMapper;
 using Repository.Repositories;
 using Serilog;
 using Service;
+using Service.Hosted;
 using Service.Services;
 using Service.Services.Implementation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text;
-using Microsoft.AspNetCore.HttpOverrides;
 
 namespace CRA_Self_drive_Rental.API
 {
@@ -159,7 +160,7 @@ namespace CRA_Self_drive_Rental.API
             builder.Services
                 .AddServices(builder.Configuration)
                 .AddRepositories(builder.Configuration);
-
+            builder.Services.AddHostedService<CarStatusBackgroundService>();
             builder.Services.AddDbContext<CRA_DbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             Log.Information("Added database {server}", builder.Configuration["ConnectionStrings:DefaultConnection"].Substring(0, Math.Min(15, builder.Configuration["ConnectionStrings:DefaultConnection"].Length)));
@@ -189,7 +190,11 @@ namespace CRA_Self_drive_Rental.API
             app.UseHttpsRedirection();
             app.UseCookiePolicy();
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                // Use a relative path so it works regardless of the domain/HTTPS setup
+                c.SwaggerEndpoint("v1/swagger.json", "CRA_CarRental V1");
+            });
             app.UseRouting();
             app.UseCors("AllowAll");            
             app.UseAuthentication();

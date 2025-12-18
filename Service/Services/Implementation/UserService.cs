@@ -297,7 +297,10 @@ namespace Service.Services.Implementation
             try
             {
                 user.Fullname = request.Fullname;
-                user.Password = request.Password;
+                if (!string.IsNullOrWhiteSpace(request.Password))
+                {
+                    user.Password = request.Password;
+                }
                 user.PhoneNumber = request.PhoneNumber;
                 user.Address = request.Address;
                 user.ImageAvatar = request.ImageAvatar;
@@ -368,7 +371,7 @@ namespace Service.Services.Implementation
             try
             {
                 string bucket = ConstantEnum.SupabaseBucket.UserAvatars;
-                string uploadDate = DateTime.UtcNow.ToString("ddMMyyyy");
+                string uploadDate = DateTime.UtcNow.AddHours(7).ToString("ddMMyyyy");
 
                 string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
                 string fileName = $"avatar_{uploadDate}{originalExt}";

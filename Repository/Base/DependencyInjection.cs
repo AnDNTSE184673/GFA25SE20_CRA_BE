@@ -64,6 +64,7 @@ namespace Repository.Base
             service.AddScoped<IStaffLogRepository, StaffLogRepository>();
             service.AddScoped<IOtpRepository, OtpRepository>();
             service.AddScoped<ILookupRepository, LookupRepository>();
+            service.AddScoped<INotifyRepository, PersitNotifRepository>();
             return service;
         }
     }

@@ -54,9 +54,12 @@ namespace Service.Services.Implementation
                     foreach (var payment in payments)
                     {
                         payment.Status = ConstantEnum.Status.Cancelled.ToString();
-                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.UpdateDate = DateTime.UtcNow;   
                         _unitOfWork._paymentRepo.Update(payment);
                     }
+                    var car = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
+                    car.Status = ConstantEnum.Statuses.ACTIVE;
+                    await _unitOfWork._carRepo.UpdateCarAsync(car);
                     _unitOfWork._invoiceRepo.Update(invoice);
                     _unitOfWork.SaveChanges();
 
@@ -104,7 +107,7 @@ namespace Service.Services.Implementation
                             _unitOfWork._paymentRepo.Update(payment);
                     }
                     var existCar = await _unitOfWork._carRepo.GetByIdAsync(booking.CarId);
-                    existCar.Status = ConstantEnum.Statuses.RESERVED;
+                    existCar.Status = ConstantEnum.Statuses.ACTIVE;
                     await _unitOfWork._carRepo.UpdateCarAsync(existCar);
                     _unitOfWork.SaveChanges();
                 }
@@ -158,7 +161,7 @@ namespace Service.Services.Implementation
                 var newBooking = new Booking
                 {
                     Id = Guid.NewGuid(),
-                    BookingNumber = $"BK{_unitOfWork._bookingRepo.GetAll().Count()}-{DateTime.UtcNow.ToString("dd-MM-yyyy")}",
+                    BookingNumber = $"BK{_unitOfWork._bookingRepo.GetAll().Count()}-{DateTime.UtcNow.AddHours(7).ToString("dd-MM-yyyy")}",
                     CreateDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow,
                     PickupPlace = request.PickupPlace,
