@@ -9,6 +9,7 @@ using Repository.DTO.RequestDTO.CarRentalRate;
 using Repository.DTO.RequestDTO.Feedback;
 using Repository.DTO.RequestDTO.Inquiry;
 using Repository.DTO.RequestDTO.ParkingLot;
+using Repository.DTO.RequestDTO.Report;
 using Repository.DTO.RequestDTO.Schedule;
 using Repository.DTO.ResponseDTO;
 using Repository.DTO.ResponseDTO.Audits;
@@ -22,6 +23,7 @@ using Repository.DTO.ResponseDTO.Inquiry;
 using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
 using Repository.DTO.ResponseDTO.Payment;
+using Repository.DTO.ResponseDTO.Report;
 using Repository.DTO.ResponseDTO.Schedule;
 using Repository.DTO.ResponseDTO.User;
 using System;
@@ -52,6 +54,19 @@ namespace Repository.Extension.AutoMapper
             */
             #endregion
 
+            CreateMap<DriverLincenseInfo, DriverLicense>()
+                .ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseId))
+                .ForMember(dest => dest.LicenseName, opt => opt.MapFrom(src => src.NameOnLicense))
+                .ForMember(dest => dest.LicenseDoB, opt => opt.MapFrom(src => src.DateOfBirth))
+                .ForMember(dest => dest.LicenseClass, opt => opt.MapFrom(src => src.Class))
+                .ForMember(dest => dest.LicenseIssue, opt => opt.MapFrom(src => src.DateOfIssue))
+                .ForMember(dest => dest.LicenseExpiry, opt => opt.MapFrom(src => src.DateOfExpiry));
+
+            CreateMap<DriverLicense, DriverLicense>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<ParkingLot, ParkingLotView>()
                 .ForMember(dest => dest.ManagerId, opt => opt.MapFrom(src => src.UserId));
             CreateMap<PostParkingLotForm, ParkingLot>()
@@ -60,6 +75,11 @@ namespace Repository.Extension.AutoMapper
             CreateMap<CreateFeedbackForm, Feedback>();
             CreateMap<Feedback, FeedbackView>();
             CreateMap<EditFeedbackForm, Feedback>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<ReportForm, Report>();
+            CreateMap<Report, ReportView>();
+            CreateMap<EditReportForm, Report>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<CreateInquiryForm, Inquiry>();

@@ -38,6 +38,7 @@ namespace Repository.Base
         public IOtpRepository _OtpRepo { get; }
         public ILookupRepository _lookupRepo { get; }
         public INotifyRepository _notifyRepository { get; set; }
+        public IReportRepository _reportRepo { get; }
 
         //no need to construct _transaction
 
@@ -61,7 +62,8 @@ namespace Repository.Base
             IOtpRepository OtpRepo,
             ILookupRepository lookupRepo,
             IPaymentRepository paymentRepo,
-            INotifyRepository notifyRepository)
+            INotifyRepository notifyRepository,
+            IReportRepository reportRepo)
         {
             _context = context;
             _userRepo = userRepo;
@@ -84,6 +86,7 @@ namespace Repository.Base
             _OtpRepo = OtpRepo;
             _lookupRepo = lookupRepo;
             _notifyRepository = notifyRepository;
+            _reportRepo = reportRepo;
         }
 
         //no need to construct _transaction

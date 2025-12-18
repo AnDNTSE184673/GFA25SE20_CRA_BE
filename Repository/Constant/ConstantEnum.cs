@@ -102,6 +102,21 @@ namespace Repository.Constant
             public const string Overdue = "Overdue";
         }
 
+        public static class VerificationStatus
+        {
+            public const string PENDING = "Pending";
+            public const string AUTO_APPROVED = "AutoApproved";
+            public const string MANUAL_APPROVED = "ManualApproved";
+            public const string NEED_MANUAL_CHECK = "NeedManualCheck";
+            public const string REJECTED = "Rejected";
+        }
+
+        public enum DriverLicenseSide
+        {
+            FrontSide = 1,
+            BackSide = 2
+        }
+
         public enum ScheduleType
         {
             Booking = 1,

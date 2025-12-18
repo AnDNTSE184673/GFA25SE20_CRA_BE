@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Medo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 using Repository.Base;
 using Repository.Constant;
 using Repository.CustomFunctions.SupabaseFileUploader;
@@ -126,7 +128,7 @@ namespace Service.Services.Implementation
                 }
 
                 var newInquiry = _mapper.Map<Inquiry>(form);
-                newInquiry.Id = Guid.NewGuid();
+                newInquiry.Id = Uuid7.NewGuid();
                 newInquiry.CreateDate = newInquiry.UpdateDate = DateTime.UtcNow;
                 newInquiry.Type = ConstantEnum.InquiryTypeConstants.Question; //redundant atm
                 newInquiry.Status = ConstantEnum.InquiryStatusConstants.Open;
@@ -182,7 +184,6 @@ namespace Service.Services.Implementation
         {
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
                 var userSendExist = await _unitOfWork._userRepo.GetByIdAsync(form.SenderId);
                 var userReceiveExist = await _unitOfWork._userRepo.GetByIdAsync(form.ReceiverId);
 
@@ -192,7 +193,7 @@ namespace Service.Services.Implementation
                 }
 
                 var newInquiry = _mapper.Map<Inquiry>(form);
-                newInquiry.Id = Guid.NewGuid();
+                newInquiry.Id = Uuid7.NewGuid();
                 newInquiry.CreateDate = newInquiry.UpdateDate = DateTime.UtcNow;
                 newInquiry.Type = ConstantEnum.InquiryTypeConstants.Answer; //redundant atm
 
@@ -201,6 +202,9 @@ namespace Service.Services.Implementation
 
                 //else find root from user FKs
                 var rootExist = await _unitOfWork._inquiryRepo.GetRootInquiryByBothUser(form.SenderId, form.ReceiverId);
+                List<Inquiry> conversation = new List<Inquiry>();
+                if (rootExist != null) conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
+                bool insertIntoMiddleOfLinked = false;
 
                 if (rootExist == null)
                 {
@@ -216,21 +220,36 @@ namespace Service.Services.Implementation
                         var parent = await _unitOfWork._inquiryRepo.GetByIdAsync(form.ParentInquiryId.Value);
 
                         if (parent == null) throw new Exception("Invalid ParentInquiryId");
-
-                        var conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
+                        
+                        //change this check correct chat logic a bit
                         var checkCorrectChat = conversation.Where(x => x.ParentInquiryId.Equals(form.ParentInquiryId) || x.Id.Equals(form.ParentInquiryId));
                         if (!checkCorrectChat.Any()) throw new Exception("This parent doesn't belong in this conversation!");
-                        else { newInquiry.ParentInquiryId = form.ParentInquiryId; }
+                        else
+                        {
+                            var nextChatofParentCheck = conversation.Where(x => x.ParentInquiryId.Equals(form.ParentInquiryId)).FirstOrDefault();
+                            if (nextChatofParentCheck != null) insertIntoMiddleOfLinked = true;
+                            newInquiry.ParentInquiryId = form.ParentInquiryId; 
+                        }
                     }
                     else 
                     {
-                        var conversation = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(rootExist.Id);
-                        var last = conversation.LastOrDefault(); //get newest
+                        var last = conversation
+                            .OrderBy(x => x.CreateDate)
+                            .LastOrDefault(); //get newest
                         newInquiry.ParentInquiryId = last.Id;
                     }
                 }
+                await _unitOfWork.BeginTransactionAsync();
 
                 var result = await _unitOfWork._inquiryRepo.CreateInquiryAsync(newInquiry);
+
+                //only do this if the new Inquiry is to be inserted into the middle of the list
+                if (insertIntoMiddleOfLinked)
+                {
+                    var nextChatofParent = conversation.Where(x => x.ParentInquiryId.Equals(form.ParentInquiryId)).FirstOrDefault();
+                    nextChatofParent.ParentInquiryId = newInquiry.Id;
+                    await _unitOfWork._inquiryRepo.UpdateAsync(nextChatofParent);
+                }
 
                 //File IO is parallel
                 var uploadTasks = new List<Task<(string url, InquiryImages obj)>>();
@@ -313,6 +332,8 @@ namespace Service.Services.Implementation
         public async Task<List<InquiryView>> GetInquiryTreeByBothSides(Guid senderId, Guid receiverId)
         {
             var root = await _unitOfWork._inquiryRepo.GetRootInquiryByBothUser(senderId, receiverId);
+
+            if (root == null) throw new KeyNotFoundException("These users has no prior conversation yet!");
 
             var tree = await _unitOfWork._inquiryRepo.GetInquiryTreeFromRoot(root.Id);
 

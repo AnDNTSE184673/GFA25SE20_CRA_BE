@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Medo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -350,7 +351,7 @@ namespace Service.Services.Implementation
                 if (form.BookingId.HasValue) booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.BookingId.Value);
 
                 var mapped = _mapper.Map<Schedules>(form);
-                mapped.Id = Guid.NewGuid();
+                mapped.Id = Uuid7.NewGuid();
                 mapped.CreateDate = DateTime.UtcNow;
                 mapped.UpdateDate = DateTime.UtcNow;
                 mapped.Status = ConstantEnum.Statuses.ACTIVE;
@@ -417,7 +418,7 @@ namespace Service.Services.Implementation
                 if (form.BookingId.HasValue) booking = await _unitOfWork._bookingRepo.GetByIdAsync(form.BookingId.Value);
 
                 var mapped = _mapper.Map<Schedules>(form);
-                mapped.Id = Guid.NewGuid();
+                mapped.Id = Uuid7.NewGuid();
                 mapped.CreateDate = DateTime.UtcNow;
                 mapped.UpdateDate = DateTime.UtcNow;
                 mapped.Status = ConstantEnum.Statuses.ACTIVE;

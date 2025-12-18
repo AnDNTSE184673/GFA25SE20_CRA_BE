@@ -59,6 +59,7 @@ namespace Service
             //service.AddScoped<IAuthenService, AuthenService>();
             service.AddScoped<IUserService, UserService>();
             service.AddScoped<IJWTService, JWTService>();
+            service.AddScoped<IReportService, ReportService>();
             service.AddScoped<IBookingService, BookingService>();
             service.AddScoped<IInvoiceService, InvoiceService>();
             service.AddScoped<ICarService, CarService>();

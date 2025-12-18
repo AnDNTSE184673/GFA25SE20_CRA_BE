@@ -1,0 +1,23 @@
+﻿using Repository.Data.Entities;
+using Repository.DTO.RequestDTO.Feedback;
+using Repository.DTO.RequestDTO.Report;
+using Repository.DTO.ResponseDTO.Feedbacks;
+using Repository.DTO.ResponseDTO.Report;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Service.Services
+{
+    public interface IReportService
+    {
+        Task<List<ReportView>> GetCarReports(Guid carId);
+        Task<List<ReportView>> GetReportsByUser(Guid userId);
+        Task<List<ReportView>> GetAllReports();
+        Task<(string status, ReportView view)> CreateCarReport(ReportForm form);
+        Task<ReportView> EditCarReport(Guid id, EditReportForm form);
+        Task<string> DeleteCarReport(Guid id);
+    }
+}
