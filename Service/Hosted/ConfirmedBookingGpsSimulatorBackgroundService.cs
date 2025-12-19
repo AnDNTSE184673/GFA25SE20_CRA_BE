@@ -91,22 +91,57 @@ namespace Service.Hosted
             }
 
             var carId = booking.CarId;
-            var car = await uow._carRepo.GetByIdAsync(carId);
+
+            // Load car including preferred lot so we can get the lot address
+            var car = await uow._carRepo.GetByIdWithIncludeAsync(carId, "Id", c => c.PreferredLot);
+            if (car == null)
+            {
+                _logger.LogWarning("Car {CarId} returned null from repo", carId);
+                return;
+            }
+
+            var preferredLot = car.PreferredLot; // may be null
+            if (preferredLot == null)
+            {
+                _logger.LogDebug("Car {CarId} has no PreferredLot assigned", carId);
+            }
+            
+            var preferredLotAddress = uow._lotRepo.GetById(car.PrefLotId);
 
             // Resolve ITrackAsiaService from the same scope (avoid injecting a scoped service into the singleton)
             var trackService = scope.ServiceProvider.GetService<ITrackAsiaService>();
 
             double startLat, startLon;
 
-            if (trackService != null && car?.PreferredLot?.Address != null)
+            if (trackService != null && !string.IsNullOrWhiteSpace(preferredLot?.Address))
             {
                 try
                 {
-                    // GetPlaceCoordinate returns (string,longtitude, string, latitude) per your note.
-                    var coord = await trackService.GetPlaceCoordinate(car.PreferredLot.Address);
-                    // Assume coord.Item1 = longitude string, coord.Item2 = latitude string
-                    var lonStr = coord.Value.Item1;
-                    var latStr = coord.Value.Item2;
+                    // GetPlaceCoordinate returns tuple of strings (longitude, latitude) per earlier note.
+                    var coord = await trackService.GetPlaceCoordinate(preferredLotAddress.Address);
+
+                    // Defensive extraction: handle both (string,string) and nullable tuple shapes.
+                    string lonStr = null!;
+                    string latStr = null!;
+                    try
+                    {
+                        lonStr = coord.Value.Item1;
+                        latStr = coord.Value.Item2;
+                    }
+                    catch
+                    {
+                        // fallback if coord is nullable with .Value
+                        try
+                        {
+                            lonStr = coord.Value.Item1;
+                            latStr = coord.Value.Item2;
+                        }
+                        catch
+                        {
+                            lonStr = null;
+                            latStr = null;
+                        }
+                    }
 
                     if (!double.TryParse(latStr, NumberStyles.Float, CultureInfo.InvariantCulture, out startLat)
                         || !double.TryParse(lonStr, NumberStyles.Float, CultureInfo.InvariantCulture, out startLon))
@@ -116,12 +151,15 @@ namespace Service.Hosted
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogDebug(ex, "Track service failed to resolve coordinates for lot; falling back to random start.");
+                    _logger.LogDebug(ex, "Track service failed to resolve coordinates for lot '{Address}'; falling back to random start.", preferredLot?.Address);
                     (startLat, startLon) = RandomStartPosition();
                 }
             }
             else
             {
+                if (preferredLot == null)
+                    _logger.LogDebug("PreferredLot not loaded for car {CarId}; using random start position", carId);
+
                 (startLat, startLon) = RandomStartPosition();
             }
 
