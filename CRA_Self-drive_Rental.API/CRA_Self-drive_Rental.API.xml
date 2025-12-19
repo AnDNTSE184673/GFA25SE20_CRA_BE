@@ -15,6 +15,26 @@
             Receive a single GPS telemetry ping for a car.
             </summary>
         </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.ReceiveTelementry(Repository.DTO.RequestDTO.GPSReceive)">
+            <summary>
+            Receive a single GPS telemetry ping for a car from Device.
+            </summary>
+        </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetAll">
+            <summary>
+            Get All GPS Telementries
+            </summary>
+        </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetForCar(System.Guid)">
+            <summary>
+            Get All GPS Telementries for a Car
+            </summary>
+        </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.DeleteAllGFromCar(System.Guid)">
+            <summary>
+            Delete all GPS telemetries from a car.
+            </summary>
+        </member>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetLastForCar(System.Guid)">
             <summary>
             Get last known telemetry for a car.

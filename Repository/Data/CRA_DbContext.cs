@@ -48,6 +48,7 @@ namespace Repository.Data
         public DbSet<ScheduleImage> ScheduleImages { get; set; }
         public DbSet<StaffLogAudit> StaffLogAudit { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<GPS> GPS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
