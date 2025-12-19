@@ -36,7 +36,7 @@ namespace Service.Hosted
             _httpFactory = httpFactory ?? throw new ArgumentNullException(nameof(httpFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _postUrl = config["Gps:Endpoint"] ?? "http://localhost:5000/api/gps";
+            _postUrl = config["Gps:Endpoint"] ?? "http://localhost:7184/api/gps";
             _interval = TimeSpan.FromSeconds(int.TryParse(config["Gps:IntervalSeconds"], out var s) ? s : 300);
             _positions = new ConcurrentDictionary<Guid, (double, double)>();
         }
