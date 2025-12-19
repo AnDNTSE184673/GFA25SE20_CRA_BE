@@ -19,6 +19,7 @@ using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.DTO.ResponseDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.DriverLicense;
 using Repository.DTO.ResponseDTO.Feedbacks;
+using Repository.DTO.ResponseDTO.GPS;
 using Repository.DTO.ResponseDTO.Inquiry;
 using Repository.DTO.ResponseDTO.Invoice;
 using Repository.DTO.ResponseDTO.ParkingLot;
@@ -75,7 +76,7 @@ namespace Repository.Extension.AutoMapper
             CreateMap<EditInquiryForm, Inquiry>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<CarRegistration,CarRegView>();
+            CreateMap<CarRegistration, CarRegView>();
             CreateMap<CarRegistration, SingleRegData>();
 
             CreateMap<User, UserView>();
@@ -155,6 +156,7 @@ namespace Repository.Extension.AutoMapper
             CreateMap<User, UserLoginView>();
             CreateMap<Schedules, ScheduleView>();
             CreateMap<PersistNotif, PersitNotifyReturn>();
+            CreateMap<GPS, GPSView>();
         }
     }
 }

@@ -78,6 +78,7 @@ namespace Service
             service.AddScoped<IOTPService, OTPService>();
             service.AddScoped<IFPTAIService, FPTAIService>();
             service.AddScoped<IPersitNotifService, PersitNotifService>();
+            service.AddScoped<IGPSService, GPSService>();
             return service;
         }
     }

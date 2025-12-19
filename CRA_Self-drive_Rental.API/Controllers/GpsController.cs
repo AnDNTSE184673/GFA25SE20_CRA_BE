@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO.GPS;
 using Service.Infranstructure;
+using Service.Services;
 
 namespace CRA_Self_drive_Rental.API.Controllers
 {
@@ -12,11 +14,13 @@ namespace CRA_Self_drive_Rental.API.Controllers
     {
         private readonly ILogger<GpsController> _logger;
         private readonly IGpsStore _store;
+        private readonly IGPSService _gpsService;
 
-        public GpsController(ILogger<GpsController> logger, IGpsStore store)
+        public GpsController(ILogger<GpsController> logger, IGpsStore store, IGPSService gPSService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _store = store ?? throw new ArgumentNullException(nameof(store));
+            _gpsService = gPSService ?? throw new ArgumentNullException(nameof(gPSService));
         }
 
         /// <summary>
@@ -38,6 +42,54 @@ namespace CRA_Self_drive_Rental.API.Controllers
 
             return Accepted();
         }
+
+        /// <summary>
+        /// Receive a single GPS telemetry ping for a car from Device.
+        /// </summary>
+        [HttpPost("/FromDevice")]
+        public async Task<IActionResult> ReceiveTelementry([FromBody] GPSReceive receive)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var result = await _gpsService.AddGPS(receive);
+            if (result == null) return BadRequest();
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// Get All GPS Telementries
+        /// </summary>
+        [HttpGet("/All")]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _gpsService.GetAllAsync();
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get All GPS Telementries for a Car
+        /// </summary>
+        [HttpGet("/Car/{carId}")]
+        public async Task<IActionResult> GetForCar(Guid carId)
+        {
+            if (carId  == Guid.Empty) return BadRequest();
+            var result = await _gpsService.GetByCarIdAsync(carId);
+            if (result == null) return BadRequest();
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Delete all GPS telemetries from a car.
+        /// </summary>
+        [HttpDelete("/Car/{carId}")]
+        public async Task<IActionResult> DeleteAllGFromCar(Guid carId)
+        {
+            if (carId == Guid.Empty) return BadRequest();
+            var result = await _gpsService.DeleteGPSOfCar(carId);
+            if (result == 0) return BadRequest();
+            return Ok(result);
+        }
+
 
         /// <summary>
         /// Get last known telemetry for a car.
