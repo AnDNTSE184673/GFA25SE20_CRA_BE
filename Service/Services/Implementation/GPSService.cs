@@ -29,6 +29,7 @@ namespace Service.Services.Implementation
                     Id = Guid.NewGuid(),
                     Latitude = receive.Latitude,
                     Longitude = receive.Longitude,
+                    Speed = receive.Speed,
                     CarId = receive.CarId,
                     UserId = receive.UserId,
                     DeviceId = receive.DeviceId,
