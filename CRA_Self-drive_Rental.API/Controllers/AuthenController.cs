@@ -50,31 +50,51 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp([FromBody] RegisterRequest register)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(new
+                if (!ModelState.IsValid)
                 {
-                    message = "Invalid registration data",
-                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    return BadRequest(new
+                    {
+                        message = "Invalid registration data",
+                        errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    });
+                }
+                await _userService.RegisterCustomer(register);
+                // Implementation for user sign-up goes here
+                return Ok(new
+                {
+                    Message = "Check your email for a verification code!"
                 });
             }
-            await _userService.RegisterCustomer(register);
-            // Implementation for user sign-up goes here
-            return Ok(new
+            catch (Exception ex)
             {
-                Message = "Check your email for a verification code!"
-            });
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }        
         }
 
         [HttpPost("SignUp/verify")]
         public async Task<IActionResult> OTPVerification(string email, string OTPCode)
         {
-            var response = await _userService.RegistrationVerificationAsync(OTPCode, email);
-            if (response == null) return BadRequest(new
+            try
             {
-                Message = "Incorrect OTP code!"
-            });
-            return Ok(response);
+                var response = await _userService.RegistrationVerificationAsync(OTPCode, email);
+                if (response == null) return BadRequest(new
+                {
+                    Message = "Incorrect OTP code!"
+                });
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
         }
 
         /// <param name="localURL">https://localhost:7184/api/Authen/login/google</param>

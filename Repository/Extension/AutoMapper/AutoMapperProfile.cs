@@ -54,19 +54,6 @@ namespace Repository.Extension.AutoMapper
             */
             #endregion
 
-            CreateMap<DriverLincenseInfo, DriverLicense>()
-                .ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseId))
-                .ForMember(dest => dest.LicenseName, opt => opt.MapFrom(src => src.NameOnLicense))
-                .ForMember(dest => dest.LicenseDoB, opt => opt.MapFrom(src => src.DateOfBirth))
-                .ForMember(dest => dest.LicenseClass, opt => opt.MapFrom(src => src.Class))
-                .ForMember(dest => dest.LicenseIssue, opt => opt.MapFrom(src => src.DateOfIssue))
-                .ForMember(dest => dest.LicenseExpiry, opt => opt.MapFrom(src => src.DateOfExpiry));
-
-            CreateMap<DriverLicense, DriverLicense>()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore())
-                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
-                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-
             CreateMap<ParkingLot, ParkingLotView>()
                 .ForMember(dest => dest.ManagerId, opt => opt.MapFrom(src => src.UserId));
             CreateMap<PostParkingLotForm, ParkingLot>()
@@ -97,8 +84,26 @@ namespace Repository.Extension.AutoMapper
             CreateMap<Car, CarView>()
                 .ForMember(d => d.RentalRate, opt => opt.MapFrom(src => src.RentalRate));
 
-            CreateMap<DriverLicense, DriverLicenseView>();
+            CreateMap<DriverLicense, DriverLicenseView>()
+.ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseNumber))
+.ForMember(dest => dest.LicenseName, opt => opt.MapFrom(src => src.LicenseName))
+.ForMember(dest => dest.LicenseDoB, opt => opt.MapFrom(src => src.LicenseDoB))
+.ForMember(dest => dest.LicenseClass, opt => opt.MapFrom(src => src.LicenseClass))
+.ForMember(dest => dest.LicenseIssue, opt => opt.MapFrom(src => src.LicenseIssue))
+.ForMember(dest => dest.LicenseExpiry, opt => opt.MapFrom(src => src.LicenseExpiry));
             CreateMap<DriverLicense, SingleLicenseData>();
+            CreateMap<DriverLincenseInfo, DriverLicense>()
+                .ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseId))
+                .ForMember(dest => dest.LicenseName, opt => opt.MapFrom(src => src.NameOnLicense))
+                .ForMember(dest => dest.LicenseDoB, opt => opt.MapFrom(src => src.DateOfBirth))
+                .ForMember(dest => dest.LicenseClass, opt => opt.MapFrom(src => src.Class))
+                .ForMember(dest => dest.LicenseIssue, opt => opt.MapFrom(src => src.DateOfIssue))
+                .ForMember(dest => dest.LicenseExpiry, opt => opt.MapFrom(src => src.DateOfExpiry));
+
+            CreateMap<DriverLicense, DriverLicense>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreateDate, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<CreateCarRentalRateForm, CarRentalRate>()
                 .ForMember(d => d.OvertravelRatePerKm, opt => opt.MapFrom(src => src.OvertravelRatePerKmInDongperKM));
