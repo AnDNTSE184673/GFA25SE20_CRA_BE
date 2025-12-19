@@ -13,6 +13,7 @@ namespace Service.Services
 {
     public interface ICarService
     {
+        //Task<CarView> StatusChange
         Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form);
         Task<CarView> UpdateCarImageAsync(List<IFormFile> images, Guid carId);
         Task<List<CarView>> GetAllCarsAsync();
