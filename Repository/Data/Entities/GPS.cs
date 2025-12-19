@@ -13,6 +13,7 @@ namespace Repository.Data.Entities
         public Guid Id { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public int? Speed { get; set; }
         public Guid CarId { get; set; }
         public Guid UserId { get; set; }
         public string DeviceId { get; set; }

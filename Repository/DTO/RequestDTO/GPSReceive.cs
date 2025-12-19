@@ -13,6 +13,7 @@ namespace Repository.DTO.RequestDTO
         public double Latitude { get; set; }
         [Required]
         public double Longitude { get; set; }
+        public int? Speed { get; set; }
         [Required]
         public Guid CarId { get; set; }
         [Required]
