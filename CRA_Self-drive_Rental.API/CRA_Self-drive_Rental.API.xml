@@ -10,5 +10,20 @@
         <member name="M:CRA_Self_drive_Rental.API.Controllers.AuthenController.GoogleResponse">
             <summary>Don't run this</summary>
         </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.ReceiveTelemetry(Repository.DTO.ResponseDTO.GPS.GpsPayload)">
+            <summary>
+            Receive a single GPS telemetry ping for a car.
+            </summary>
+        </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetLastForCar(System.Guid)">
+            <summary>
+            Get last known telemetry for a car.
+            </summary>
+        </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetAllLast">
+            <summary>
+            Get last known telemetry for all cars (in-memory).
+            </summary>
+        </member>
     </members>
 </doc>
