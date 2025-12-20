@@ -69,7 +69,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         /// <summary>
         /// Get All GPS Telementries for a Car
         /// </summary>
-        [HttpGet("/Car/{carId}")]
+        [HttpGet("/ByCar/{carId}")]
         public async Task<IActionResult> GetForCar(Guid carId)
         {
             if (carId  == Guid.Empty) return BadRequest();
@@ -81,7 +81,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         /// <summary>
         /// Get All GPS Telementries for a User
         /// </summary>
-        [HttpGet("/Car/{userId}")]
+        [HttpGet("/ByUser/{userId}")]
         public async Task<IActionResult> GetForUser(Guid userId)
         {
             if (userId == Guid.Empty) return BadRequest();
@@ -91,9 +91,9 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         /// <summary>
-        /// Get All GPS Telementries for a Car
+        /// Get All GPS Telementries for a Device
         /// </summary>
-        [HttpGet("/Car/{deviceId}")]
+        [HttpGet("/ByDevice/{deviceId}")]
         public async Task<IActionResult> GetForDevice(string deviceId)
         {
             if (string.IsNullOrEmpty(deviceId)) return BadRequest();
