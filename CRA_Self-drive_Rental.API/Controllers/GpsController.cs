@@ -114,6 +114,29 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Delete all GPS telemetries for a user.
+        /// </summary>
+        [HttpDelete("/User/{userId}")]
+        public async Task<IActionResult> DeleteAllGForUser(Guid userId)
+        {
+            if (userId == Guid.Empty) return BadRequest();
+            var result = await _gpsService.DeleteGPSOfUser(userId);
+            if (result == 0) return BadRequest();
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Delete all but not the lastest two for a user.
+        /// </summary>
+        [HttpDelete("/User/LastestTwo/{userId}")]
+        public async Task<IActionResult> DeleteAndLeftTwo(Guid userId)
+        {
+            if (userId == Guid.Empty) return BadRequest();
+            var result = await _gpsService.DeleteAndLeftLastTwoByUser(userId);
+            if (result == null || result.Count <= 0) return BadRequest();
+            return Ok(result);
+        }
 
         /// <summary>
         /// Get last known telemetry for a car.

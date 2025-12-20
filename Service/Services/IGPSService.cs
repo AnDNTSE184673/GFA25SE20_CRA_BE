@@ -16,5 +16,7 @@ namespace Service.Services
         Task<List<GPSView>> GetAllAsync();
         Task<GPSView> AddGPS(GPSReceive receive);
         Task<int> DeleteGPSOfCar(Guid carId);
+        Task<int> DeleteGPSOfUser(Guid userId);
+        Task<List<GPSView>> DeleteAndLeftLastTwoByUser(Guid userId);
     }
 }
