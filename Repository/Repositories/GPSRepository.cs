@@ -44,5 +44,21 @@ namespace Repository.Repositories
                 .OrderByDescending(gps => gps.Timestamp)
                 .ToListAsync();
         }
+
+        public async Task<List<GPS>> GetGPSDataByDeviceIdAsync(string deviceId)
+        {
+            return await _context.GPS
+                .Where(gps => gps.DeviceId == deviceId)
+                .OrderByDescending(gps => gps.Timestamp)
+                .ToListAsync();
+        }
+
+        public async Task<List<GPS>> GetGPSDataByUserIdAsync(Guid userId)
+        {
+            return await _context.GPS
+                .Where(gps => gps.UserId == userId)
+                .OrderByDescending(gps => gps.Timestamp)
+                .ToListAsync();
+        }
     }
 }

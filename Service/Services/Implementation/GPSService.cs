@@ -84,5 +84,21 @@ namespace Service.Services.Implementation
             if (gpsData == null || !gpsData.Any()) return new List<GPSView>();
             return _mapper.Map<List<GPSView>>(gpsData);
         }
+
+        public async Task<List<GPSView>> GetByDeviceIdAsync(string deviceId)
+        {
+            var gpsData = await  _unitOfWork._gpsRepo.GetGPSDataByDeviceIdAsync(deviceId);
+            if (gpsData == null || !gpsData.Any()) return new List<GPSView>();
+            return _mapper.Map<List<GPSView>>(gpsData);
+        }
+
+        public async Task<List<GPSView>> GetByUserIdAsync(Guid userId)
+        {
+            var user = await _unitOfWork._userRepo.GetByIdAsync(userId);
+            if (user == null) return new List<GPSView>();
+            var gpsData = await  _unitOfWork._gpsRepo.GetGPSDataByUserIdAsync(userId);
+            if (gpsData == null || !gpsData.Any()) return new List<GPSView>();
+            return _mapper.Map<List<GPSView>>(gpsData);
+        }
     }
 }
