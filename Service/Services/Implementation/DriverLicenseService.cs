@@ -63,7 +63,7 @@ namespace Service.Services.Implementation
                 regs = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(user.Id);
 
                 var latestPerSideNeedsCheck = regs
-                .Where(r => r.Status.Equals(ConstantEnum.VerificationStatus.NEED_MANUAL_CHECK))
+                //.Where(r => r.Status.Equals(ConstantEnum.VerificationStatus.NEED_MANUAL_CHECK))
                 .GroupBy(r => r.Side)
                 .Select(g => g
                     .OrderByDescending(r => r.CreateDate)
@@ -133,12 +133,22 @@ namespace Service.Services.Implementation
 
             await _upload.EnsureInitializedAsync();
 
-            foreach (var r in result)
+            var tasks = latestPerUserPerSide.Select(async license =>
             {
-                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
-            }
-            var uploadResults = await Task.WhenAll(uploadTasks);
-            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(latestPerUserPerSide));
+                var url = await _upload.CreateSignedUrlAsync(
+                    license.Bucket,
+                    license.FilePath,
+                    expirationTimeinSeconds);
+
+                var view = _mapper.Map<DriverLicenseView>(license);
+                view.Urls = new List<string> { url };
+
+                return view;
+            });
+
+            var views = (await Task.WhenAll(tasks)).ToList();
+
+            return (null, views);
         }
 
         public async Task<(string[] signedUrl, List<DriverLicenseView> view)> GetDriverLicenseByUser(LicenseSearchForm form)
@@ -162,15 +172,26 @@ namespace Service.Services.Implementation
                 .ToList();
 
             await _upload.EnsureInitializedAsync();
-            foreach (var r in latestPerSide)
+
+            var tasks = latestPerSide.Select(async license =>
             {
-                uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeinSeconds));
-            }
-            var uploadResults = await Task.WhenAll(uploadTasks);
-            return (uploadResults, _mapper.Map<List<DriverLicenseView>>(latestPerSide));
+                var url = await _upload.CreateSignedUrlAsync(
+                    license.Bucket,
+                    license.FilePath,
+                    expirationTimeinSeconds);
+
+                var view = _mapper.Map<DriverLicenseView>(license);
+                view.Urls = new List<string> { url };
+
+                return view;
+            });
+
+            var views = (await Task.WhenAll(tasks)).ToList();
+
+            return (null, views);
         }
 
-        public async Task<DriverLicenseView> UpdateDriverLicenseAsync(Guid userId, IFormFile backImage, IFormFile frontImage)
+        public async Task<DriverLicenseView> UpdateDriverLicenseAsync(Guid userId, IFormFile frontImage)
         {
             try
             {
@@ -186,7 +207,6 @@ namespace Service.Services.Implementation
 
                 await _upload.EnsureInitializedAsync();
                 uploadTasks.Add(UploadDriverLicenseAsync(frontImage, userId, (int)ConstantEnum.DriverLicenseSide.FrontSide));
-                uploadTasks.Add(UploadDriverLicenseAsync(backImage, userId, (int)ConstantEnum.DriverLicenseSide.BackSide));
 
                 var uploadResults = await Task.WhenAll(uploadTasks);
 
@@ -202,7 +222,6 @@ namespace Service.Services.Implementation
                 foreach (var u in uploadResults)
                 {
                     if (u.obj.Side == 1) _mapper.Map(aiCheck, u.obj);
-                    if (u.obj.Side == 2) u.obj.Status = aiCheck.Status;
                     await _unitOfWork._driverLicenseRepo.AddDriverLicenseAsync(u.obj);
                 }
                 var result = await _unitOfWork.SaveChangesAsync();
@@ -213,7 +232,14 @@ namespace Service.Services.Implementation
                     Urls = urls,
                     UserId = userId,
                     CreateDate = DateTime.UtcNow,
-                    Status = aiCheck.Status
+                    Status = aiCheck.Status,
+                    Side = aiCheck.Side,
+                    LicenseNumber = aiCheck.LicenseNumber,
+                    LicenseName = aiCheck.LicenseName,
+                    LicenseDoB = aiCheck.LicenseDoB,
+                    LicenseClass = aiCheck.LicenseClass,
+                    LicenseIssue = aiCheck.LicenseIssue,
+                    LicenseExpiry = aiCheck.LicenseExpiry
                 };
                 return mapped;
             }

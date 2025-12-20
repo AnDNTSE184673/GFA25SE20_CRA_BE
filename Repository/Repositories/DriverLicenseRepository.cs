@@ -72,5 +72,26 @@ namespace Repository.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<string> DeleteLicenseAsync(Guid id)
+        {
+            try
+            {
+                var existing = await GetByIdAsync(id);
+                if (existing == null)
+                    return "License not found";
+
+                await RemoveAsync(existing);
+
+                if (await GetByIdAsync(id) == null)
+                    return ConstantEnum.RepoStatus.SUCCESS;
+                else
+                    return ConstantEnum.RepoStatus.FAILURE;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

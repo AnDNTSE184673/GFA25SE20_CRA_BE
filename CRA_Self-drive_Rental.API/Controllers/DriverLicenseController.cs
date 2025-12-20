@@ -25,9 +25,9 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
-                if (form.frontDriverLicenseimg == null || form.backDriverLicenseimg == null)
+                if (form.frontDriverLicenseimg == null)
                 {
-                    throw new ArgumentException("Both front side and back side of license needed!");
+                    throw new ArgumentException("Front side of license needed!");
                 }
 
                 var allowedExtensions = new HashSet<string>
@@ -47,11 +47,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 if (!frontResult.IsValid)
                     return BadRequest(frontResult.Error);
 
-                var backResult = FileValidationHelper.Validate(form.backDriverLicenseimg, imageValidationOptions);
+                /*var backResult = FileValidationHelper.Validate(form.backDriverLicenseimg, imageValidationOptions);
                 if (!backResult.IsValid)
-                    return BadRequest(backResult.Error);
+                    return BadRequest(backResult.Error);*/
 
-                var result = await _licenseService.UpdateDriverLicenseAsync(form.userId, form.backDriverLicenseimg, form.frontDriverLicenseimg);
+                var result = await _licenseService.UpdateDriverLicenseAsync(form.userId, form.frontDriverLicenseimg);
                 return result == null
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {
@@ -76,7 +76,10 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 (string[] signedUrl, List<DriverLicenseView> view) result = (Array.Empty<string>(), new List<DriverLicenseView>());
                 if (!form.IsValid())
                 {
-                    result = await _licenseService.GetAllDocumentsAsync();
+                    return BadRequest(new
+                    {
+                        Message = ModelState
+                    });
                 }
                 else
                 {
@@ -90,7 +93,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     })
                     : Ok(new
                     {
-                        Urls = result.signedUrl,
+                        //Urls = result.signedUrl,
                         View = result.view
                     });
             }
@@ -144,7 +147,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     })
                     : Ok(new
                     {
-                        Urls = result.signedUrl,
+                        //Urls = result.signedUrl,
                         View = result.view
                     });
             }

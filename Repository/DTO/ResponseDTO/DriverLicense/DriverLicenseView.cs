@@ -20,6 +20,7 @@ namespace Repository.DTO.ResponseDTO.DriverLicense
         public DateOnly? LicenseExpiry { get; set; }
 
         public List<string> Urls { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public string Status { get; set; }
