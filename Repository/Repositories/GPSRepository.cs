@@ -32,7 +32,7 @@ namespace Repository.Repositories
 
         public async Task<List<GPS>> DeleteAndLeftLastTwoByUser(Guid userId)
         {
-            var gpsData = await _context.GPS.Include(gps => gps.Car).Include(gps => gps.User)
+            var gpsData = await _context.GPS.Include(gps => gps.User)
                 .Where(gps => gps.UserId == userId)
                 .OrderByDescending(gps => gps.Timestamp)
                 .ToListAsync();
@@ -43,39 +43,17 @@ namespace Repository.Repositories
             return gpsData.Take(2).ToList();
         }
 
-        public async Task<int> DeleteGPSDataByCarIdAsync(Guid carId)
-        {
-            var gpsData = await _context.GPS.Where(gps => gps.CarId == carId).ToListAsync();
-            if (!gpsData.Any())
-            {
-                return 0;
-            }
-            _context.RemoveRange(gpsData);
-            return await _context.SaveChangesAsync();
-        }
-
         public async Task<List<GPS>> GetAllGPSDataAsync()
         {
             return await _context.GPS
-                .Include(gps => gps.Car)
                 .Include(gps => gps.User)
-                .OrderByDescending(gps => gps.Timestamp)
-                .ToListAsync();
-        }
-
-        public async Task<List<GPS>> GetGPSDataByCarIdAsync(Guid carId)
-        {
-            return await _context.GPS
-                .Include(gps => gps.Car)
-                .Include(gps => gps.User)
-                .Where(gps => gps.CarId == carId)
                 .OrderByDescending(gps => gps.Timestamp)
                 .ToListAsync();
         }
 
         public async Task<List<GPS>> GetGPSDataByDeviceIdAsync(string deviceId)
         {
-            return await _context.GPS.Include(gps => gps.Car).Include(gps => gps.User)
+            return await _context.GPS.Include(gps => gps.User)
                 .Where(gps => gps.DeviceId == deviceId)
                 .OrderByDescending(gps => gps.Timestamp)
                 .ToListAsync();
@@ -83,7 +61,7 @@ namespace Repository.Repositories
 
         public async Task<List<GPS>> GetGPSDataByUserIdAsync(Guid userId)
         {
-            return await _context.GPS.Include(gps => gps.Car).Include(gps => gps.User)
+            return await _context.GPS.Include(gps => gps.User)
                 .Where(gps => gps.UserId == userId)
                 .OrderByDescending(gps => gps.Timestamp)
                 .ToListAsync();
