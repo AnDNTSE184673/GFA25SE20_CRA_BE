@@ -14,13 +14,9 @@ namespace Repository.Data.Entities
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public int? Speed { get; set; }
-        public Guid CarId { get; set; }
         public Guid UserId { get; set; }
         public string DeviceId { get; set; }
         public DateTime Timestamp { get; set; }
-
-        [ForeignKey("CarId")]
-        public virtual Car Car { get; set; }
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
     }

@@ -67,18 +67,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         /// <summary>
-        /// Get All GPS Telementries for a Car
-        /// </summary>
-        [HttpGet("/ByCar/{carId}")]
-        public async Task<IActionResult> GetForCar(Guid carId)
-        {
-            if (carId  == Guid.Empty) return BadRequest();
-            var result = await _gpsService.GetByCarIdAsync(carId);
-            if (result == null) return BadRequest();
-            return Ok(result);
-        }
-
-        /// <summary>
         /// Get All GPS Telementries for a User
         /// </summary>
         [HttpGet("/ByUser/{userId}")]
@@ -99,18 +87,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
             if (string.IsNullOrEmpty(deviceId)) return BadRequest();
             var result = await _gpsService.GetByDeviceIdAsync(deviceId);
             if (result == null) return BadRequest();
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Delete all GPS telemetries from a car.
-        /// </summary>
-        [HttpDelete("/Car/{carId}")]
-        public async Task<IActionResult> DeleteAllGFromCar(Guid carId)
-        {
-            if (carId == Guid.Empty) return BadRequest();
-            var result = await _gpsService.DeleteGPSOfCar(carId);
-            if (result == 0) return BadRequest();
             return Ok(result);
         }
 

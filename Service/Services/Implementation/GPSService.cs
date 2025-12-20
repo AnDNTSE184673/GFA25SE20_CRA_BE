@@ -30,7 +30,6 @@ namespace Service.Services.Implementation
                     Latitude = receive.Latitude,
                     Longitude = receive.Longitude,
                     Speed = receive.Speed,
-                    CarId = receive.CarId,
                     UserId = receive.UserId,
                     DeviceId = receive.DeviceId,
                     Timestamp = DateTime.UtcNow
@@ -71,25 +70,6 @@ namespace Service.Services.Implementation
             }
         }
 
-        public async Task<int> DeleteGPSOfCar(Guid carId)
-        {
-            try
-            {
-                _unitOfWork.BeginTransaction();
-                var car = await _unitOfWork._carRepo.GetByIdAsync(carId);
-                if (car == null) return 0;
-                var result = await _unitOfWork._gpsRepo.DeleteGPSDataByCarIdAsync(carId);
-                await _unitOfWork.SaveChangesAsync();
-                _unitOfWork.CommitTransaction();
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _unitOfWork.RollbackTransaction();
-                throw new Exception(ex.Message);
-            }
-        }
-
         public async Task<int> DeleteGPSOfUser(Guid userId)
         {
             try
@@ -116,15 +96,6 @@ namespace Service.Services.Implementation
             {
                 return new List<GPSView>();
             }
-            return _mapper.Map<List<GPSView>>(gpsData);
-        }
-
-        public async Task<List<GPSView>> GetByCarIdAsync(Guid carId)
-        {
-            var car = await _unitOfWork._carRepo.GetByIdAsync(carId);
-            if (car == null) return new List<GPSView>();
-            var gpsData = await  _unitOfWork._gpsRepo.GetGPSDataByCarIdAsync(carId);
-            if (gpsData == null || !gpsData.Any()) return new List<GPSView>();
             return _mapper.Map<List<GPSView>>(gpsData);
         }
 

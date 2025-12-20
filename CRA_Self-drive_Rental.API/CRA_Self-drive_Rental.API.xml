@@ -25,11 +25,6 @@
             Get All GPS Telementries
             </summary>
         </member>
-        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetForCar(System.Guid)">
-            <summary>
-            Get All GPS Telementries for a Car
-            </summary>
-        </member>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetForUser(System.Guid)">
             <summary>
             Get All GPS Telementries for a User
@@ -38,11 +33,6 @@
         <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetForDevice(System.String)">
             <summary>
             Get All GPS Telementries for a Device
-            </summary>
-        </member>
-        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.DeleteAllGFromCar(System.Guid)">
-            <summary>
-            Delete all GPS telemetries from a car.
             </summary>
         </member>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.DeleteAllGForUser(System.Guid)">

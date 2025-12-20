@@ -15,8 +15,6 @@ namespace Repository.DTO.RequestDTO
         public string Longitude { get; set; }
         public int? Speed { get; set; }
         [Required]
-        public Guid CarId { get; set; }
-        [Required]
         public Guid UserId { get; set; }
         [Required]
         public string DeviceId { get; set; }
