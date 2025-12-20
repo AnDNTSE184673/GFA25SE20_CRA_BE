@@ -161,6 +161,8 @@ namespace CRA_Self_drive_Rental.API
                 .AddServices(builder.Configuration)
                 .AddRepositories(builder.Configuration);
             builder.Services.AddHostedService<CarStatusBackgroundService>();
+            builder.Services.AddHostedService<ConfirmedBookingGpsSimulatorBackgroundService>();
+            builder.Services.AddSingleton<Service.Infranstructure.IGpsStore, Service.Infranstructure.GpsStore>();
             builder.Services.AddDbContext<CRA_DbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             Log.Information("Added database {server}", builder.Configuration["ConnectionStrings:DefaultConnection"].Substring(0, Math.Min(15, builder.Configuration["ConnectionStrings:DefaultConnection"].Length)));

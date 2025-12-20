@@ -65,6 +65,7 @@ namespace Repository.Base
             service.AddScoped<IOtpRepository, OtpRepository>();
             service.AddScoped<ILookupRepository, LookupRepository>();
             service.AddScoped<INotifyRepository, PersitNotifRepository>();
+            service.AddScoped<IGPSRepository, GPSRepository>();
             return service;
         }
     }

@@ -39,6 +39,7 @@ namespace Repository.Base
         public ILookupRepository _lookupRepo { get; }
         public INotifyRepository _notifyRepository { get; set; }
         public IReportRepository _reportRepo { get; }
+        public IGPSRepository _gpsRepo { get; }
 
         //no need to construct _transaction
 
@@ -63,7 +64,8 @@ namespace Repository.Base
             ILookupRepository lookupRepo,
             IPaymentRepository paymentRepo,
             INotifyRepository notifyRepository,
-            IReportRepository reportRepo)
+            IReportRepository reportRepo,
+            IGPSRepository gpsRepo)
         {
             _context = context;
             _userRepo = userRepo;
@@ -87,6 +89,7 @@ namespace Repository.Base
             _lookupRepo = lookupRepo;
             _notifyRepository = notifyRepository;
             _reportRepo = reportRepo;
+            _gpsRepo = gpsRepo;
         }
 
         //no need to construct _transaction
