@@ -11,7 +11,7 @@ namespace Repository.DTO.RequestDTO.DriverLicense
     public class UploadDriverLicenses
     {
         public IFormFile frontDriverLicenseimg { get; set; }
-        public IFormFile backDriverLicenseimg { get; set; }
+        //public IFormFile backDriverLicenseimg { get; set; }
         public Guid userId { get; set; }
     }
 }
