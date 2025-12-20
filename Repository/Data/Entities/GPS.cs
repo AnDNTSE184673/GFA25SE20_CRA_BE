@@ -11,8 +11,8 @@ namespace Repository.Data.Entities
     public class GPS
     {
         public Guid Id { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
         public int? Speed { get; set; }
         public Guid CarId { get; set; }
         public Guid UserId { get; set; }

@@ -10,9 +10,9 @@ namespace Repository.DTO.RequestDTO
     public class GPSReceive
     {
         [Required]
-        public double Latitude { get; set; }
+        public string Latitude { get; set; }
         [Required]
-        public double Longitude { get; set; }
+        public string Longitude { get; set; }
         public int? Speed { get; set; }
         [Required]
         public Guid CarId { get; set; }
