@@ -221,6 +221,32 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
         }
 
+        [HttpPatch("activeStatus/change")]
+        public async Task<IActionResult> ChangeCarStatus(CarStatusChange form)
+        {
+            try
+            {
+                if (!form.IsValid()) return BadRequest(new
+                {
+                    Message = "One of the two field must be filled in!"
+                });
+                var result = await _carServ.ChangeCarStatusAsync(form);
+                return result == null
+                    ? StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Message = "Data not found, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
         [HttpGet("AllCars")]
         public async Task<IActionResult> GetAllCars()
         {
@@ -307,6 +333,10 @@ namespace CRA_Self_drive_Rental.API.Controllers
         {
             try
             {
+                if (!form.IsValid().valid) return BadRequest(new
+                {
+                    Message = "One of the two field must be filled in!"
+                });
                 var result = await _carRentalRateServ.SetRentalRate(form);
                 return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(StatusCodes.Status400BadRequest, new

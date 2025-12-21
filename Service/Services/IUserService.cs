@@ -18,7 +18,7 @@ namespace Service.Services
         Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId);
         Task<(string status, UserPostRegView? user)> GoogleRegister(string email, string name, string googleId);
         Task<(string msg, LoginResponse token)> AuthenticateAsync(string email, string password);
-        Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string email);
+        Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string phoneNumber);
         Task RegisterCustomer(RegisterRequest request);
         Task<User> CreateOwner(RegisterOwnerRequest request);
         Task<User?> UpdateToCarOwner(Guid userId);
