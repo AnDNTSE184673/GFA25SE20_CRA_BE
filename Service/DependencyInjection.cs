@@ -15,6 +15,7 @@ using Repository.CustomFunctions.SupabaseFileUploader;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
 using Repository.Extension.SpeedSMS;
+using Repository.Extension.TextBeeDotDev;
 
 namespace Service
 {
@@ -54,6 +55,7 @@ namespace Service
             });
             service.AddScoped<UploadFile>();
             service.AddScoped<SpeedSMSAPI>();
+            service.AddScoped<TextBeeSMSAPI>();
             //service.AddAutoMapper(typeof(AutoMapperProfile));
 
             //service.AddScoped<IAuthenService, AuthenService>();

@@ -78,7 +78,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 {
                     return BadRequest(new
                     {
-                        Message = ModelState
+                        Message = "One of the two field must be filled in!"
                     });
                 }
                 else

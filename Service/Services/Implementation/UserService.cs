@@ -27,6 +27,7 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using Repository.DTO.RequestDTO.User;
 using System.Net.NetworkInformation;
 using Repository.DTO.ResponseDTO.Report;
+using Repository.Extension.TextBeeDotDev;
 
 namespace Service.Services.Implementation
 {
@@ -40,11 +41,12 @@ namespace Service.Services.Implementation
         private readonly IEmailService _email;
         private readonly ILogger<UserService> _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<UserService>();
         private readonly IOTPService _otp;
+        private readonly TextBeeSMSAPI _sms;
 
         int expirationTimeSec = 1800;
         bool isPublic = true;
 
-        public UserService(UploadFile upload, UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email, ILogger<UserService> logger, IOTPService otp)
+        public UserService(UploadFile upload, UnitOfWork unitOfWork, JWTTokenProvider jwtService, IMapper mapper, IConfiguration config, IEmailService email, ILogger<UserService> logger, IOTPService otp, TextBeeSMSAPI sms)
         {
             _upload = upload;
             _unitOfWork = unitOfWork;
@@ -54,6 +56,7 @@ namespace Service.Services.Implementation
             _email = email;
             _logger = logger;
             _otp = otp;
+            _sms = sms;
         }
 
         public async Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId)
@@ -107,7 +110,7 @@ namespace Service.Services.Implementation
                 if (response.status.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
                     var body = _email.GenerateBodyRegisterSuccess(response.user.Username, response.user.Password, "S", "");
-                    _email.SendEmailAsync("Morent Self-driving Rental", body, response.user.Email, response.user.Fullname);
+                    _email.SendEmailAsync(_config["ServiceName"], body, response.user.Email, response.user.Fullname);
                     return (response.status, _mapper.Map<UserPostRegView>(response.user));
                 }
                 else
@@ -155,12 +158,12 @@ namespace Service.Services.Implementation
             return ("Login successful!", token);
         }
 
-        public async Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string email)
+        public async Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string phoneNumber)
         {
             try
             {
-                var user = _unitOfWork._userRepo.GetByEmail(email);
-                var result = await _otp.OTPVerificationAsync(OTPCode, email);
+                var user = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(x => x.PhoneNumber.Equals(phoneNumber.Trim()));
+                var result = await _otp.OTPVerificationAsync(OTPCode, user.Email);
                 if (result.message.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
                     user.Status = ConstantEnum.Statuses.ACTIVE;
@@ -184,10 +187,11 @@ namespace Service.Services.Implementation
             _unitOfWork.BeginTransaction();
             try
             {
-                var knownUser = _unitOfWork._userRepo.GetByEmail(request.Email);
+                var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(
+                u => u.Email == request.Email || u.PhoneNumber == request.PhoneNumber);
                 if (knownUser != null)
                 {
-                    throw new Exception("Email already in use");
+                    throw new Exception("Email or and phone number already in use");
                 }
                 User newUser = new User()
                 {
@@ -219,10 +223,11 @@ namespace Service.Services.Implementation
 
         public async Task RegisterCustomer(RegisterRequest request)
         {
-            var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(u => u.Email == request.Email);
+            var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(
+                u => u.Email == request.Email || u.PhoneNumber == request.PhoneNumber);
             if (knownUser != null)
             {
-                throw new Exception("Email already in use");
+                throw new Exception("Email or and phone number already in use");
             }
             User newUser = new User()
             {
@@ -254,8 +259,11 @@ namespace Service.Services.Implementation
             User newlyCtUser = _unitOfWork._userRepo.GetByEmail(newUser.Email);
             var OtpCode = await _otp.SendOTPCodes(newlyCtUser.Id, null);
 
-            var body = _email.GenerateBodyOtpCode(newlyCtUser.Username, OtpCode, "Morent", null);
-            _email.SendEmailAsync("Morent Self-driving Rental", body, newlyCtUser.Email, newlyCtUser.Fullname);
+            var message = _sms.SMSMessage(_config["ServiceName"], OtpCode);
+            _sms.SendSMSMessage(message, newlyCtUser.PhoneNumber);
+
+            /*var body = _email.GenerateBodyOtpCode(newlyCtUser.Username, OtpCode, "Morent", null);
+            _email.SendEmailAsync("Morent Self-driving Rental", body, newlyCtUser.Email, newlyCtUser.Fullname);*/
         }
 
         public async Task<List<User>> GetAllUsers()

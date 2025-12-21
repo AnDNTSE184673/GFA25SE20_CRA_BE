@@ -77,11 +77,11 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("SignUp/verify")]
-        public async Task<IActionResult> OTPVerification(string email, string OTPCode)
+        public async Task<IActionResult> OTPVerification(string phone, string OTPCode)
         {
             try
             {
-                var response = await _userService.RegistrationVerificationAsync(OTPCode, email);
+                var response = await _userService.RegistrationVerificationAsync(OTPCode, phone.Trim());
                 if (response == null) return BadRequest(new
                 {
                     Message = "Incorrect OTP code!"

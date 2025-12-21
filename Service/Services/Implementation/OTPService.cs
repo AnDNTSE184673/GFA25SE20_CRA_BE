@@ -28,6 +28,9 @@ namespace Service.Services.Implementation
             _email = email;
         }
 
+        /// <summary>
+        /// This creates an OtpCode entry to store in the DB, then return a string of the unhashed code to attach to email or message
+        /// </summary>
         public async Task<string> SendOTPCodes(Guid userId, string? additionalInfo)
         {
             try
@@ -64,6 +67,9 @@ namespace Service.Services.Implementation
             }
         }
 
+        /// <summary>
+        /// Invalidate an existing active OTP code if there is one, then regenerate and send back a new one, also return an unhashed string code
+        /// </summary>
         public async Task<string> ResendOTPCodes(Guid userId, string? additionalInfo)
         {
             try
@@ -107,6 +113,9 @@ namespace Service.Services.Implementation
             }
         }
 
+        /// <summary>
+        /// Don't actually call this, call OTPVerificationAsync() instead
+        /// </summary>
         public async Task<(OTPCode entry, string message)> SubmitOTPCodes(Guid userId, string unhashedCode)
         {
             try
@@ -138,6 +147,9 @@ namespace Service.Services.Implementation
             }
         }
 
+        /// <summary>
+        /// Exposes the SubmitOTPCodes function
+        /// </summary>
         public async Task<(OTPCode entry, string message)> OTPVerificationAsync(string OTPCode, string email)
         {
             try
