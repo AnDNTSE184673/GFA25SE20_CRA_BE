@@ -19,11 +19,14 @@ namespace Repository.Data.Entities
         public DateTime CreateDate { get; set; }
         public string Status { get; set; }
 
-        public Guid CarId { get; set; }
-        public Guid UserId { get; set; }
-        [ForeignKey("CarId")]
+        public Guid? ReportedCarId { get; set; }
+        public Guid? ReportedUserId { get; set; }
+        public Guid ReporterId { get; set; }
+        [ForeignKey("ReportedCarId")]
         public Car Car { get; set; }
-        [ForeignKey("UserId")]
+        [ForeignKey("ReportedUserId")]
+        public User Reported { get; set; }
+        [ForeignKey("ReporterId")]
         public User Reporter { get; set; }
     }
 }

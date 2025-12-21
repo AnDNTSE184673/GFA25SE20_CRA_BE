@@ -55,6 +55,7 @@ namespace Repository.Constant
             public const string RESERVED = "Reserved";
             public const string APPROVED = "Approved";
             public const string DENIED = "Denied";
+            public const string CLOSED = "Closed";
         }
 
         public static class SupabaseBucket

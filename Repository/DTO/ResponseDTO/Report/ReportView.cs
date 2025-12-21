@@ -17,7 +17,8 @@ namespace Repository.DTO.ResponseDTO.Report
         public DateTime CreateDate { get; set; }
         public string Status { get; set; }
 
-        public Guid CarId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? ReportedCarId { get; set; }
+        public Guid? ReportedUserId { get; set; }
+        public Guid ReporterId { get; set; }
     }
 }

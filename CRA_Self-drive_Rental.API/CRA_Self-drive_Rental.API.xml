@@ -37,7 +37,7 @@
         </member>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.GetForDevice(System.String)">
             <summary>
-            Get All GPS Telementries for a Car
+            Get All GPS Telementries for a Device
             </summary>
         </member>
         <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.DeleteAllGFromCar(System.Guid)">

@@ -46,6 +46,17 @@ namespace Repository.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Car> GetCarByLicensePlate(string licensePlate)
+        {
+            return await _dbContext.Cars
+                .Include(x => x.Owner)
+                .Include(x => x.PreferredLot)
+                .Include(x => x.Images)
+                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE) 
+                && x.LicensePlate.Equals(licensePlate.Trim()))
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Car> UpdateCarAsync(Car car)
         {
             try
