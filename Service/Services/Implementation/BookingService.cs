@@ -270,7 +270,7 @@ namespace Service.Services.Implementation
                     Description = $"Extension for {request.TimeExtInDays} days",
                     Quantity = request.TimeExtInDays,
                     UnitPrice = (decimal)carRate.DailyRate,
-                    Total = (decimal)(carRate.DailyRate * request.TimeExtInDays),
+                    Total = (decimal)(carRate.DailyRate * request.TimeExtInDays)/10,
                     Note = "Auto-generated for booking extension"
                 };
                 await _unitOfWork._invoiceRepo.UpdateAsync(invoice);
