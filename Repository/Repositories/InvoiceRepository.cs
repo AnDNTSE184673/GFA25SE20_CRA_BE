@@ -54,7 +54,7 @@ namespace Repository.Repositories
                 .Include(u => u.Owner).FirstOrDefaultAsync();
             var carRate = await _context.CarRentalRates.Where(r => r.CarId == request.CarId)
                 .FirstOrDefaultAsync();
-            var rentalTotal = carRate.DailyRate * request.RentTime;
+            var rentalTotal = (carRate.DailyRate * request.RentTime)/100;
             if (user == null || carRate == null)
             {
                 rentalTotal = request.CarRate * request.RentTime;
@@ -64,7 +64,7 @@ namespace Repository.Repositories
             if (request.DistanceInM > 0)
             {
                 var kilometers = Convert.ToDecimal(request.DistanceInM) / 1000m;
-                distanceFee = kilometers * 20000m;
+                distanceFee = (kilometers * 20000m)/10;
             }
             var newInvoice = new Invoice
             {
