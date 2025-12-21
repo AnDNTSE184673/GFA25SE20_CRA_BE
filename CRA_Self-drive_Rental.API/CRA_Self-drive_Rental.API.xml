@@ -55,5 +55,10 @@
             Get last known telemetry for all cars (in-memory).
             </summary>
         </member>
+        <member name="M:CRA_Self_drive_Rental.API.Controllers.GpsController.UpdateGPSInfo(Repository.DTO.RequestDTO.GPSUpdate)">
+            <summary>
+            Update GPS information based on Device ID and User ID.
+            </summary>
+        </member>
     </members>
 </doc>
