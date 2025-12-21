@@ -137,6 +137,15 @@ namespace Service.Services.Implementation
                 }
 
                 var result = await _unitOfWork._reportRepo.UpdateReport(reportExist);
+                var notify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = form.isApproved ? $"The report for Car {car.LicensePlate} has been approved. The car is now deactivatied" : $"The report for Car {car.LicensePlate} has been denied.",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = reportExist.ReporterId,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(notify);
 
                 if (result == null)
                 {
@@ -172,6 +181,16 @@ namespace Service.Services.Implementation
                 mapped.ReportNo = $"C-RP{mapped.Id.ToString().Split('-').Last().Substring(0, 12).ToUpper()}";
                 mapped.CreateDate = DateTime.UtcNow;
                 mapped.Status = ConstantEnum.Statuses.ACTIVE;
+
+                var carNoti = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your car with ID: {carExist.Id} has been reported for '{form.Title}'. Please check the report for more details.",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = carExist.UserId,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(carNoti);
 
                 var result = await _unitOfWork._reportRepo.CreateReport(mapped);
                 await _unitOfWork.CommitTransactionAsync();
@@ -210,10 +229,21 @@ namespace Service.Services.Implementation
                 mapped.CreateDate = DateTime.UtcNow;
                 mapped.Status = ConstantEnum.Statuses.ACTIVE;
 
-                var result = await _unitOfWork._reportRepo.CreateReport(mapped);
+                var result = await _unitOfWork._reportRepo.CreateReport(mapped);               
 
-                reportedUserExist.BehaviourScore = reportedUserExist.BehaviourScore - form.deductedPoints; 
+                reportedUserExist.BehaviourScore = reportedUserExist.BehaviourScore - form.deductedPoints;
                 //first report is 66, second report is 32, third report is -2 which will hit this condition (old)
+
+                var userNoti = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"You have been reported for '{form.Title}'. Your account health is now {reportedUserExist.BehaviourScore}. Check the report for more details. Please be more carefull next time",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = reportedUserExist.Id,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(userNoti);
+
                 if (reportedUserExist.BehaviourScore <= 0) reportedUserExist.Status = ConstantEnum.Statuses.CLOSED;
                 await _unitOfWork._userRepo.UpdateAsync(reportedUserExist);
 

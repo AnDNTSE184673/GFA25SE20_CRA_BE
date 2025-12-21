@@ -51,6 +51,15 @@ namespace Repository.Repositories
                 .ToListAsync();
         }
 
+        public async Task<GPS> GetGPSByUserAndDevice(Guid userId, string deviceId)
+        {
+            return await _context.GPS
+                .Include(gps => gps.User)
+                .Where(gps => gps.UserId == userId && gps.DeviceId == deviceId)
+                .OrderByDescending(gps => gps.Timestamp)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<List<GPS>> GetGPSDataByDeviceIdAsync(string deviceId)
         {
             return await _context.GPS.Include(gps => gps.User)

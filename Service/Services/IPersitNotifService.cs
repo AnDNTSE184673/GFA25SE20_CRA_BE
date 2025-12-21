@@ -15,6 +15,7 @@ namespace Service.Services
         Task<PersitNotifyReturn?> GetNotifById(Guid notify);
         Task<PersitNotifyReturn?> CreateNotif(NotifiCreateRequest input);
         Task<PersitNotifyReturn?> UpdateNotif(NotiUpdateRequest input);
+        Task<PersitNotifyReturn?> MarkAsRead(Guid id);
         Task<int> DeleteNotif(Guid id);
         Task<int> DeleteNotifsByUserId(Guid userId);
     }

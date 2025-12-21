@@ -12,6 +12,7 @@ namespace Repository.Repositories.Interfaces
     {
         Task<List<GPS>> GetGPSDataByUserIdAsync(Guid userId);
         Task<List<GPS>> GetGPSDataByDeviceIdAsync(string deviceId);
+        Task<GPS> GetGPSByUserAndDevice(Guid userId, string deviceId);
         Task<List<GPS>> GetAllGPSDataAsync();
         Task<int> DeleteAllGPSDataByUserIdAsync(Guid userId);
         Task<List<GPS>> DeleteAndLeftLastTwoByUser(Guid userId);

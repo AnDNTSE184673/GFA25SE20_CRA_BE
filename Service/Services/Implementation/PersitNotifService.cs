@@ -123,6 +123,33 @@ namespace Service.Services.Implementation
             return _mapper.Map<List<PersitNotifyReturn>>(notifs);
         }
 
+        public async Task<PersitNotifyReturn?> MarkAsRead(Guid id)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var notifToUpdateTask = await _unitOfWork._notifyRepository.GetNotifyByIdAsync(id);
+                if (notifToUpdateTask == null)
+                {
+                    return null;
+                }
+                notifToUpdateTask.IsViewed = true;
+                var updatedNotif = await _unitOfWork._notifyRepository.UpdateNotify(notifToUpdateTask);
+                if (updatedNotif == null)
+                {
+                    return null;
+                }
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                return _mapper.Map<PersitNotifyReturn>(updatedNotif);
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw;
+            }
+        }
+
         public async Task<PersitNotifyReturn?> UpdateNotif(NotiUpdateRequest input)
         {
             try

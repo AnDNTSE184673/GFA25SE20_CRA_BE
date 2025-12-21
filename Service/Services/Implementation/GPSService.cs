@@ -114,5 +114,27 @@ namespace Service.Services.Implementation
             if (gpsData == null || !gpsData.Any()) return new List<GPSView>();
             return _mapper.Map<List<GPSView>>(gpsData);
         }
+
+        public async Task<GPSView> UpdateGPS(GPSUpdate request)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var exitingGps = await _unitOfWork._gpsRepo.GetGPSByUserAndDevice(request.UserId, request.DeviceId);
+                if (exitingGps == null) throw new KeyNotFoundException("GPS record not found for the given UserId and DeviceId");
+                exitingGps.Longitude = request.Longitude;
+                exitingGps.Latitude = request.Latitude;
+                exitingGps.Timestamp = DateTime.UtcNow;
+                await _unitOfWork._gpsRepo.UpdateAsync(exitingGps);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                return _mapper.Map<GPSView>(exitingGps);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
