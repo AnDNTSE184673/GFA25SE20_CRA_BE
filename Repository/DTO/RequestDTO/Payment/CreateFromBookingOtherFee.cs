@@ -10,6 +10,12 @@ namespace Repository.DTO.RequestDTO.Payment
     {
         public Guid BookingId { get; set; }
         public string Description { get; set; }
-        public decimal Amount { get; set; }
+
+        private decimal amount;
+        public decimal Amount
+        {
+            get { return amount; }
+            set { amount = value / 10; }
+        }
     }
 }
