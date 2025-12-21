@@ -67,18 +67,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         /// <summary>
-        /// Get All GPS Telementries for a Car
-        /// </summary>
-        [HttpGet("/ByCar/{carId}")]
-        public async Task<IActionResult> GetForCar(Guid carId)
-        {
-            if (carId  == Guid.Empty) return BadRequest();
-            var result = await _gpsService.GetByCarIdAsync(carId);
-            if (result == null) return BadRequest();
-            return Ok(result);
-        }
-
-        /// <summary>
         /// Get All GPS Telementries for a User
         /// </summary>
         [HttpGet("/ByUser/{userId}")]
@@ -103,17 +91,28 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         /// <summary>
-        /// Delete all GPS telemetries from a car.
+        /// Delete all GPS telemetries for a user.
         /// </summary>
-        [HttpDelete("/Car/{carId}")]
-        public async Task<IActionResult> DeleteAllGFromCar(Guid carId)
+        [HttpDelete("/User/{userId}")]
+        public async Task<IActionResult> DeleteAllGForUser(Guid userId)
         {
-            if (carId == Guid.Empty) return BadRequest();
-            var result = await _gpsService.DeleteGPSOfCar(carId);
+            if (userId == Guid.Empty) return BadRequest();
+            var result = await _gpsService.DeleteGPSOfUser(userId);
             if (result == 0) return BadRequest();
             return Ok(result);
         }
 
+        /// <summary>
+        /// Delete all but not the lastest two for a user.
+        /// </summary>
+        [HttpDelete("/User/LastestTwo/{userId}")]
+        public async Task<IActionResult> DeleteAndLeftTwo(Guid userId)
+        {
+            if (userId == Guid.Empty) return BadRequest();
+            var result = await _gpsService.DeleteAndLeftLastTwoByUser(userId);
+            if (result == null || result.Count <= 0) return BadRequest();
+            return Ok(result);
+        }
 
         /// <summary>
         /// Get last known telemetry for a car.

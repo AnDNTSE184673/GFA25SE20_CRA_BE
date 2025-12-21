@@ -14,11 +14,9 @@ namespace Repository.DTO.ResponseDTO.GPS
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public int? Speed { get; set; }
-        public Guid CarId { get; set; }
         public Guid UserId { get; set; }
         public string DeviceId { get; set; }
         public DateTime Timestamp { get; set; }
-        public virtual CarView Car { get; set; }
         public virtual UserView User { get; set; }
     }
 }

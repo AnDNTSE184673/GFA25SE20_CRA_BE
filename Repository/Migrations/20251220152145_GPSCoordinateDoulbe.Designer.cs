@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    partial class CRA_DbContextModelSnapshot : ModelSnapshot
+    [Migration("20251220152145_GPSCoordinateDoulbe")]
+    partial class GPSCoordinateDoulbe
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1009,6 +1012,9 @@ namespace Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -1020,15 +1026,6 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("ReportedCarId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ReportedUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ReporterId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -1037,13 +1034,14 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ReportedCarId");
+                    b.HasIndex("CarId");
 
-                    b.HasIndex("ReportedUserId");
-
-                    b.HasIndex("ReporterId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Reports");
                 });
@@ -1241,9 +1239,6 @@ namespace Repository.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("text");
-
-                    b.Property<int>("BehaviourScore")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
@@ -1637,21 +1632,17 @@ namespace Repository.Migrations
                 {
                     b.HasOne("Repository.Data.Entities.Car", "Car")
                         .WithMany()
-                        .HasForeignKey("ReportedCarId");
-
-                    b.HasOne("Repository.Data.Entities.User", "Reported")
-                        .WithMany()
-                        .HasForeignKey("ReportedUserId");
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Repository.Data.Entities.User", "Reporter")
                         .WithMany()
-                        .HasForeignKey("ReporterId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Car");
-
-                    b.Navigation("Reported");
 
                     b.Navigation("Reporter");
                 });
