@@ -212,8 +212,8 @@ namespace Service.Services.Implementation
 
                 var result = await _unitOfWork._reportRepo.CreateReport(mapped);
 
-                reportedUserExist.BehaviourScore = reportedUserExist.BehaviourScore - 34; //3 strikes and you're out type shi
-                //first report is 66, second report is 32, third report is -2 which will hit this condition
+                reportedUserExist.BehaviourScore = reportedUserExist.BehaviourScore - form.deductedPoints; 
+                //first report is 66, second report is 32, third report is -2 which will hit this condition (old)
                 if (reportedUserExist.BehaviourScore <= 0) reportedUserExist.Status = ConstantEnum.Statuses.CLOSED;
                 await _unitOfWork._userRepo.UpdateAsync(reportedUserExist);
 
