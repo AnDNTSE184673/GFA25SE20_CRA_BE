@@ -22,6 +22,8 @@ namespace Repository.DTO.ResponseDTO.User
         public bool IsVerified { get; set; }
         public double Rating { get; set; }
 
+        public int BehaviourScore { get; set; }
+
         public string Status { get; set; }
 
         public int RoleId { get; set; }
