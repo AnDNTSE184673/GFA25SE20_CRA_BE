@@ -47,13 +47,14 @@ namespace Repository.Repositories
 
         public async Task<List<PersistNotif>?> GetAllNotifiesAsync()
         {
-            return await _context.PersistNotifs.Include(n => n.User).ToListAsync();
+            return await _context.PersistNotifs.Include(n => n.User).OrderByDescending(n => n.CreateDate).ToListAsync();
         }
 
         public async Task<List<PersistNotif>?> GetNotifiesByUserIdAsync(Guid userId)
         {
             var notifies = await  _context.PersistNotifs
                 .Include(n => n.User)
+                .OrderByDescending(n => n.CreateDate)
                 .Where(n => n.UserId == userId).ToListAsync();
             return notifies;
         }

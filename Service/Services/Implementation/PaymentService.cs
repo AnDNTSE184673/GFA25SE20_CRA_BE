@@ -58,7 +58,15 @@ namespace Service.Services.Implementation
                 paymentHis.Signature = paymentRequest.Signature;
                 paymentHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
-
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {paymentHis.OrderCode} has been created. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = paymentHis.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -104,6 +112,15 @@ namespace Service.Services.Implementation
                 bookingPayHis.Signature = paymentRequest.Signature;
                 bookingPayHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(bookingPayHis);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {bookingPayHis.OrderCode} for Booking {booking.BookingNumber} has been created. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = booking.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -410,6 +427,15 @@ namespace Service.Services.Implementation
                 rentalPayHis.Signature = paymentRequest.Signature;
                 rentalPayHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(rentalPayHis);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {rentalPayHis.OrderCode} for Booking {booking.BookingNumber} has been created. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = booking.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -483,6 +509,15 @@ namespace Service.Services.Implementation
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {rentalPay.OrderCode} for Rental Fee has been updated to {status} for booking {bookingTask.BookingNumber}.",
+                    IsViewed = false,
+                    UserId = bookingTask.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(rentalPay.Id);
                 if (updatedPayment == null) return null;
@@ -527,6 +562,15 @@ namespace Service.Services.Implementation
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {rentalPay.OrderCode} for Booking {bookingTask.BookingNumber} has been updated to {status} for booking fee.",
+                    IsViewed = false,
+                    UserId = bookingTask.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(rentalPay.Id);
                 if (updatedPayment == null) return null;
@@ -574,6 +618,15 @@ namespace Service.Services.Implementation
                         await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                     }
                 }
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment for Fine Fee has been updated to {status} for booking {bookingTask.BookingNumber}.",
+                    IsViewed = false,
+                    UserId = bookingTask.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(bookingTask.InvoiceId);
                 if (updatedPayments == null) return null;
@@ -635,6 +688,15 @@ namespace Service.Services.Implementation
                 addPayment.Signature = paymentRequest.Signature;
                 addPayment.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(addPayment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"A new additional payment with Order Code {addPayment.OrderCode} has been created for booking {booking.BookingNumber}. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = addPayment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -680,6 +742,15 @@ namespace Service.Services.Implementation
                     PaymentMethod = "N/A",
                     Note = "Payment for extension booking fee",
                 };
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"A new payment with Order Code {newPayment.OrderCode} has been created for booking {booking.BookingNumber} for extension. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = newPayment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork._paymentRepo.CreateAsync(newPayment);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -756,6 +827,15 @@ namespace Service.Services.Implementation
                     payment.UpdateDate = DateTime.UtcNow;
                 }
                 await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your payment with Order Code {payment.OrderCode} has been updated to {payment.Status}.",
+                    IsViewed = false,
+                    UserId = payment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var paymentView = _mapper.Map<PaymentHistoryView>(payment);
@@ -830,6 +910,15 @@ namespace Service.Services.Implementation
                     payment.UpdateDate = DateTime.UtcNow;
                 }
                 await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your payment with Order Code {payment.OrderCode} has been updated to {payment.Status}.",
+                    IsViewed = false,
+                    UserId = payment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var paymentView = _mapper.Map<PaymentHistoryView>(payment);
