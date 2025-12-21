@@ -15,8 +15,11 @@ namespace Service.Services
     {
         Task<List<ReportView>> GetCarReports(Guid carId);
         Task<List<ReportView>> GetReportsByUser(Guid userId);
+        Task<List<ReportView>> GetReportsByReportedUser(Guid reportUserId);
         Task<List<ReportView>> GetAllReports();
-        Task<(string status, ReportView view)> CreateCarReport(ReportForm form);
+        Task<ReportView> ApproveCarReport(ApproveReportForm form);
+        Task<(string status, ReportView view)> CreateCarReport(CarReportForm form);
+        Task<(string status, ReportView view)> CreateUserReport(UserReportForm form);
         Task<ReportView> EditCarReport(Guid id, EditReportForm form);
         Task<string> DeleteCarReport(Guid id);
     }

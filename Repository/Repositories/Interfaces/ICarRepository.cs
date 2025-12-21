@@ -16,5 +16,6 @@ namespace Repository.Repositories.Interfaces
         Task<string> DeleteCarAsync(Guid id);
         Task<List<Car?>> GetAllCars();
         Task<List<Car>> GetAllActiveCars();
+        Task<Car> GetCarByLicensePlate(string licensePlate);
     }
 }

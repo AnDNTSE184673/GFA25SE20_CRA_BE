@@ -13,7 +13,9 @@ namespace Repository.Repositories.Interfaces
         Task<(string status, Report? report)> CreateReport(Report report);
         Task<string> RemoveReport(Guid id);
         Task<Report> UpdateReport(Report report);
+        Task<Report> GetReportByReportNo(string reportNo);
         Task<List<Report>> GetReportsByUser(Guid userId);
+        Task<List<Report>> GetReportsByReportedUser(Guid reportUserId);
         Task<List<Report>> GetReportsByCar(Guid carId);
         Task<List<Report>> GetAllReports();
     }

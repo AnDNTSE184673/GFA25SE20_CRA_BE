@@ -14,6 +14,7 @@ using Repository.Extension.SupabaseFileUploader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -279,6 +280,42 @@ namespace Service.Services.Implementation
         public async Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId)
         {
             return await _unitOfWork._lookupRepo.GetCarDetailsModelByManufacturer(manufacturerId);
+        }
+
+        public async Task<CarView> ChangeCarStatusAsync(CarStatusChange form)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+                Car carExist = new Car();
+
+                if (!form.LicensePlate.IsNullOrEmpty()) carExist = await _unitOfWork._carRepo.GetCarByLicensePlate(form.LicensePlate);
+                else if (!form.carId.HasValue) carExist = await _unitOfWork._carRepo.GetByIdAsync(form.carId.Value);
+                else throw new InvalidOperationException("Must fill in one field!");
+
+                if (carExist == null) throw new KeyNotFoundException("No car with the given number or Id found!");
+
+                if (form.isActive)
+                {
+                    //if(carExist.Status.Equals(ConstantEnum.Statuses.RESERVED))
+                    carExist.Status = ConstantEnum.Statuses.ACTIVE;
+                }
+                else
+                {
+                    carExist.Status = ConstantEnum.Statuses.INACTIVE;
+                }
+
+                await _unitOfWork._carRepo.UpdateCarAsync(carExist);
+                await _unitOfWork.CommitTransactionAsync();
+
+                return _mapper.Map<CarView>(carExist);
+
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
         }
 
         public Task<List<CarView>> SearchCarAsync(SearchCarForm searchParam)

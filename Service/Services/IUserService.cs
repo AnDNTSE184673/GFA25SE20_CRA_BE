@@ -29,5 +29,6 @@ namespace Service.Services
         Task<User?> GetUserById(Guid userId);
         Task<User?> GetUserWithToken(Guid userId);
         Task<UserView> UpdateUserAvatarAsync(IFormFile image, Guid userId);
+        Task<UserView> ResetUserReputation(Guid userId);
     }
 }

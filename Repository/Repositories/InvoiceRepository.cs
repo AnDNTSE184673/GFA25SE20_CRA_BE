@@ -54,7 +54,7 @@ namespace Repository.Repositories
                 .Include(u => u.Owner).FirstOrDefaultAsync();
             var carRate = await _context.CarRentalRates.Where(r => r.CarId == request.CarId)
                 .FirstOrDefaultAsync();
-            var rentalTotal = (carRate.DailyRate * request.RentTime)/100;
+            var rentalTotal = (carRate.DailyRate * request.RentTime)/10;
             if (user == null || carRate == null)
             {
                 rentalTotal = request.CarRate * request.RentTime;

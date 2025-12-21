@@ -26,6 +26,7 @@ using Repository.Extension.SupabaseFileUploader;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Repository.DTO.RequestDTO.User;
 using System.Net.NetworkInformation;
+using Repository.DTO.ResponseDTO.Report;
 
 namespace Service.Services.Implementation
 {
@@ -97,6 +98,8 @@ namespace Service.Services.Implementation
                 regUser.GoogleId = googleId;
 
                 var regData = _mapper.Map<User>(regUser);
+
+                regData.BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint");
 
                 var response = await _unitOfWork._userRepo.RegisterByGoogle(regData);
 
@@ -198,6 +201,7 @@ namespace Service.Services.Implementation
                     IsVerified = request.IsVerified,
                     Rating = request.Rating,
                     Status = request.Status,
+                    BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint"),
                     RoleId = (int)ConstantEnum.RoleID.CAROWNER
                 };
                 await _unitOfWork._userRepo.CreateAsync(newUser);
@@ -232,6 +236,7 @@ namespace Service.Services.Implementation
                 RoleId = (int)ConstantEnum.RoleID.CUSTOMER, //Customer role
                 IsGoogle = false,
                 IsVerified = false,
+                BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint"),
                 Status = ConstantEnum.Statuses.PENDING,
             };
             try
@@ -324,6 +329,40 @@ namespace Service.Services.Implementation
             {
                 _unitOfWork.RollbackTransaction();
                 throw new Exception("Update failed: " + ex.Message);
+            }
+        }
+
+        public async Task<UserView> ResetUserReputation(Guid userId)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+                var userExist = await _unitOfWork._userRepo.GetByIdAsync(userId);
+
+                if (userExist == null)
+                    throw new KeyNotFoundException("User not found!");
+
+                userExist.BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint");
+
+                await _unitOfWork._userRepo.UpdateAsync(userExist);
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                var result = await _unitOfWork._userRepo.GetByIdAsync(userId);
+                if (result != null)
+                {
+                    await _unitOfWork.CommitTransactionAsync();
+                    return _mapper.Map<UserView>(result);
+                }
+                else
+                {
+                    throw new Exception("Update failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
             }
         }
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Repository.Constant;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.RequestDTO.CarRegister;
@@ -56,6 +58,28 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
             var response = await _userService.UpdateUserInfo(request);
             return Ok(response);
+        }
+
+        [HttpPatch("reset-user-reputation")]
+        public async Task<IActionResult> ResetUserReputation(Guid userId)
+        {
+            try 
+            {
+                var response = await _userService.ResetUserReputation(userId);
+                return response == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Error updating, check log and form"
+                    })
+                    : Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = ex.Message
+                });
+            }  
         }
 
         [HttpPost("reset-password")]

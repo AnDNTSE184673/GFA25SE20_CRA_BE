@@ -65,7 +65,8 @@ namespace Repository.Extension.AutoMapper
             CreateMap<EditFeedbackForm, Feedback>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<ReportForm, Report>();
+            CreateMap<CarReportForm, Report>();
+            CreateMap<UserReportForm, Report>();
             CreateMap<Report, ReportView>();
             CreateMap<EditReportForm, Report>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));

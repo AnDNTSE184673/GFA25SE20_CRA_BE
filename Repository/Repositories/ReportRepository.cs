@@ -75,19 +75,39 @@ namespace Repository.Repositories
         public async Task<List<Report>> GetReportsByCar(Guid carId)
         {
             return await _dbContext.Reports
-                .Where(x => x.CarId.Equals(carId))
+                .Where(x => x.ReportedCarId.Equals(carId))
                 .Include(x => x.Reporter)
                 .Include(x => x.Car)
+                .ToListAsync();
+        }
+
+        public async Task<List<Report>> GetReportsByReportedUser(Guid reportUserId)
+        {
+            return await _dbContext.Reports
+                .Where(x => x.ReportedUserId.Equals(reportUserId))
+                .Include(x => x.Reporter)
+                .Include(x => x.Reported)
                 .ToListAsync();
         }
 
         public async Task<List<Report>> GetReportsByUser(Guid userId)
         {
             return await _dbContext.Reports
-                .Where(x => x.UserId.Equals(userId))
+                .Where(x => x.ReporterId.Equals(userId))
                 .Include(x => x.Reporter)
                 .Include(x => x.Car)
+                .Include(x => x.Reported)
                 .ToListAsync();
+        }
+
+        public async Task<Report> GetReportByReportNo(string reportNo)
+        {
+            return await _dbContext.Reports
+                .Where(x => x.ReportNo.Equals(reportNo.Trim()))
+                .Include(x => x.Reporter)
+                .Include(x => x.Car)
+                .Include(x => x.Reported)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<Report>> GetAllReports()
