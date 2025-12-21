@@ -975,5 +975,133 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<PaymentHistoryView?> UpdateBookingPaymentWithoutBookingConfirmed(PaymentUpdateWithOrderCode request)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var payment = await _unitOfWork._paymentRepo.GetPaymentByOrderCode(request.OrderCode);
+                if (payment == null)
+                {
+                    throw new InvalidOperationException($"Payment with Id {request.OrderCode} not found");
+                }
+
+                var incoming = request.Status?.Trim();
+                if (string.IsNullOrEmpty(incoming))
+                {
+                    throw new InvalidOperationException($"Invalid status value: {request.Status}");
+                }
+
+                // Define which statuses this method accepts (canonical constants)
+                var allowedStatuses = new[]
+                {
+                    ConstantEnum.Statuses.PAID,
+                    ConstantEnum.Statuses.CANCELLED
+                };
+
+                var matched = allowedStatuses
+                    .FirstOrDefault(s => s.Equals(incoming, StringComparison.OrdinalIgnoreCase));
+
+                if (matched == null)
+                {
+                    throw new InvalidOperationException($"Invalid status value: {request.Status}");
+                }
+
+                // Use canonical constant instead of arbitrary casing
+                payment.Status = matched;
+
+                if (payment.Item.Equals("Rental Fee", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.COMPLETED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                else if (payment.Item.Equals("Booking Fee", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.PENDING;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                else
+                {
+                    // For other payment items like "Fine Fee" or "Additional Payment"
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your payment with Order Code {payment.OrderCode} has been updated to {payment.Status}.",
+                    IsViewed = false,
+                    UserId = payment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var paymentView = _mapper.Map<PaymentHistoryView>(payment);
+                return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

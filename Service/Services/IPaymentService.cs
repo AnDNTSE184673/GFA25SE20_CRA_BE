@@ -35,5 +35,6 @@ namespace Service.Services
         Task<PaymentHistoryView?> CreateNewPayFromBooking(Guid BookingId, string Desc, decimal Amount);
         Task<PaymentHistoryView?> UpdatePayment(UpdatePaymentRequest request);
         Task<PaymentHistoryView?> UpdatePaymentWithOrderCode(PaymentUpdateWithOrderCode request);
+        Task<PaymentHistoryView?> UpdateBookingPaymentWithoutBookingConfirmed(PaymentUpdateWithOrderCode request);
     }
 }
