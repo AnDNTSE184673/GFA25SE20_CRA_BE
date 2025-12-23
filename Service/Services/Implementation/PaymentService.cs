@@ -58,7 +58,15 @@ namespace Service.Services.Implementation
                 paymentHis.Signature = paymentRequest.Signature;
                 paymentHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(paymentHis);
-
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {paymentHis.OrderCode} has been created. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = paymentHis.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -104,6 +112,15 @@ namespace Service.Services.Implementation
                 bookingPayHis.Signature = paymentRequest.Signature;
                 bookingPayHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(bookingPayHis);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {bookingPayHis.OrderCode} for Booking {booking.BookingNumber} has been created. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = booking.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -410,6 +427,15 @@ namespace Service.Services.Implementation
                 rentalPayHis.Signature = paymentRequest.Signature;
                 rentalPayHis.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(rentalPayHis);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {rentalPayHis.OrderCode} for Booking {booking.BookingNumber} has been created. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = booking.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -483,6 +509,15 @@ namespace Service.Services.Implementation
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {rentalPay.OrderCode} for Rental Fee has been updated to {status} for booking {bookingTask.BookingNumber}.",
+                    IsViewed = false,
+                    UserId = bookingTask.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(rentalPay.Id);
                 if (updatedPayment == null) return null;
@@ -527,6 +562,15 @@ namespace Service.Services.Implementation
                     await _unitOfWork._bookingRepo.UpdateAsync(bookingTask);
                     await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                 }
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment {rentalPay.OrderCode} for Booking {bookingTask.BookingNumber} has been updated to {status} for booking fee.",
+                    IsViewed = false,
+                    UserId = bookingTask.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayment = await _unitOfWork._paymentRepo.GetByIdAsync(rentalPay.Id);
                 if (updatedPayment == null) return null;
@@ -574,6 +618,15 @@ namespace Service.Services.Implementation
                         await _unitOfWork._paymentRepo.UpdateAsync(rentalPay);
                     }
                 }
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Payment for Fine Fee has been updated to {status} for booking {bookingTask.BookingNumber}.",
+                    IsViewed = false,
+                    UserId = bookingTask.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 var updatedPayments = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(bookingTask.InvoiceId);
                 if (updatedPayments == null) return null;
@@ -635,6 +688,15 @@ namespace Service.Services.Implementation
                 addPayment.Signature = paymentRequest.Signature;
                 addPayment.PaymentMethod = "PayOS";
                 await _unitOfWork._paymentRepo.UpdateAsync(addPayment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"A new additional payment with Order Code {addPayment.OrderCode} has been created for booking {booking.BookingNumber}. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = addPayment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 CreatePaymentLinkResponse response = await payOS.PaymentRequests.CreateAsync(paymentRequest);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -680,6 +742,15 @@ namespace Service.Services.Implementation
                     PaymentMethod = "N/A",
                     Note = "Payment for extension booking fee",
                 };
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"A new payment with Order Code {newPayment.OrderCode} has been created for booking {booking.BookingNumber} for extension. Please proceed to payment.",
+                    IsViewed = false,
+                    UserId = newPayment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork._paymentRepo.CreateAsync(newPayment);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
@@ -756,6 +827,15 @@ namespace Service.Services.Implementation
                     payment.UpdateDate = DateTime.UtcNow;
                 }
                 await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your payment with Order Code {payment.OrderCode} has been updated to {payment.Status}.",
+                    IsViewed = false,
+                    UserId = payment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var paymentView = _mapper.Map<PaymentHistoryView>(payment);
@@ -803,33 +883,215 @@ namespace Service.Services.Implementation
                 // Use canonical constant instead of arbitrary casing
                 payment.Status = matched;
 
-                if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                if (payment.Item.Equals("Rental Fee", StringComparison.OrdinalIgnoreCase))
                 {
-                    var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
-                    var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
-                    if (bknd != null)
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
                     {
-                        bknd.UpdateDate = DateTime.UtcNow;
-                        bknd.Status = ConstantEnum.Statuses.COMPLETED;
-                        await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.COMPLETED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
                     }
-                    payment.UpdateDate = DateTime.UtcNow;
-                    payment.PaymentMethod = request.Method;
-                }
 
-                if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
-                {
-                    var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
-                    var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
-                    if (bknd != null)
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
                     {
-                        bknd.UpdateDate = DateTime.UtcNow;
-                        bknd.Status = ConstantEnum.Statuses.CANCELLED;
-                        await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
                     }
-                    payment.UpdateDate = DateTime.UtcNow;
+                }
+                else if (payment.Item.Equals("Booking Fee", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CONFIRMED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                else
+                {
+                                       // For other payment items like "Fine Fee" or "Additional Payment"
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
                 }
                 await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your payment with Order Code {payment.OrderCode} has been updated to {payment.Status}.",
+                    IsViewed = false,
+                    UserId = payment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
+                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.CommitTransaction();
+                var paymentView = _mapper.Map<PaymentHistoryView>(payment);
+                return paymentView;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<PaymentHistoryView?> UpdateBookingPaymentWithoutBookingConfirmed(PaymentUpdateWithOrderCode request)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var payment = await _unitOfWork._paymentRepo.GetPaymentByOrderCode(request.OrderCode);
+                if (payment == null)
+                {
+                    throw new InvalidOperationException($"Payment with Id {request.OrderCode} not found");
+                }
+
+                var incoming = request.Status?.Trim();
+                if (string.IsNullOrEmpty(incoming))
+                {
+                    throw new InvalidOperationException($"Invalid status value: {request.Status}");
+                }
+
+                // Define which statuses this method accepts (canonical constants)
+                var allowedStatuses = new[]
+                {
+                    ConstantEnum.Statuses.PAID,
+                    ConstantEnum.Statuses.CANCELLED
+                };
+
+                var matched = allowedStatuses
+                    .FirstOrDefault(s => s.Equals(incoming, StringComparison.OrdinalIgnoreCase));
+
+                if (matched == null)
+                {
+                    throw new InvalidOperationException($"Invalid status value: {request.Status}");
+                }
+
+                // Use canonical constant instead of arbitrary casing
+                payment.Status = matched;
+
+                if (payment.Item.Equals("Rental Fee", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.COMPLETED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                else if (payment.Item.Equals("Booking Fee", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.PENDING;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCustomer(payment.UserId);
+                        var bknd = bookings.FirstOrDefault(x => x.InvoiceId == payment.InvoiceId);
+                        if (bknd != null)
+                        {
+                            bknd.UpdateDate = DateTime.UtcNow;
+                            bknd.Status = ConstantEnum.Statuses.CANCELLED;
+                            await _unitOfWork._bookingRepo.UpdateAsync(bknd);
+                        }
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                else
+                {
+                    // For other payment items like "Fine Fee" or "Additional Payment"
+                    if (ConstantEnum.Statuses.PAID.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        payment.UpdateDate = DateTime.UtcNow;
+                        payment.PaymentMethod = request.Method;
+                    }
+                    if (ConstantEnum.Statuses.CANCELLED.Equals(matched, StringComparison.OrdinalIgnoreCase))
+                    {
+                        payment.UpdateDate = DateTime.UtcNow;
+                    }
+                }
+                await _unitOfWork._paymentRepo.UpdateAsync(payment);
+                var payNotify = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your payment with Order Code {payment.OrderCode} has been updated to {payment.Status}.",
+                    IsViewed = false,
+                    UserId = payment.UserId,
+                    CreateDate = DateTime.UtcNow,
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(payNotify);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var paymentView = _mapper.Map<PaymentHistoryView>(payment);

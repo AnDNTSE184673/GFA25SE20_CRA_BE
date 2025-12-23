@@ -180,5 +180,17 @@ namespace CRA_Self_drive_Rental.API.Controllers
             }
             return NotFound("No payments found to update for the specified booking ID.");
         }
+
+        [HttpPatch("/UpdatePayment/Booking/WithoutBookingConfirmed")]
+        public async Task<IActionResult> UpdateBookingPaymentWithoutBookingConfirmed([FromBody] PaymentUpdateWithOrderCode request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var payments = await _paymentService.UpdateBookingPaymentWithoutBookingConfirmed(request);
+            if (payments != null)
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found to update for the specified booking ID.");
+        }
     }
 }

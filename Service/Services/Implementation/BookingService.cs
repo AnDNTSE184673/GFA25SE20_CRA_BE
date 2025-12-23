@@ -112,7 +112,16 @@ namespace Service.Services.Implementation
                     _unitOfWork.SaveChanges();
                 }
                 booking.Status = status;
-                _unitOfWork._bookingRepo.Update(booking);                
+                _unitOfWork._bookingRepo.Update(booking);   
+                var bookingNoti = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your booking {booking.BookingNumber} status has been updated to {status}.",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = booking.UserId
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(bookingNoti);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
@@ -158,6 +167,15 @@ namespace Service.Services.Implementation
                         DistanceInM = distance
                     };
                 var invoice = await _unitOfWork._invoiceRepo.CreateInvoice(newInvoice);
+                var InvoiceNoti = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"New invoice {invoice.InvoiceNo} has been created for your booking.",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = request.CustomerId
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(InvoiceNoti);
                 var newBooking = new Booking
                 {
                     Id = Guid.NewGuid(),
@@ -176,7 +194,15 @@ namespace Service.Services.Implementation
                 await _unitOfWork._bookingRepo.CreateAsync(newBooking);
                 await _unitOfWork._paymentRepo.CreateNewPaymentForBookingFee(newBooking.InvoiceId);
                 await _unitOfWork._paymentRepo.CreateNewPaymentForRentalFee(newBooking.InvoiceId);
-
+                var bookingNoti = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your booking {newBooking.BookingNumber} has been created successfully.",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = request.CustomerId
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(bookingNoti);
                 var bookingSchedule = new CreateScheduleForm
                 {
                     Title = ConstantEnum.ScheduleDefaultTitle.PICKUP,
@@ -274,7 +300,16 @@ namespace Service.Services.Implementation
                     Note = "Auto-generated for booking extension"
                 };
                 await _unitOfWork._invoiceRepo.UpdateAsync(invoice);
-                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);       
+                await _unitOfWork._invoiceRepo.AddNewInvoiceItem(booking.InvoiceId, newInvoiceItem);    
+                var bookingNoti = new PersistNotif
+                {
+                    Id = Guid.NewGuid(),
+                    Content = $"Your booking {booking.BookingNumber} has been extended by {request.TimeExtInDays} days.",
+                    IsViewed = false,
+                    CreateDate = DateTime.UtcNow,
+                    UserId = booking.UserId
+                };
+                await _unitOfWork._notifyRepository.CreateNotify(bookingNoti);
                 await _unitOfWork.SaveChangesAsync();
                 _unitOfWork.CommitTransaction();
                 var updatedBooking = await _unitOfWork._bookingRepo.GetByIdAsync(booking.Id);

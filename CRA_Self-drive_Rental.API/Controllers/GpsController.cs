@@ -138,5 +138,19 @@ namespace CRA_Self_drive_Rental.API.Controllers
             var all = _store.GetAll();
             return Ok(all);
         }
+
+        /// <summary>
+        /// Update GPS information based on Device ID and User ID.
+        /// </summary>
+        [HttpPut("/Update")]
+        public async Task<IActionResult> UpdateGPSInfo([FromBody] GPSUpdate update)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var result = await _gpsService.UpdateGPS(update);
+            if (result == null)
+                return NotFound(new { Message = "GPS record not found for the specified Device ID and User ID." });
+            return Ok(result);
+        }
     }
 }

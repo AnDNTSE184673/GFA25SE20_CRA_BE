@@ -50,6 +50,13 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return Ok(result);
         }
 
+        [HttpPatch("/MarkAsRead/{id}")]
+        public async Task<IActionResult> MarkAsRead(Guid id)
+        {
+            var result = await _persitNotifService.MarkAsRead(id);
+            return Ok(result);
+        }
+
         [HttpDelete("/DeleteNotif/{id}")]
         public async Task<IActionResult> DeleteNotif(Guid id)
         {
