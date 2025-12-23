@@ -39,15 +39,15 @@ namespace Service.Services.Implementation
             _upload = upload;
         }
 
-        public async Task<ScheduleView> StatusChangeAsync(Guid bookingId, bool isCompleted, bool isOverdue)
+        public async Task<ScheduleView> StatusChangeAsync(Guid scheduleId, bool isCompleted, bool isOverdue)
         {
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                var schedule = await _unitOfWork._scheduleRepo.GetByIdWithIncludeAsync(bookingId, "Id", x => x.User, x => x.Car, x => x.Booking);
+                var schedule = await _unitOfWork._scheduleRepo.GetByIdWithIncludeAsync(scheduleId, "Id", x => x.User, x => x.Car, x => x.Booking);
 
-                if (schedule == null) throw new KeyNotFoundException("Car not found");
+                if (schedule == null) throw new KeyNotFoundException("Schedule not found");
 
                 if (isCompleted)
                 {
@@ -76,17 +76,17 @@ namespace Service.Services.Implementation
                     }
                 }
 
-                var result1 = await _unitOfWork._scheduleRepo.CreateScheduleAsync(schedule); //update
+                var result1 = await _unitOfWork._scheduleRepo.UpdateScheduleAsync(schedule); //update
 
                 await _unitOfWork.CommitTransactionAsync();
 
-                if (result1.status.Equals(ConstantEnum.RepoStatus.FAILURE))
+                if (result1 == null)
                 {
-                    throw new Exception("Create function failed to create the object!");
+                    throw new Exception("Update failed!");
                 }
                 else
                 {
-                    var returnObj = _mapper.Map<ScheduleView>(result1.Schedules);
+                    var returnObj = _mapper.Map<ScheduleView>(result1);
                     return returnObj;
                 }
             }

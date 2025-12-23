@@ -150,11 +150,11 @@ namespace Service.Services.Implementation
         /// <summary>
         /// Exposes the SubmitOTPCodes function
         /// </summary>
-        public async Task<(OTPCode entry, string message)> OTPVerificationAsync(string OTPCode, string email)
+        public async Task<(OTPCode entry, string message)> OTPVerificationAsync(string OTPCode, Guid userId)
         {
             try
             {
-                var user = _unitOfWork._userRepo.GetByEmail(email);
+                var user = _unitOfWork._userRepo.GetById(userId);
                 if (user == null) throw new KeyNotFoundException("User not found!");
                 var result = await SubmitOTPCodes(user.Id, OTPCode);
                 var otpStatus = result.entry;
