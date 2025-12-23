@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Constant;
 using Repository.DTO.RequestDTO.Feedback;
 using Repository.Extension.SupabaseFileUploader;
@@ -41,6 +42,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateFeedback([FromForm] CreateFeedbackForm form)
         {
             try
@@ -84,6 +86,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateFeedback(Guid id, [FromForm] EditFeedbackForm form)
         {
             try
@@ -106,6 +109,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteFeedback(Guid id)
         {
             try

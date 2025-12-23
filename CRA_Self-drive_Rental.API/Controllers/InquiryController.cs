@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Constant;
 using Repository.DTO.RequestDTO.Inquiry;
 using Repository.Extension.SupabaseFileUploader;
@@ -20,6 +21,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize]
         public async Task<IActionResult> GetInquiryByUser(Guid userId)
         {
             try
@@ -42,6 +44,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("chatLog")]
+        [Authorize]
         public async Task<IActionResult> GetAllInquiryOfTwoSides(Guid senderId, Guid receiverId)
         {
             try
@@ -64,6 +67,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("initial")]
+        [Authorize]
         public async Task<IActionResult> StartInquiry([FromForm] CreateInquiryForm form)
         {
             try
@@ -110,6 +114,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("answer")]
+        [Authorize]
         public async Task<IActionResult> AnswerInquiry([FromForm] AnswerInquiryForm form)
         {
             try
@@ -156,6 +161,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateInquiry(Guid id, [FromForm] EditInquiryForm form)
         {
             try
@@ -178,6 +184,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteInquiry(Guid id)
         {
             try

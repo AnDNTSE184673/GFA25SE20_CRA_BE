@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Base;
 using Repository.Constant;
 using Repository.Data.Entities;
@@ -30,6 +31,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("regDoc/approve")]
+        [Authorize(Roles = "1002")]
         public async Task<IActionResult> ApproveDocument(DocumentSearchForm form, bool isApproved)
         {
             try
@@ -58,6 +60,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("regDoc/all")]
+        [Authorize(Roles = "1002")]
         public async Task<IActionResult> GetAllDocuments()
         {
             try
@@ -85,6 +88,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("registerCar/carInfo")]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> AddCarInfo([FromForm] CarInfoForm form)
         {
             try
@@ -107,6 +111,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("registerCar/carInfo/updateImage")]
+        [Authorize(Roles = "2,1002")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
         public async Task<IActionResult> UploadCarImage([FromForm] UploadCarImages form)
@@ -135,6 +140,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("registerCar/regDoc")]
+        [Authorize(Roles = "2,1002")]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
         public async Task<IActionResult> UploadRegistrationImage([FromForm] CarRegForm form)
@@ -164,6 +170,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
 
 
         [HttpGet("regDoc")]
+        [Authorize(Roles = "2,1002")]
         ///<summary>Also send a flag indicating whether to search using "path" or "id" or "info"</summary>
         public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, string flag)
         {
@@ -222,6 +229,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("activeStatus/change")]
+        [Authorize(Roles = "2,1002")]
         public async Task<IActionResult> ChangeCarStatus(CarStatusChange form)
         {
             try
@@ -351,6 +359,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("rentalRate")]
+        [Authorize(Roles = "2,1002")]
         public async Task<IActionResult> SetRentalRate(CreateCarRentalRateForm form)
         {
             try
@@ -377,6 +386,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("rentalRate")]
+        [Authorize(Roles = "2,1002")]
         public async Task<IActionResult> UpdateRentalRate(UpdateCarRentalRateForm form)
         {
             try
@@ -399,6 +409,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpDelete("rentalRate/{carId}")]
+        [Authorize(Roles = "2,1002")]
         public async Task<IActionResult> DeleteRentalRate(Guid carId)
         {
             try

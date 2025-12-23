@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repository.DTO.RequestDTO.Payment;
 using Service.Services;
@@ -16,6 +17,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/User/{userId}")]
+        [Authorize]
         public async Task<IActionResult> GetPaymentsByUserId(Guid userId)
         {
             var payments = await _paymentService.GetHistoryForUser(userId);
@@ -27,6 +29,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/Invoice/All")]
+        [Authorize]
         public async Task<IActionResult> GetAllInvoicePayments()
         {
             var payments = await _paymentService.GetAllPayment();
@@ -38,6 +41,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/PayOSPayment/{orderCode}")]
+        [Authorize]
         public async Task<IActionResult> GetPayOSPaymentDetails(long orderCode)
         {
             var paymentDetails = await _paymentService.GetPayOSPaymentResponse(orderCode);
@@ -49,6 +53,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/PayOS/AllPayments")]
+        [Authorize]
         public async Task<IActionResult> GetAllPayOSPayments()
         {
             var payments = await _paymentService.GetAllPaymentPayOS();
@@ -60,6 +65,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/Payment/{OrderCode}")]
+        [Authorize]
         public async Task<IActionResult> GetPaymentByOrderCode(long OrderCode)
         {
             var payment = await _paymentService.GetPaymentByOrderCode(OrderCode);
@@ -71,6 +77,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/Invoice/{invoiceId}")]
+        [Authorize]
         public async Task<IActionResult> GetPaymentsByInvoiceId(Guid invoiceId)
         {
             var payments = await _paymentService.GetPaymentsByInvoiceId(invoiceId);
@@ -82,6 +89,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/Booking/{bookingId}/Payments")]
+        [Authorize]
         public async Task<IActionResult> GetPaymentsByBookingId(Guid bookingId)
         {
             var payments = await _paymentService.GetPaymentsByBookingId(bookingId);
@@ -93,6 +101,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("/CreatePayOSPaymentRequest")]
+        [Authorize]
         public async Task<IActionResult> CreatePayOSPaymentRequest([FromBody] CreatePaymentRequest request)
         {
             var (orderCode, checkoutUrl) = await _paymentService.CreatePayOSPaymentRequest(request);
@@ -100,6 +109,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("/PayOS/Booking/CreateRentalPayment/")]
+        [Authorize]
         public async Task<IActionResult> CreatePayOSPaymentRequestForRentalAfterBooking([FromBody] CreatePaymentRentalPayOS request)
         {
             var (orderCode, checkoutUrl) = await _paymentService.CreatePayOSPaymentRequestForRentalAfterBooking(request.BookingId);
@@ -107,6 +117,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("CreatePaymentFromInvoice/{invoiceId}")]
+        [Authorize]
         public async Task<IActionResult> CreatePaymentFromInvoice(Guid invoiceId)
         {
             var payments = await _paymentService.CreatePaymentFromInvoice(invoiceId);
@@ -118,6 +129,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("/CreateAdditionalPayment")]
+        [Authorize]
         public async Task<IActionResult> CreateAdditionalPayment([FromBody] CreateFromBookingOtherFee request)
         {
             var payment = await _paymentService.CreateNewAddPayFromBoooking(request.BookingId, request.Description, request.Amount);
@@ -134,6 +146,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/RentalPayment")]
+        [Authorize(Roles = "1002,2")]
         public async Task<IActionResult> UpdateRentalPayWithBooking([FromBody] UpdatePayUsingBooking request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -146,6 +159,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/BookingPayment")]
+        [Authorize(Roles = "1002,2")]
         public async Task<IActionResult> UpdateBookingPayWithBooking([FromBody] UpdatePayUsingBooking request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -158,6 +172,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/Payment")]
+        [Authorize(Roles = "1002,2")]
         public async Task<IActionResult> UpdatePay([FromBody] UpdatePaymentRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -170,6 +185,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/PaymentOrderCode")]
+        [Authorize(Roles = "1002,2")]
         public async Task<IActionResult> UpdatePayWithOrderCode([FromBody] PaymentUpdateWithOrderCode request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -182,6 +198,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/WithoutBookingConfirmed")]
+        [Authorize(Roles = "1002,2")]
         public async Task<IActionResult> UpdateBookingPaymentWithoutBookingConfirmed([FromBody] PaymentUpdateWithOrderCode request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
