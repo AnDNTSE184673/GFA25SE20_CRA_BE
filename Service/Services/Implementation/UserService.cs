@@ -163,7 +163,7 @@ namespace Service.Services.Implementation
             try
             {
                 var user = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(x => x.PhoneNumber.Equals(phoneNumber.Trim()));
-                var result = await _otp.OTPVerificationAsync(OTPCode, user.Email);
+                var result = await _otp.OTPVerificationAsync(OTPCode, user.Id);
                 if (result.message.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
                     user.Status = ConstantEnum.Statuses.ACTIVE;
@@ -314,7 +314,7 @@ namespace Service.Services.Implementation
                 {
                     user.Password = request.Password;
                 }
-                user.PhoneNumber = request.PhoneNumber;
+                //user.PhoneNumber = request.PhoneNumber;
                 user.Address = request.Address;
                 user.ImageAvatar = request.ImageAvatar;
                 user.Status = request.Status;
@@ -337,6 +337,65 @@ namespace Service.Services.Implementation
             {
                 _unitOfWork.RollbackTransaction();
                 throw new Exception("Update failed: " + ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateUserPhoneNumber(UpdatePhoneNumberRequest request)
+        {
+            try
+            {
+                var userExist = await _unitOfWork._userRepo.GetByIdAsync(request.userId);
+                if (userExist == null)
+                {
+                    throw new KeyNotFoundException("User not found");
+                }
+                var phoneExist = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(
+                x => x.PhoneNumber.Equals(request.newPhoneNumber.Trim()) && x.Status.Equals(ConstantEnum.Statuses.ACTIVE));
+                if (phoneExist != null)
+                {
+                    throw new Exception("That phone number has already been registered!");
+                }
+
+                var otpCode = await _otp.SendOTPCodes(userExist.Id, request.newPhoneNumber.Trim());
+
+                var message = _sms.SMSMessage(_config["ServiceName"], otpCode);
+                _sms.SendSMSMessage(message, request.newPhoneNumber);
+
+                return "Check your phone for the verification code!";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ex.Message");
+            }
+        }
+
+        public async Task<string> AuthorizeUpdateUserPhoneNumberAsync(string phoneNumber, string OtpCode)
+        {
+            try
+            {
+                var existOtp = await _unitOfWork._OtpRepo.GetFirstWithIncludeAsync(
+                    x => x.AdditionalInfo.Equals(phoneNumber.Trim())
+                    && x.IsUsed == false
+                    , x => x.User);
+
+                var result = await _otp.OTPVerificationAsync(OtpCode, existOtp.UserId);
+
+                if (result.message.Equals(ConstantEnum.RepoStatus.SUCCESS))
+                {
+                    if (result.entry.AdditionalInfo.IsNullOrEmpty())
+                        throw new Exception("The database is missing the new phone number, please restart the sequence!");
+                    existOtp.User.PhoneNumber = result.entry.AdditionalInfo;
+                    await _unitOfWork.BeginTransactionAsync();
+                    await _unitOfWork._userRepo.UpdateAsync(existOtp.User);
+                    await _unitOfWork.CommitTransactionAsync();
+                    return ConstantEnum.RepoStatus.SUCCESS;
+                }
+                else return ConstantEnum.RepoStatus.FAILURE;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollbackTransaction();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -465,7 +524,7 @@ namespace Service.Services.Implementation
             try
             {
                 var user = _unitOfWork._userRepo.GetByEmail(email);
-                var result = await _otp.OTPVerificationAsync(OtpCode, email);
+                var result = await _otp.OTPVerificationAsync(OtpCode, user.Id);
                 if (result.message.Equals(ConstantEnum.RepoStatus.SUCCESS))
                 {
                     if (result.entry.AdditionalInfo.IsNullOrEmpty()) 

@@ -64,7 +64,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 // Implementation for user sign-up goes here
                 return Ok(new
                 {
-                    Message = "Check your email for a verification code!"
+                    Message = "Check your phone for a verification code!"
                 });
             }
             catch (Exception ex)

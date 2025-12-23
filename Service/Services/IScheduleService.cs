@@ -10,7 +10,7 @@ namespace Service.Services
 {
     public interface IScheduleService
     {
-        Task<ScheduleView> StatusChangeAsync(Guid bookingId, bool isCompleted, bool isOverdue);
+        Task<ScheduleView> StatusChangeAsync(Guid scheduleId, bool isCompleted, bool isOverdue);
         Task<(string status, ScheduleView view)> SetMaintenanceAsync(MaintenanceSchedule form);
         Task<List<ScheduleView>> GetAllSchedulesOfUserAsync(Guid userId);
         Task<List<ScheduleView>> GetAllSchedulesOfCarAsync(Guid carId);
