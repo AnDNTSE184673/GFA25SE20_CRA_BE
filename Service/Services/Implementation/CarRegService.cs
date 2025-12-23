@@ -82,7 +82,7 @@ namespace Service.Services.Implementation
                     else
                     {
                         r.Status = ConstantEnum.Statuses.DENIED;
-                        car.Status = ConstantEnum.Statuses.INACTIVE;
+                        car.Status = ConstantEnum.Statuses.DENIED;
                     }
 
                     var result = await _unitOfWork._carRegRepo.UpdateCarReg(r);
@@ -213,6 +213,9 @@ namespace Service.Services.Implementation
                 }
 
                 var result = await _unitOfWork.SaveChangesAsync();
+                if (car.Status.Equals(ConstantEnum.Statuses.DENIED)) car.Status = ConstantEnum.Statuses.PENDING;
+                await _unitOfWork._carRepo.UpdateAsync(car);
+
                 await _unitOfWork.CommitTransactionAsync();
 
                 var carRegView = new CarRegView

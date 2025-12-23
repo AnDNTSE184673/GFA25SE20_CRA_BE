@@ -191,11 +191,37 @@ namespace Service.Services.Implementation
             return (null, views);
         }
 
-        public async Task<DriverLicenseView> UpdateDriverLicenseAsync(Guid userId, IFormFile frontImage)
+        public async Task<List<DriverLicense>> OverwritePrevLicenseImagesAsync(Guid userId)
         {
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
+
+                await _upload.EnsureInitializedAsync();
+                var userLicense = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(userId);
+
+                foreach (var i in userLicense)
+                {
+                    i.Status = ConstantEnum.Statuses.INACTIVE;
+                }
+                await _unitOfWork.SaveChangesAsync();
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return userLicense;
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<DriverLicenseView> UpdateDriverLicenseAsync(Guid userId, IFormFile frontImage)
+        {
+            try
+            {
+                
                 var userExist = await _unitOfWork._userRepo.GetByIdAsync(userId);
 
                 if (userExist == null)
@@ -203,6 +229,9 @@ namespace Service.Services.Implementation
                     throw new InvalidOperationException("User doesn't exist!");
                 }
 
+                await OverwritePrevLicenseImagesAsync(userExist.Id);
+
+                await _unitOfWork.BeginTransactionAsync();
                 var uploadTasks = new List<Task<(string url, DriverLicense obj)>>();
 
                 await _upload.EnsureInitializedAsync();

@@ -58,7 +58,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
-            
+
         [HttpGet("regDoc/all")]
         [Authorize(Roles = "1002")]
         public async Task<IActionResult> GetAllDocuments()
@@ -243,6 +243,28 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     ? StatusCode(StatusCodes.Status404NotFound, new
                     {
                         Message = "Data not found, check log and form"
+                    })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPatch("{carId}")]
+        public async Task<IActionResult> UpdateCar(Guid carId, UpdateCarForm form)
+        {
+            try
+            {
+                var result = await _carServ.UpdateCarAsync(carId, form);
+                return result == null
+                    ? StatusCode(StatusCodes.Status400BadRequest, new
+                    {
+                        Message = "Data update error, check log and form"
                     })
                     : Ok(result);
             }

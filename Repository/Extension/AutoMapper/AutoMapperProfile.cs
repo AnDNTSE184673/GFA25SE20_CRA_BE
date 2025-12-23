@@ -85,6 +85,9 @@ namespace Repository.Extension.AutoMapper
             CreateMap<CarInfoForm, Car>();
             CreateMap<Car, CarView>()
                 .ForMember(d => d.RentalRate, opt => opt.MapFrom(src => src.RentalRate));
+            CreateMap<UpdateCarForm, Car>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null 
+                && !(srcMember is string s && string.IsNullOrWhiteSpace(s))));
 
             CreateMap<DriverLicense, DriverLicenseView>()
 .ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseNumber))
@@ -131,7 +134,7 @@ namespace Repository.Extension.AutoMapper
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Username, opt => opt.Condition(src => src.Username != null))
                 .ForMember(dest => dest.Password, opt => opt.Condition(src => src.Password != null))
-                .ForMember(dest => dest.PhoneNumber, opt => opt.Condition(src => src.PhoneNumber != null))
+                //.ForMember(dest => dest.PhoneNumber, opt => opt.Condition(src => src.PhoneNumber != null))
                 .ForMember(dest => dest.Fullname, opt => opt.Condition(src => src.Fullname != null))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.Condition(src => src.DateOfBirth != null))
                 .ForMember(dest => dest.Address, opt => opt.Condition(src => src.Address != null))

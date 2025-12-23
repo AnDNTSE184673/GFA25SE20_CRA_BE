@@ -30,7 +30,7 @@ namespace Repository.Repositories
             return await _dbContext.Cars
                 .Include(x => x.Owner)
                 .Include(x => x.PreferredLot)
-                .Include(x => x.Images)
+                .Include(x => x.Images.Where(i => i.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -40,7 +40,7 @@ namespace Repository.Repositories
             return await _dbContext.Cars
                 .Include(x => x.Owner)
                 .Include(x => x.PreferredLot)
-                .Include(x => x.Images)
+                .Include(x => x.Images.Where(i => i.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE))
                 .AsNoTracking()
                 .ToListAsync();
@@ -51,7 +51,7 @@ namespace Repository.Repositories
             return await _dbContext.Cars
                 .Include(x => x.Owner)
                 .Include(x => x.PreferredLot)
-                .Include(x => x.Images)
+                .Include(x => x.Images.Where(i => i.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE) 
                 && x.LicensePlate.Equals(licensePlate.Trim()))
                 .FirstOrDefaultAsync();

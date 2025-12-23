@@ -77,15 +77,47 @@ namespace Service.Services.Implementation
             await _upload.EnsureInitializedAsync();
             var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", 
                 x => x.Owner,
-                x => x.PreferredLot, 
-                x => x.Images,
-                x => x.RentalRate);
+                x => x.PreferredLot,
+                x => x.RentalRate,
+                x => x.Images.Where(img => img.Status.Equals(ConstantEnum.Statuses.ACTIVE)));
+            /*var images = car.Images
+                .GroupBy(img => img.FilePath.Split('_')[0]) //image1, image2
+                .Select(g => g.OrderByDescending(i => i.CreateDate).First())
+                .OrderBy(i => i.FilePath)
+                .ToList();*/
             var urls = await Task.WhenAll(car.Images.Select(
                     img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
                     ));
             var carView = _mapper.Map<CarView>(car);
             carView.ImageUrls.AddRange(urls);
             return carView;
+        }
+
+        public async Task<List<CarImage>> OverwritePrevCarImagesAsync(Guid carId)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                await _upload.EnsureInitializedAsync();
+                var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id",
+                    x => x.Images);
+
+                foreach(var i in car.Images)
+                {
+                    i.Status = ConstantEnum.Statuses.INACTIVE;
+                }
+                await _unitOfWork.SaveChangesAsync();
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return car.Images.ToList();
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<(string status, CarView car)> RegisterCarAsync(CarInfoForm form)
@@ -190,12 +222,14 @@ namespace Service.Services.Implementation
 
                 if (car == null) throw new KeyNotFoundException("Car not found!");
 
-                var existImage = await _unitOfWork._carImageRepo.GetAllAsync();
+                //var existImage = await _unitOfWork._carImageRepo.GetAllAsync();
+                await OverwritePrevCarImagesAsync(car.Id);
 
                 await _unitOfWork.BeginTransactionAsync();
 
                 var uploadTasks = new List<Task<(string url, CarImage obj)>>();
-                int count = existImage.Count();
+                //int count = existImage.Count();
+                int count = 1;
 
                 await _upload.EnsureInitializedAsync();
 
@@ -321,6 +355,28 @@ namespace Service.Services.Implementation
         public Task<List<CarView>> SearchCarAsync(SearchCarForm searchParam)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<CarView> UpdateCarAsync(Guid carId, UpdateCarForm form)
+        {
+            try
+            {
+                var carExist = await _unitOfWork._carRepo.GetByIdAsync(carId);
+                if (carExist == null) throw new KeyNotFoundException("No car with this Id found");
+
+                var updateObject = _mapper.Map(form, carExist);
+
+                await _unitOfWork.BeginTransactionAsync();
+                await _unitOfWork._carRepo.UpdateCarAsync(carExist);
+                await _unitOfWork.CommitTransactionAsync();
+
+                return _mapper.Map<CarView>(carExist);
+            }
+            catch(Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
