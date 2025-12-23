@@ -229,15 +229,15 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("statusChange/{scheduleId}")]
-        public async Task<IActionResult> StatusChange(Guid bookingId, bool isCompleted)
+        public async Task<IActionResult> StatusChange(Guid scheduleId, bool isCompleted)
         {
             try
             {
-                var result = await _scheduleServ.StatusChangeAsync(bookingId, isCompleted, false);
+                var result = await _scheduleServ.StatusChangeAsync(scheduleId, isCompleted, false);
                 return result == null
                     ? StatusCode(StatusCodes.Status400BadRequest, new
                     {
-                        Message = "Data creation error, check log and form"
+                        Message = "Data update error, check log and form"
                     })
                     : Ok(result);
             }

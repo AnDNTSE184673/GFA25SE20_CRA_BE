@@ -106,9 +106,41 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("reset-password/verify")]
-        public async Task<IActionResult> OTPVerification(string email, string OTPCode)
+        public async Task<IActionResult> OTPVerificationPassword(string email, string OTPCode)
         {
             var response = await _userService.AuthorizeUpdateUserPasswordAsync(email, OTPCode);
+            if (response == null) return BadRequest(new
+            {
+                Message = "Incorrect OTP code!"
+            });
+            return Ok(new
+            {
+                Message = response
+            });
+        }
+
+        [HttpPost("change-phoneNo")]
+        public async Task<IActionResult> ChangeUserPhoneNumber([FromBody] UpdatePhoneNumberRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid update phone number data",
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+            var response = await _userService.UpdateUserPhoneNumber(request);
+            return Ok(new
+            {
+                Message = response
+            });
+        }
+
+        [HttpPost("change-phoneNo/verify")]
+        public async Task<IActionResult> OTPVerificationPhone(string phone, string OTPCode)
+        {
+            var response = await _userService.AuthorizeUpdateUserPhoneNumberAsync(phone, OTPCode);
             if (response == null) return BadRequest(new
             {
                 Message = "Incorrect OTP code!"

@@ -12,7 +12,7 @@ namespace Service.Services
     {
         Task<string> SendOTPCodes(Guid userId, string? additionalInfo);
         Task<string> ResendOTPCodes(Guid userId, string? additionalInfo);
-        Task<(OTPCode entry, string message)> OTPVerificationAsync(string OTPCode, string email);
+        Task<(OTPCode entry, string message)> OTPVerificationAsync(string OTPCode, Guid userId);
         Task<(OTPCode entry, string message)> SubmitOTPCodes(Guid userId, string unhashedCode);
     }
 }

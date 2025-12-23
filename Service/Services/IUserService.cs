@@ -30,5 +30,7 @@ namespace Service.Services
         Task<User?> GetUserWithToken(Guid userId);
         Task<UserView> UpdateUserAvatarAsync(IFormFile image, Guid userId);
         Task<UserView> ResetUserReputation(Guid userId);
+        Task<string> UpdateUserPhoneNumber(UpdatePhoneNumberRequest request);
+        Task<string> AuthorizeUpdateUserPhoneNumberAsync(string phoneNumber, string OtpCode);
     }
 }
