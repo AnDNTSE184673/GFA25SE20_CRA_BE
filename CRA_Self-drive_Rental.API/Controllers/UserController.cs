@@ -29,7 +29,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetAllUsers")]
-        [Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await _userService.GetAllUsers();
@@ -37,7 +36,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetUserById")]
-        [Authorize]
         public async Task<IActionResult> GetUserById([FromQuery] Guid userId)
         {
             var response = await _userService.GetUserById(userId);
@@ -49,7 +47,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("UpdateUserInfo")]
-        [Authorize]
         public async Task<IActionResult> UpdateUserInfo([FromBody] UserUpdateRequest request)
         {
             if (!ModelState.IsValid)
@@ -65,7 +62,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("reset-user-reputation")]
-        [Authorize(Roles = "1001,1002")]
         public async Task<IActionResult> ResetUserReputation(Guid userId)
         {
             try 
@@ -152,7 +148,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("upload-avatar/{userId}")]
-        [Authorize]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
         public async Task<IActionResult> UploadUserAvatarImage([FromForm] UserAvatarImage form)

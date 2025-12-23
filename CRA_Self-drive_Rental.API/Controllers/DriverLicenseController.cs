@@ -108,7 +108,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("approve")]
-        [Authorize]
         public async Task<IActionResult> ApproveDocument(LicenseSearchForm form, bool isApproved)
         {
             try
