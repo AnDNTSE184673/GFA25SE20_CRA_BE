@@ -244,7 +244,7 @@ namespace Service.Services.Implementation
                 };
                 await _unitOfWork._notifyRepository.CreateNotify(userNoti);
 
-                if (reportedUserExist.BehaviourScore <= 0) reportedUserExist.Status = ConstantEnum.Statuses.CLOSED;
+                if (reportedUserExist.BehaviourScore <= _config.GetValue<int>("BannedPointThreshold")) reportedUserExist.Status = ConstantEnum.Statuses.CLOSED;
                 await _unitOfWork._userRepo.UpdateAsync(reportedUserExist);
 
                 await _unitOfWork.CommitTransactionAsync();

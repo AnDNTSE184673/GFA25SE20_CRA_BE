@@ -410,6 +410,7 @@ namespace Service.Services.Implementation
                     throw new KeyNotFoundException("User not found!");
 
                 userExist.BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint");
+                if (userExist.Status.Equals(ConstantEnum.Statuses.CLOSED)) userExist.Status = ConstantEnum.Statuses.ACTIVE;
 
                 await _unitOfWork._userRepo.UpdateAsync(userExist);
 
