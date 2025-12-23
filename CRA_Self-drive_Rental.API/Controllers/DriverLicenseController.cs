@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Constant;
 using Repository.DTO.RequestDTO.DriverLicense;
 using Repository.DTO.ResponseDTO.DriverLicense;
@@ -107,6 +108,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("approve")]
+        [Authorize(Roles = "1002")]
         public async Task<IActionResult> ApproveDocument(LicenseSearchForm form, bool isApproved)
         {
             try

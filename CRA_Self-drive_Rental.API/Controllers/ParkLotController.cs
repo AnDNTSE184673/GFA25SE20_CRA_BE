@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Repository.Constant;
 using Repository.DTO.RequestDTO.ParkingLot;
 using Service.Services;
@@ -39,6 +40,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "2,1002")]
         public async Task<IActionResult> RegisterLot(PostParkingLotForm form) // TODO: FILTER SEARCH
         {
             try

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repository.DTO.RequestDTO;
 
@@ -15,6 +16,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("AllInvoices")]
+        [Authorize]
         public async Task<IActionResult> GetAllInvoices()
         {
             var invoices = await _invoiceService.GetInvoices();
@@ -23,6 +25,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("AllInvoicesFromCustomer/{cusId}")]
+        [Authorize]
         public async Task<IActionResult> GetInvoicesFromCustomer(Guid cusId)
         {
             var invoices = await _invoiceService.GetInvoicesByCusId(cusId);
@@ -31,6 +34,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("AllInvoicesToVendor/{vendorId}")]
+        [Authorize(Roles = "2,1002")]
         public async Task<IActionResult> GetInvoicesToVendor(Guid vendorId)
         {
             var invoices = await _invoiceService.GetInvoicesByVendorId(vendorId);
@@ -39,6 +43,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("/{InvoiceId}")]
+        [Authorize]
         public async Task<IActionResult> GetAnInvoice(Guid InvoiceId)
         {
             var invoice = await _invoiceService.GetInvoiceById(InvoiceId);
@@ -47,6 +52,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("CreateInvoice")]
+        [Authorize]
         public async Task<IActionResult> CreateInvoice([FromBody] InvoiceCreateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -56,6 +62,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("UpdateInvoice")]
+        [Authorize]
         public async Task<IActionResult> UpdateInvoice(InvoiceUpdateRequest request)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -65,6 +72,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("InvoiceComplete")]
+        [Authorize(Roles = "1002")]
         public async Task<IActionResult> UpdateInvoiceToCompleted([FromBody]Guid id)
         {
             if (id == Guid.Empty) return BadRequest();
@@ -74,6 +82,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("InvoiceFailed")]
+        [Authorize(Roles = "1002")]
         public async Task<IActionResult> UpdateInvoiceToFailed([FromBody] Guid id)
         {
             if (id == Guid.Empty) return BadRequest();
