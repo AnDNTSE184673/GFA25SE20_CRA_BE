@@ -146,7 +146,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/RentalPayment")]
-        [Authorize(Roles = "1002,2")]
+        [Authorize]
         public async Task<IActionResult> UpdateRentalPayWithBooking([FromBody] UpdatePayUsingBooking request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -159,7 +159,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/BookingPayment")]
-        [Authorize(Roles = "1002,2")]
+        [Authorize]
         public async Task<IActionResult> UpdateBookingPayWithBooking([FromBody] UpdatePayUsingBooking request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -172,7 +172,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/Payment")]
-        [Authorize(Roles = "1002,2")]
+        [Authorize]
         public async Task<IActionResult> UpdatePay([FromBody] UpdatePaymentRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -185,7 +185,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/PaymentOrderCode")]
-        [Authorize(Roles = "1002,2")]
+        [Authorize]
         public async Task<IActionResult> UpdatePayWithOrderCode([FromBody] PaymentUpdateWithOrderCode request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -198,7 +198,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("/UpdatePayment/Booking/WithoutBookingConfirmed")]
-        [Authorize(Roles = "1002,2")]
+        [Authorize]
         public async Task<IActionResult> UpdateBookingPaymentWithoutBookingConfirmed([FromBody] PaymentUpdateWithOrderCode request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

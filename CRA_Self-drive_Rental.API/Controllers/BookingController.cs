@@ -110,7 +110,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
 
 
         [HttpPatch("UpdateBooking")]
-        [Authorize(Roles = "1002")]
+        [Authorize]
         public async Task<IActionResult> UpdateBooking([FromBody]BookingUpdateRequest request)
         {
             if(!ModelState.IsValid) return BadRequest();
