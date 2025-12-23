@@ -31,7 +31,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("regDoc/approve")]
-        [Authorize]
         public async Task<IActionResult> ApproveDocument(DocumentSearchForm form, bool isApproved)
         {
             try
@@ -60,7 +59,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("regDoc/all")]
-        [Authorize]
         public async Task<IActionResult> GetAllDocuments()
         {
             try
@@ -88,7 +86,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("registerCar/carInfo")]
-        [Authorize(Roles = "2")]
         public async Task<IActionResult> AddCarInfo([FromForm] CarInfoForm form)
         {
             try
@@ -111,7 +108,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("registerCar/carInfo/updateImage")]
-        [Authorize]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
         public async Task<IActionResult> UploadCarImage([FromForm] UploadCarImages form)
@@ -140,7 +136,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("registerCar/regDoc")]
-        [Authorize]
         [SwaggerOperation(Summary = "Don't FromForm the IFormFile as it's already implied")]
         ///<summary>"Don't FromForm the IFormFile as it's already implied"</summary>
         public async Task<IActionResult> UploadRegistrationImage([FromForm] CarRegForm form)
@@ -170,7 +165,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
 
 
         [HttpGet("regDoc")]
-        [Authorize]
         ///<summary>Also send a flag indicating whether to search using "path" or "id" or "info"</summary>
         public async Task<IActionResult> GetCarRegistration([FromQuery] GetCarRegForm form, string flag)
         {
@@ -229,7 +223,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("activeStatus/change")]
-        [Authorize]
         public async Task<IActionResult> ChangeCarStatus(CarStatusChange form)
         {
             try
@@ -359,7 +352,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("rentalRate")]
-        [Authorize]
         public async Task<IActionResult> SetRentalRate(CreateCarRentalRateForm form)
         {
             try
@@ -386,7 +378,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("rentalRate")]
-        [Authorize]
         public async Task<IActionResult> UpdateRentalRate(UpdateCarRentalRateForm form)
         {
             try
@@ -409,7 +400,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpDelete("rentalRate/{carId}")]
-        [Authorize]
         public async Task<IActionResult> DeleteRentalRate(Guid carId)
         {
             try

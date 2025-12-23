@@ -19,7 +19,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetAllBookings")]
-        [Authorize]
         public async Task<IActionResult> GetAllBookings()
         {
             var bookings = await _bookingService.GetAllBooking();
@@ -27,7 +26,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetBookingById/{bookingId}")]
-        [Authorize]
         public async Task<IActionResult> GetBookingById(Guid bookingId)
         {
             var booking = await _bookingService.GetBooking(bookingId);
@@ -39,7 +37,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetBookingsFromCustomer/{cusId}")]
-        [Authorize]
         public async Task<IActionResult> GetBookingFromCustomer(Guid cusId)
         {
             var bookings = await _bookingService.GetBookingsFromCustomer(cusId);
@@ -51,7 +48,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetBookingsForCar/{carId}")]
-        [Authorize]
         public async Task<IActionResult> GetBookingForCar(Guid carId)
         {
             var bookings = await _bookingService.GetBookingsFromCar(carId);
@@ -60,7 +56,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetBookingsByInvoice/{invoiceId}")]
-        [Authorize]
         public async Task<IActionResult> GetBookingsByInvoice(Guid invoiceId)
         {
             if (invoiceId == Guid.Empty) return BadRequest();
@@ -73,7 +68,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetBookingsByBookNum/{bookingNum}")]
-        [Authorize]
         public async Task<IActionResult> GetBookingsByBookNum(string bookingNum)
         {
             if (string.IsNullOrEmpty(bookingNum)) return BadRequest();
@@ -86,7 +80,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("CreateBooking")]
-        [Authorize]
         public async Task<IActionResult> CreateBooking([FromBody]BookingCreateRequest request)
         {
             if(!ModelState.IsValid) return BadRequest();
@@ -98,7 +91,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("Booking/ExtendBooking")]
-        [Authorize]
         public async Task<IActionResult> ExtendBooking([FromBody]BookingExtensionRequest request)
         {
             if(!ModelState.IsValid) return BadRequest();
@@ -110,7 +102,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
 
 
         [HttpPatch("UpdateBooking")]
-        [Authorize]
         public async Task<IActionResult> UpdateBooking([FromBody]BookingUpdateRequest request)
         {
             if(!ModelState.IsValid) return BadRequest();
