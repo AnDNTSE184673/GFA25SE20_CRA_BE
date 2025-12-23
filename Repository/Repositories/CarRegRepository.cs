@@ -32,7 +32,8 @@ namespace Repository.Repositories
         public async Task<List<CarRegistration>> FindCarRegById(Guid carId, Guid userId)
         {
             return await _dbContext.CarRegistrations
-                .Where(x => x.CarId.Equals(carId) && x.UserId.Equals(userId))
+                .Where(x => (x.CarId.Equals(carId) && x.UserId.Equals(userId)))
+                //&& x.Status.Equals(ConstantEnum.Statuses.PENDING))
                 .ToListAsync();
         }
 

@@ -21,6 +21,7 @@ namespace Service.Services
         Task<List<CarView>> GetActiveCarsAsync();
         Task<CarView> GetCarByIdAsync(Guid carId);
         Task<List<CarView>> SearchCarAsync(SearchCarForm searchParam);
+        Task<CarView> UpdateCarAsync(Guid carId, UpdateCarForm form);
         Task<List<CarDetailsManufacturer>> GetManufacturerLookup();
         Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId);
     }
