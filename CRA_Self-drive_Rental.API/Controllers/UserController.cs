@@ -29,7 +29,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("GetAllUsers")]
-        [Authorize(Roles = "1001,1002")]
+        [Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await _userService.GetAllUsers();
