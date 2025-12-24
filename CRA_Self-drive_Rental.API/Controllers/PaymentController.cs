@@ -93,6 +93,21 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payments found for the specified booking ID.");
         }
 
+        [HttpGet("/Vendor/{vendorId}")]
+        public async Task<IActionResult> GetPaymentsByVendorId(Guid vendorId)
+        {
+            if (vendorId == Guid.Empty)
+            {
+                return BadRequest("Invalid vendor ID.");
+            }
+            var payments = await _paymentService.GetByVendor(vendorId);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified vendor ID.");
+        }
+
         [HttpPost("/CreatePayOSPaymentRequest")]
         public async Task<IActionResult> CreatePayOSPaymentRequest([FromBody] CreatePaymentRequest request)
         {

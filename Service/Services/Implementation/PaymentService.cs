@@ -1103,5 +1103,25 @@ namespace Service.Services.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<PaymentHistoryView>?> GetByVendor(Guid vendorId)
+        {
+            var user = await _unitOfWork._userRepo.GetByIdAsync(vendorId);
+            if (user == null) return null;
+            var invoices = await _unitOfWork._invoiceRepo.GetInvoiceByVendorId(vendorId);
+            if (invoices == null || !invoices.Any()) return null;
+            var payments = new List<PaymentHistory>();
+            foreach (var invoice in invoices)
+            {
+                var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(invoice.Id);
+                if (pays != null && pays.Any())
+                {
+                    payments.AddRange(pays);
+                }
+            }
+            if (payments.Count == 0) return null;
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
     }
 }

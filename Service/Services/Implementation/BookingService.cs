@@ -37,12 +37,29 @@ namespace Service.Services.Implementation
             try
             {
                 _unitOfWork.BeginTransaction();
+                string normalizedStatus = status.Trim().ToLower();
+
+                normalizedStatus = normalizedStatus switch
+                {
+                    "canceled" => ConstantEnum.Statuses.CANCELLED,
+                    "cancelled" => ConstantEnum.Statuses.CANCELLED,
+
+                    "confirmed" => ConstantEnum.Statuses.CONFIRMED,
+
+                    "completed" => ConstantEnum.Statuses.COMPLETED,
+
+                    "pending" => ConstantEnum.Statuses.PENDING,
+
+                    "ongoing" => ConstantEnum.Statuses.ONGOING,
+
+                    _ => throw new ArgumentException($"Invalid booking status: {status}")
+                };
                 var booking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
                 if (booking == null)
                 {
                     throw new Exception("Booking not found");
                 }                
-                if (ConstantEnum.Statuses.CANCELLED.ToLower().Equals(status.ToLower()))
+                if (normalizedStatus == ConstantEnum.Statuses.CANCELLED)
                 {
                     var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
                     if (invoice == null)
@@ -64,7 +81,7 @@ namespace Service.Services.Implementation
                     _unitOfWork.SaveChanges();
 
                 }
-                if (ConstantEnum.Statuses.CONFIRMED.ToLower().Equals(status.ToLower()))
+                if (normalizedStatus == ConstantEnum.Statuses.COMPLETED)
                 {
                     var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
                     if (invoice == null)
@@ -89,7 +106,7 @@ namespace Service.Services.Implementation
                     await _unitOfWork._carRepo.UpdateCarAsync(existCar);
                     _unitOfWork.SaveChanges();
                 }
-                if (ConstantEnum.Statuses.COMPLETED.ToLower().Equals(status.ToLower()))
+                if (normalizedStatus == ConstantEnum.Statuses.CONFIRMED)
                 {
                     var invoice = await _unitOfWork._invoiceRepo.GetByIdAsync(booking.InvoiceId);
                     if (invoice == null)
@@ -111,7 +128,7 @@ namespace Service.Services.Implementation
                     await _unitOfWork._carRepo.UpdateCarAsync(existCar);
                     _unitOfWork.SaveChanges();
                 }
-                booking.Status = status;
+                booking.Status = normalizedStatus;
                 _unitOfWork._bookingRepo.Update(booking);   
                 var bookingNoti = new PersistNotif
                 {

@@ -24,6 +24,7 @@ namespace Service.Services
         Task<List<PaymentHistoryView>?> GetPaymentsByInvoiceId(Guid invoiceId);
         Task<List<PaymentHistoryView>?> GetPaymentsByBookingId(Guid bookingId);
         Task<List<PaymentHistoryView>?> GetAllPayment();
+        Task<List<PaymentHistoryView>?> GetByVendor(Guid vendorId);
         Task<PaymentHistoryView?> UpdatePaymentStatusAndMethod(Guid paymentId, string status, string method);
         Task<PaymentHistoryView?> UpdatePaymentUsingOrderCode(long orderCode, string status, string method);
         Task<PaymentHistoryView?> UpdateRentalPayWithBooking(Guid bookingId, string status);
