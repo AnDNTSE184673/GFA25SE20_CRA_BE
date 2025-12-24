@@ -59,10 +59,10 @@ namespace Service.Services.Implementation
             _sms = sms;
         }
 
-        public async Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId)
+        public async Task<(string? message, UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId)
         {
             if (email.IsNullOrEmpty() && name.IsNullOrEmpty() && googleId.IsNullOrEmpty())
-                return (null, null);
+                return (ConstantEnum.RepoStatus.FAILURE, null, null);
             //This is the existing check, check account with similar email or name AND googleId
             //If login failed = account doesnt exist, so register an account with google
             var existing = await _unitOfWork._userRepo.LoginByGoogle(email, name, googleId);
@@ -74,10 +74,12 @@ namespace Service.Services.Implementation
                 var refreshToken = _jwtService.GenerateRefreshToken();
                 await RefreshTokenAsync(refreshToken, user);
                 result.user.JwtToken = token.token;
-                return (null, result.user);
+                return (ConstantEnum.RepoStatus.SUCCESS, null, result.user);
             }
             else
             {
+                if(existing.Status.Equals(ConstantEnum.Statuses.CLOSED))
+                    return ("Account is closed due to low reputation, contact staff via this email: vinhtrannguyenquang912@gmail.com", null, null);
                 var token = _jwtService.GenerateAccessToken(existing);
                 var refreshToken = _jwtService.GenerateRefreshToken();
 
@@ -85,7 +87,7 @@ namespace Service.Services.Implementation
 
                 var mapped = _mapper.Map<UserLoginView?>(existing); //include Role
                 mapped.JwtToken = token.token;
-                return (mapped, null);
+                return (ConstantEnum.RepoStatus.SUCCESS, mapped, null);
             }
         }
 
@@ -146,6 +148,10 @@ namespace Service.Services.Implementation
         {
             var user = await _unitOfWork._userRepo.Authentication(email, password);
             if (user == null) return (ConstantEnum.RepoStatus.FAILURE, null!);
+
+            if (user.Status.Equals(ConstantEnum.Statuses.CLOSED))
+                return ("Account is closed due to low reputation, contact staff via this email: vinhtrannguyenquang912@gmail.com", null);
+
             /*if (user.RoleId == (int)ConstantEnum.RoleID.ADMIN || user.RoleId == (int)ConstantEnum.RoleID.STAFF)
             {
                 var OtpCode = await _otp.SendOTPCodes(user.Id);
@@ -207,6 +213,84 @@ namespace Service.Services.Implementation
                     Status = request.Status,
                     BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint"),
                     RoleId = (int)ConstantEnum.RoleID.CAROWNER
+                };
+                await _unitOfWork._userRepo.CreateAsync(newUser);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                User newOnwer = _unitOfWork._userRepo.GetByEmail(newUser.Email);
+                return newOnwer;
+            }
+            catch
+            {
+                _unitOfWork.RollbackTransaction();
+                return null!;
+            }
+        }
+
+        public async Task<User> CreateStaff(RegisterRequest request)
+        {
+            _unitOfWork.BeginTransaction();
+            try
+            {
+                var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(
+                u => u.Email == request.Email || u.PhoneNumber == request.PhoneNumber);
+                if (knownUser != null)
+                {
+                    throw new Exception("Email or and phone number already in use");
+                }
+                User newUser = new User()
+                {
+                    Username = request.Username,
+                    Password = request.Password,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    Fullname = request.Fullname,
+                    Address = request.Address,
+                    Gender = request.Gender,
+                    RoleId = (int)ConstantEnum.RoleID.STAFF,
+                    IsGoogle = false,
+                    IsVerified = true,
+                    BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint"),
+                    Status = ConstantEnum.Statuses.ACTIVE,
+                };
+                await _unitOfWork._userRepo.CreateAsync(newUser);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+                User newOnwer = _unitOfWork._userRepo.GetByEmail(newUser.Email);
+                return newOnwer;
+            }
+            catch
+            {
+                _unitOfWork.RollbackTransaction();
+                return null!;
+            }
+        }
+
+        public async Task<User> CreateAdmin(RegisterRequest request)
+        {
+            _unitOfWork.BeginTransaction();
+            try
+            {
+                var knownUser = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(
+                u => u.Email == request.Email || u.PhoneNumber == request.PhoneNumber);
+                if (knownUser != null)
+                {
+                    throw new Exception("Email or and phone number already in use");
+                }
+                User newUser = new User()
+                {
+                    Username = request.Username,
+                    Password = request.Password,
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
+                    Fullname = request.Fullname,
+                    Address = request.Address,
+                    Gender = request.Gender,
+                    RoleId = (int)ConstantEnum.RoleID.ADMIN,
+                    IsGoogle = false,
+                    IsVerified = true,
+                    BehaviourScore = _config.GetValue<int>("DefaultBehaviourPoint"),
+                    Status = ConstantEnum.Statuses.ACTIVE,
                 };
                 await _unitOfWork._userRepo.CreateAsync(newUser);
                 await _unitOfWork.SaveChangesAsync();

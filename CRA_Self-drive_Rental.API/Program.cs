@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Repository;
 using Repository.Base;
 using Repository.Data;
+using Repository.Data.Entities;
 using Repository.Extension.AutoMapper;
 using Repository.Repositories;
 using Serilog;
@@ -202,7 +204,7 @@ namespace CRA_Self_drive_Rental.API
             app.UseCors("AllowAll");            
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.MapControllers();
 
             //navigate to this path to check environment

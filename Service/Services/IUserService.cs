@@ -15,7 +15,7 @@ namespace Service.Services
 {
     public interface IUserService
     {
-        Task<(UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId);
+        Task<(string? message, UserLoginView? login, UserPostRegView? register)> GoogleLogin(string email, string name, string googleId);
         Task<(string status, UserPostRegView? user)> GoogleRegister(string email, string name, string googleId);
         Task<(string msg, LoginResponse token)> AuthenticateAsync(string email, string password);
         Task<LoginResponse?> RegistrationVerificationAsync(string OTPCode, string phoneNumber);
@@ -32,5 +32,7 @@ namespace Service.Services
         Task<UserView> ResetUserReputation(Guid userId);
         Task<string> UpdateUserPhoneNumber(UpdatePhoneNumberRequest request);
         Task<string> AuthorizeUpdateUserPhoneNumberAsync(string phoneNumber, string OtpCode);
+        Task<User> CreateStaff(RegisterRequest request);
+        Task<User> CreateAdmin(RegisterRequest request);
     }
 }
