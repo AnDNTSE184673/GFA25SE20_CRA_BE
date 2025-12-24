@@ -121,7 +121,7 @@ namespace Service.Services.Implementation
             var result = await _unitOfWork._carRegRepo.GetCarRegsAsync();
             var uploadTasks = new List<Task<string>>();
 
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             foreach (var r in result)
             {
@@ -136,7 +136,7 @@ namespace Service.Services.Implementation
             var rows = await _unitOfWork._carRegRepo.FindCarRegById(form.CarId.Value, form.UserId.Value);
             var uploadTasks = new List<Task<string>>();
 
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             foreach (var r in rows)
             {
@@ -151,7 +151,7 @@ namespace Service.Services.Implementation
             var rows = await _unitOfWork._carRegRepo.FindCarRegByInfo(form.LicensePlate, form.Email);
             var uploadTasks = new List<Task<string>>();
 
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             foreach (var r in rows)
             {
@@ -166,7 +166,7 @@ namespace Service.Services.Implementation
             var rows = await _unitOfWork._carRegRepo.FindCarRegByPath(form.FilePath, form.Bucket);
             var uploadTasks = new List<Task<string>>();
 
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             foreach (var r in rows)
             {
@@ -191,7 +191,7 @@ namespace Service.Services.Implementation
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, CarRegistration obj)>>();
 
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
 
                 foreach (var file in form.images)
                 {

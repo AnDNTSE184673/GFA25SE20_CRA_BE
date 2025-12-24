@@ -38,7 +38,7 @@ namespace Service.Services.Implementation
 
         public async Task<List<CarView>> GetAllCarsAsync()
         {
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             var cars = await _unitOfWork._carRepo.GetAllCars();
             var carViews = new List<CarView>();
@@ -56,7 +56,7 @@ namespace Service.Services.Implementation
 
         public async Task<List<CarView>> GetActiveCarsAsync()
         {
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             var cars = await _unitOfWork._carRepo.GetAllActiveCars();
             var carViews = new List<CarView>();
@@ -74,7 +74,7 @@ namespace Service.Services.Implementation
 
         public async Task<CarView> GetCarByIdAsync(Guid carId)
         {
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
             var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id", 
                 x => x.Owner,
                 x => x.PreferredLot,
@@ -99,15 +99,15 @@ namespace Service.Services.Implementation
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                await _upload.EnsureInitializedAsync();
-                var car = await _unitOfWork._carRepo.GetByIdWithIncludeAsync(carId, "Id",
+                //await _upload.EnsureInitializedAsync();
+                var car = await _unitOfWork._carRepo.GetFirstWithIncludeAsync(x => x.Id.Equals(carId),
                     x => x.Images);
 
                 foreach(var i in car.Images)
                 {
                     i.Status = ConstantEnum.Statuses.INACTIVE;
                 }
-                await _unitOfWork.SaveChangesAsync();
+                var result = await _unitOfWork.SaveChangesAsync();
 
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -170,7 +170,7 @@ namespace Service.Services.Implementation
                 var uploadTasks = new List<Task<(string url, CarImage obj)>>();
                 int count = 1;
 
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
 
                 foreach (var file in form.Medias)
                 {
@@ -231,7 +231,7 @@ namespace Service.Services.Implementation
                 //int count = existImage.Count();
                 int count = 1;
 
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
 
                 foreach (var file in images)
                 {

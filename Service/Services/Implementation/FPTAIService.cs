@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Repository.DTO.ResponseDTO.DriverLicense;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,6 +39,7 @@ namespace Service.Services.Implementation
 
             using var response = await client.PostAsync(url, multipart);
             var responseString = await response.Content.ReadAsStringAsync();
+            Log.Information(responseString);
 
             if (!response.IsSuccessStatusCode)
             {

@@ -43,6 +43,10 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                 if (_initialized) return;
 
                 await _supabase.InitializeAsync();
+
+                if (_supabase.Storage == null)
+                    throw new InvalidOperationException("Supabase Storage is null after initialization.");
+
                 _initialized = true;
             }
             finally
@@ -50,6 +54,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
                 _initLock.Release();
             }
         }
+
 
         public async Task<byte[]> DownloadImageAsync(string prefix, string username, string subject, string folderName, string targetBucket)
         {
@@ -87,6 +92,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
         /// </summary>
         public async Task<string> UploadImageAsync(IFormFile file, string fileName, string imagePath, string targetBucket, int signedExpirationTimeSec, bool isPublic)
         {
+            await EnsureInitializedAsync();
             var allowedExtensions = new[]
             {
                 ".jpg", ".jpeg", ".png", ".gif", ".webp", // image types
@@ -141,6 +147,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
         {
             try 
             {
+                await EnsureInitializedAsync();
                 var bucket = _supabase.Storage.From(bucketName);
                 var result = bucket.GetPublicUrl(filePath);
                 Log.Information("Signed URL generated: {Url}", result);
@@ -159,6 +166,7 @@ namespace Repository.CustomFunctions.SupabaseFileUploader
         {
             try
             {
+                await EnsureInitializedAsync();
                 var bucket = _supabase.Storage.From(bucketName);
                 var result = await bucket.CreateSignedUrl(filePath, expirySeconds);
                 Log.Information("Signed URL generated: {Url}", result);
