@@ -131,7 +131,7 @@ namespace Service.Services.Implementation
                     .First())
                 .ToList();
 
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             var tasks = latestPerUserPerSide.Select(async license =>
             {
@@ -171,7 +171,7 @@ namespace Service.Services.Implementation
                     .OrderByDescending(r => r.CreateDate).First())
                 .ToList();
 
-            await _upload.EnsureInitializedAsync();
+            //await _upload.EnsureInitializedAsync();
 
             var tasks = latestPerSide.Select(async license =>
             {
@@ -197,7 +197,7 @@ namespace Service.Services.Implementation
             {
                 await _unitOfWork.BeginTransactionAsync();
 
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
                 var userLicense = await _unitOfWork._driverLicenseRepo.GetLicenseByUserIdAsync(userId);
 
                 foreach (var i in userLicense)
@@ -234,7 +234,7 @@ namespace Service.Services.Implementation
                 await _unitOfWork.BeginTransactionAsync();
                 var uploadTasks = new List<Task<(string url, DriverLicense obj)>>();
 
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
                 uploadTasks.Add(UploadDriverLicenseAsync(frontImage, userId, (int)ConstantEnum.DriverLicenseSide.FrontSide));
 
                 var uploadResults = await Task.WhenAll(uploadTasks);

@@ -452,7 +452,7 @@ namespace Service.Services.Implementation
                 else folder = "CheckOut";
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
                 foreach (var file in images)
                 {
                     uploadTasks.Add(UploadCICOImagesAsync(file, bookingId, count, folder, isCheckIn));
@@ -542,7 +542,7 @@ namespace Service.Services.Implementation
                 var rows2 = await _unitOfWork._carHandoverRepo.GetCarHandoverByScheduleAsync(schedule.Id);
 
                 var uploadTasks = new List<Task<string>>();
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
                 foreach (var r in rows)
                 {
                     uploadTasks.Add(_upload.CreateSignedUrlAsync(r.Bucket, r.FilePath, expirationTimeSec));
@@ -585,7 +585,7 @@ namespace Service.Services.Implementation
                 else folder = "CheckOut";
                 int count = 1;
                 var uploadTasks = new List<Task<(string url, ScheduleImage obj)>>();
-                await _upload.EnsureInitializedAsync();
+                //await _upload.EnsureInitializedAsync();
                 foreach (var file in form.images)
                 {
                     uploadTasks.Add(UploadCICOImagesAsync(file, form.bookingId, count, folder, form.isCheckIn));

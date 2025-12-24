@@ -31,7 +31,7 @@ namespace Service
                 config.AddProfile<AutoMapperProfile>();
             });*/ //for automapper 15.0+
             service.AddAutoMapper(typeof(AutoMapperProfile));
-            service.AddScoped<Supabase.Client>(o =>
+            service.AddSingleton<Supabase.Client>(o =>
             {
                 var url = configuration["Supabase:Url"];
                 var key = configuration["Supabase:PrivateKey"];
@@ -53,7 +53,7 @@ namespace Service
                     }
                 );
             });
-            service.AddScoped<UploadFile>();
+            service.AddSingleton<UploadFile>();
             service.AddScoped<SpeedSMSAPI>();
             service.AddScoped<TextBeeSMSAPI>();
             //service.AddAutoMapper(typeof(AutoMapperProfile));
