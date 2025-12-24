@@ -28,7 +28,7 @@ namespace Repository.Repositories
                 .Where(x => (x.Email.Equals(email) || x.Username.Equals(name))
                 && x.GoogleId == googleId
                 && x.IsGoogle == true)
-                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE))
+                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE) || x.Status.Equals(ConstantEnum.Statuses.CLOSED))
                 .Include(x => x.Role)
                 .FirstOrDefaultAsync();
         }
@@ -62,7 +62,7 @@ namespace Repository.Repositories
         {
             var user = _context.Users
                 .Include(u => u.Role)
-                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE))
+                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE) || x.Status.Equals(ConstantEnum.Statuses.CLOSED))
                 .FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
             return user;
         }

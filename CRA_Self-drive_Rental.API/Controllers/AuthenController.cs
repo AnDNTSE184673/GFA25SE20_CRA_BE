@@ -39,7 +39,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 if (response.msg.Equals(ConstantEnum.RepoStatus.FAILURE))
                     return Unauthorized("Invalid email or password.");
                 else
-                    return Ok(new
+                    return Unauthorized(new
                     {
                         Message = response.msg
                     });
@@ -130,7 +130,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 //service LoginGoogle if no acc regster Google take it email nam googleiD
                 var response = await _userService.GoogleLogin(email, name, googleId);
                 //check response.Status
-                if (response.login == null && response.register == null)
+                if (response.login == null && response.register == null && response.message.Equals(ConstantEnum.RepoStatus.FAILURE))
                     throw new Exception("Something went wrong, contact admin");
                 else if (response.login != null)
                 {
@@ -161,7 +161,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
                     //return Ok(response.register);
                 }
                 else
-                    throw new Exception("Something went wrong, contact admin");
+                    throw new Exception(response.message);
             }
             catch (Exception ex)
             {
@@ -213,6 +213,8 @@ namespace CRA_Self_drive_Rental.API.Controllers
         //    }
         //}
 
+
+        [SwaggerOperation(Summary = "DOESNT WORK, DO NOT RUN (not because it breaks thing but it is just useless (for now))")]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokensRequest form)
         {
@@ -268,6 +270,64 @@ namespace CRA_Self_drive_Rental.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("CreateStaff")]
+        public async Task<IActionResult> SignUpStaff([FromBody] RegisterRequest register)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Invalid registration data",
+                        errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    });
+                }
+                var result = await _userService.CreateStaff(register);
+                // Implementation for user sign-up goes here
+                return Ok(new
+                {
+                    result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("CreateAdmin")]
+        public async Task<IActionResult> SignUpAdmin([FromBody] RegisterRequest register)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Invalid registration data",
+                        errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    });
+                }
+                var result = await _userService.CreateAdmin(register);
+                // Implementation for user sign-up goes here
+                return Ok(new
+                {
+                    result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
             }
         }
     }

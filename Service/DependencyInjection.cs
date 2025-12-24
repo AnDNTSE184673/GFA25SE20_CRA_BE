@@ -16,6 +16,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
 using Repository.Extension.SpeedSMS;
 using Repository.Extension.TextBeeDotDev;
+using Microsoft.AspNetCore.Identity;
+using Repository.Data.Entities;
+using Repository.Data;
 
 namespace Service
 {
@@ -53,6 +56,7 @@ namespace Service
                     }
                 );
             });
+
             service.AddSingleton<UploadFile>();
             service.AddScoped<SpeedSMSAPI>();
             service.AddScoped<TextBeeSMSAPI>();
