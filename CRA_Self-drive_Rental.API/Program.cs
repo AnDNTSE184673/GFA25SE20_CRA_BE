@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using Repository.Extension.AutoMapper;
 using Repository.Repositories;
 using Serilog;
 using Service;
+using Service.CustomMiddleware;
 using Service.Hosted;
 using Service.Services;
 using Service.Services.Implementation;
@@ -120,6 +122,22 @@ namespace CRA_Self_drive_Rental.API
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
                         NameClaimType = JwtRegisteredClaimNames.Name  // maps "name" → User.Identity.Name
                     };
+                    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+                    {
+                        OnForbidden = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+
+                            return context.Response.WriteAsync(
+                                """
+                                {
+                                    "message": "Account is closed due to low reputation, contact staff via this email: vinhtrannguyenquang912@gmail.com"
+                                }
+                                """
+                            );
+                        }
+                    };
                 })
                 .AddGoogle(google =>
                 {
@@ -148,7 +166,15 @@ namespace CRA_Self_drive_Rental.API
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AccountNotClosed", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(new AccountNotClosedRequirement());
+                });
+            });
+
             Log.Information("Added Author/Authen");
             // Add CORS policy to allow specific origins (e.g., localhost for development)
             builder.Services.AddCors(options =>
@@ -162,6 +188,9 @@ namespace CRA_Self_drive_Rental.API
             builder.Services
                 .AddServices(builder.Configuration)
                 .AddRepositories(builder.Configuration);
+
+            builder.Services.AddSingleton<IAuthorizationHandler, AccountNotClosedHandler>();
+
             builder.Services.AddHostedService<CarStatusBackgroundService>();
             builder.Services.AddHostedService<ConfirmedBookingGpsSimulatorBackgroundService>();
             builder.Services.AddHostedService<InvoiceStatusBackgroundService>();
