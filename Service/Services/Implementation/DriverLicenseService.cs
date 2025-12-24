@@ -222,7 +222,7 @@ namespace Service.Services.Implementation
             try
             {
                 
-                var userExist = await _unitOfWork._userRepo.GetByIdAsync(userId);
+                var userExist = await _unitOfWork._userRepo.GetFirstWithIncludeAsync(x => x.Id.Equals(userId));
 
                 if (userExist == null)
                 {
@@ -246,6 +246,9 @@ namespace Service.Services.Implementation
                 }).ToList();
 
                 var aiCheck = await AutoApproveLicenseAsync(frontImage);
+
+                if (aiCheck.Status.Equals(ConstantEnum.VerificationStatus.AUTO_APPROVED))
+                    userExist.IsVerified = true;
 
                 //But ef core operation is sequential
                 foreach (var u in uploadResults)
