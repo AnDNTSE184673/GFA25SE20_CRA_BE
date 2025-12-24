@@ -63,6 +63,7 @@ namespace Repository.CustomFunctions.TokenHandler
                         new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email, user.Email),
                         new Claim("IsVerified", user.IsVerified.ToString()),
                         new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+                        new Claim("status", user.Status),
                         //new Claim("RoleName", user.Role.Name)
                         //new Claim("email_verified",)
                     ]),
