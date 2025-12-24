@@ -42,7 +42,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> CreateFeedback([FromForm] CreateFeedbackForm form)
         {
             try
@@ -86,7 +85,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize]
         public async Task<IActionResult> UpdateFeedback(Guid id, [FromForm] EditFeedbackForm form)
         {
             try
@@ -109,7 +107,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteFeedback(Guid id)
         {
             try

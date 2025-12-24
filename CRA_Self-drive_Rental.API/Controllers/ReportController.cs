@@ -19,7 +19,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAllReports()
         {
             try
@@ -42,7 +41,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("reportedCar/{carId}")]
-        [Authorize]
         public async Task<IActionResult> GetReportsByCar(Guid carId)
         {
             try
@@ -65,7 +63,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("reportedUser/{userId}")]
-        [Authorize]
         public async Task<IActionResult> GetReportsByReportedUser(Guid userId)
         {
             try
@@ -88,7 +85,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        [Authorize]
         public async Task<IActionResult> GetReportsByUser(Guid userId)
         {
             try
@@ -111,7 +107,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("reportedCar")]
-        [Authorize]
         public async Task<IActionResult> CreateCarReport([FromForm] CarReportForm form)
         {
             try
@@ -135,7 +130,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("reportedUser")]
-        [Authorize]
         public async Task<IActionResult> CreateUserReport([FromForm] UserReportForm form)
         {
             try
@@ -159,7 +153,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("approve")]
-        [Authorize(Roles = "1002")]
         public async Task<IActionResult> UpdateReport([FromBody] ApproveReportForm form)
         {
             try
@@ -182,7 +175,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize]
         public async Task<IActionResult> UpdateReport(Guid id, [FromForm] EditReportForm form)
         {
             try
@@ -205,7 +197,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteReport(Guid id)
         {
             try

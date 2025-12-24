@@ -19,7 +19,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("staffLogs")]
-        [Authorize(Roles = "1001")]
         public async Task<IActionResult> GetStaffLogsAsync()
         {
             try
@@ -42,7 +41,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("staffLogs/{staffId}")]
-        [Authorize(Roles = "1001")]
         public async Task<IActionResult> GetStaffLogsByStaffAsync(Guid staffId)
         {
             try
@@ -65,7 +63,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("carHandover")]
-        [Authorize(Roles = "1001,1002")]
         public async Task<IActionResult> GetCarHandoversAsync()
         {
             try
@@ -88,7 +85,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpGet("carHandover/{scheduleId}")]
-        [Authorize(Roles = "1001,1002")]
         public async Task<IActionResult> GetCarHandoversByScheduleAsync(Guid scheduleId)
         {
             try

@@ -38,7 +38,6 @@ namespace CRA_Self_drive_Rental.API.Controllers
         }
 
         [HttpPost("/CreateNotif")]
-        [Authorize(Roles = "2,1001,1002")]
         public async Task<IActionResult> CreateNotif([FromBody] NotifiCreateRequest input)
         {
             var result = await _persitNotifService.CreateNotif(input);
