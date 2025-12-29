@@ -1123,5 +1123,51 @@ namespace Service.Services.Implementation
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
         }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentsByCarId(Guid carId)
+        {
+            var car = await _unitOfWork._carRepo.GetByIdAsync(carId);
+            if (car == null) return null;
+            var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCar(carId);
+            if (bookings == null || !bookings.Any()) return null;
+            var payments = new List<PaymentHistory>();
+            foreach (var booking in bookings)
+            {
+                var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+                if (pays != null && pays.Any())
+                {
+                    payments.AddRange(pays);
+                }
+            }
+            if (payments.Count == 0) return null;
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentsByParkLot(Guid parkLotId)
+        {
+            var parkLot = await _unitOfWork._lotRepo.GetByIdAsync(parkLotId);
+            if (parkLot == null) return null;
+            var cars = await _unitOfWork._carRepo.GetAllAsync();
+            var carsInLot = cars.Where(c => c.PrefLotId == parkLotId).ToList();
+            if (carsInLot == null || !carsInLot.Any()) return null;
+            var payments = new List<PaymentHistory>();
+            foreach (var car in carsInLot)
+            {
+                var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCar(car.Id);
+                if (bookings == null || !bookings.Any()) continue;
+                foreach (var booking in bookings)
+                {
+                    var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+                    if (pays != null && pays.Any())
+                    {
+                        payments.AddRange(pays);
+                    }
+                }
+            }
+            if (payments.Count == 0) return null;
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
     }
 }
