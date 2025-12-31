@@ -20,6 +20,8 @@ using Medo;
 using System.Reactive.Subjects;
 using Supabase.Gotrue;
 using Microsoft.Extensions.Configuration;
+using System.Runtime.ConstrainedExecution;
+using Repository.DTO.ResponseDTO.Car;
 
 namespace Service.Services.Implementation
 {
@@ -28,13 +30,19 @@ namespace Service.Services.Implementation
         private readonly IMapper _mapper;
         private readonly UnitOfWork _unitOfWork;
         private readonly IConfiguration _config;
+        private readonly UploadFile _upload;
 
-        public ReportService(IMapper mapper, UnitOfWork unitOfWork, IConfiguration config)
+        public ReportService(IMapper mapper, UnitOfWork unitOfWork, IConfiguration config, UploadFile upload)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _config = config;
+            _upload = upload;
         }
+
+        int expirationTimeinSeconds = 1800;
+        bool isPublic = true;
+
 
         public async Task<string> DeleteCarReport(Guid id)
         {
@@ -82,33 +90,65 @@ namespace Service.Services.Implementation
         public async Task<List<ReportView>> GetCarReports(Guid carId)
         {
             var result = await _unitOfWork._reportRepo.GetReportsByCar(carId);
-            var reportViews = _mapper.Map<List<ReportView>>(result);
-
-            return reportViews;
+            var listViews = new List<ReportView>();
+            foreach (var r in result)
+            {
+                var urls = await Task.WhenAll(r.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+                var reportView = _mapper.Map<ReportView>(r);
+                reportView.Urls.AddRange(urls);
+                listViews.Add(reportView);
+            }
+            return listViews;
         }
         
         public async Task<List<ReportView>> GetReportsByUser(Guid userId)
         {
             var result = await _unitOfWork._reportRepo.GetReportsByUser(userId);
-            var reportViews = _mapper.Map<List<ReportView>>(result);
-
-            return reportViews;
+            var listViews = new List<ReportView>();
+            foreach (var r in result)
+            {
+                var urls = await Task.WhenAll(r.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+                var reportView = _mapper.Map<ReportView>(r);
+                reportView.Urls.AddRange(urls);
+                listViews.Add(reportView);
+            }
+            return listViews;
         }
 
         public async Task<List<ReportView>> GetReportsByReportedUser(Guid userId)
         {
             var result = await _unitOfWork._reportRepo.GetReportsByReportedUser(userId);
-            var reportViews = _mapper.Map<List<ReportView>>(result);
-
-            return reportViews;
+            var listViews = new List<ReportView>();
+            foreach (var r in result)
+            {
+                var urls = await Task.WhenAll(r.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+                var reportView = _mapper.Map<ReportView>(r);
+                reportView.Urls.AddRange(urls);
+                listViews.Add(reportView);
+            }
+            return listViews;
         }
 
         public async Task<List<ReportView>> GetAllReports()
         {
             var result = await _unitOfWork._reportRepo.GetAllReports();
-            var reportViews = _mapper.Map<List<ReportView>>(result);
-
-            return reportViews;
+            var listViews = new List<ReportView>();
+            foreach (var r in result)
+            {
+                var urls = await Task.WhenAll(r.Images.Select(
+                    img => _upload.GetPublicUrlAsync(img.Bucket, img.FilePath)
+                    ));
+                var reportView = _mapper.Map<ReportView>(r);
+                reportView.Urls.AddRange(urls);
+                listViews.Add(reportView);
+            }
+            return listViews;
         }
 
         public async Task<ReportView> ApproveCarReport(ApproveReportForm form)
@@ -193,6 +233,28 @@ namespace Service.Services.Implementation
                 await _unitOfWork._notifyRepository.CreateNotify(carNoti);
 
                 var result = await _unitOfWork._reportRepo.CreateReport(mapped);
+
+                var uploadTasks = new List<Task<(string url, ReportImage obj)>>();
+
+                foreach(var file in form.images)
+                {
+                    uploadTasks.Add(UploadReportImagesAsync(file, mapped.Id, "Car"));
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._reportImageRepo.AddReportImagesAsync(u.obj);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
                 if (result.status.Equals(ConstantEnum.RepoStatus.FAILURE))
@@ -247,6 +309,28 @@ namespace Service.Services.Implementation
                 if (reportedUserExist.BehaviourScore <= _config.GetValue<int>("BannedPointThreshold")) reportedUserExist.Status = ConstantEnum.Statuses.CLOSED;
                 await _unitOfWork._userRepo.UpdateAsync(reportedUserExist);
 
+                var uploadTasks = new List<Task<(string url, ReportImage obj)>>();
+
+                foreach(var file in form.images)
+                {
+                    uploadTasks.Add(UploadReportImagesAsync(file, mapped.Id, "User"));
+                }
+
+                var uploadResults = await Task.WhenAll(uploadTasks);
+
+                var urls = uploadResults.Select(r =>
+                {
+                    if (r.url.IsNullOrEmpty() || r.obj == null) throw new Exception("File upload failure!");
+                    return r.url;
+                }).ToList();
+
+                foreach (var u in uploadResults)
+                {
+                    await _unitOfWork._reportImageRepo.AddReportImagesAsync(u.obj);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+
                 await _unitOfWork.CommitTransactionAsync();
 
                 if (result.status.Equals(ConstantEnum.RepoStatus.FAILURE))
@@ -262,6 +346,46 @@ namespace Service.Services.Implementation
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(string url, ReportImage obj)> UploadReportImagesAsync(IFormFile file, Guid reportId, string flag)
+        {
+            try
+            {
+                string bucket = ConstantEnum.SupabaseBucket.ReportImages;
+                string uploadDate = DateTime.UtcNow.AddHours(7).ToString("ddMMyyyy");
+
+                string originalExt = Path.GetExtension(file.FileName).ToLowerInvariant();
+                string ogName = Path.GetFileNameWithoutExtension(file.FileName);
+                string fileName = $"{uploadDate}_{file.FileName}{originalExt}"; //abc-cde-def_01011990.png
+                string imagePath = "";
+                if (flag.Contains('C')) imagePath = $"car/{reportId}/{fileName}";
+                else if (flag.Contains('U')) imagePath = $"user/{reportId}/{fileName}";
+                else throw new InvalidOperationException("A flag must be provided to identify report type!");
+
+                var url = await _upload.UploadImageAsync(file, fileName, imagePath, bucket, expirationTimeinSeconds, isPublic);
+
+                if (url.IsNullOrEmpty()) throw new Exception("File upload failure!");
+
+                var reportImage = new ReportImage
+                {
+                    FilePath = imagePath,
+                    FileName = fileName,
+                    Bucket = bucket,
+                    CreateDate = DateTime.UtcNow,
+                    MimeType = MimeTypeHelper.GetMimeType(originalExt),
+                    FileSize = file.Length,
+                    Status = ConstantEnum.Statuses.ACTIVE,
+                    ReportId = reportId
+                };
+
+                return (url, reportImage);
+
+            }
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }

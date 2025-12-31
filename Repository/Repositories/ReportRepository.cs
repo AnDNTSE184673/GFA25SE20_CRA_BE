@@ -78,6 +78,7 @@ namespace Repository.Repositories
                 .Where(x => x.ReportedCarId.Equals(carId))
                 .Include(x => x.Reporter)
                 .Include(x => x.Car)
+                .Include(x => x.Images.Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .ToListAsync();
         }
 
@@ -87,6 +88,7 @@ namespace Repository.Repositories
                 .Where(x => x.ReportedUserId.Equals(reportUserId))
                 .Include(x => x.Reporter)
                 .Include(x => x.Reported)
+                .Include(x => x.Images.Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .ToListAsync();
         }
 
@@ -97,6 +99,7 @@ namespace Repository.Repositories
                 .Include(x => x.Reporter)
                 .Include(x => x.Car)
                 .Include(x => x.Reported)
+                .Include(x => x.Images.Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .ToListAsync();
         }
 
@@ -105,8 +108,9 @@ namespace Repository.Repositories
             return await _dbContext.Reports
                 .Where(x => x.ReportNo.Equals(reportNo.Trim()))
                 .Include(x => x.Reporter)
-                .Include(x => x.Car)
                 .Include(x => x.Reported)
+                .Include(x => x.Car)
+                .Include(x => x.Images.Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .FirstOrDefaultAsync();
         }
 
@@ -114,7 +118,9 @@ namespace Repository.Repositories
         {
             return await _dbContext.Reports
                 .Include(x => x.Reporter)
+                .Include(x => x.Reported)
                 .Include(x => x.Car)
+                .Include(x => x.Images.Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
                 .ToListAsync();
         }
     }

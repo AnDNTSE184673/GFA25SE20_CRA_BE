@@ -28,5 +28,7 @@ namespace Repository.Data.Entities
         public User Reported { get; set; }
         [ForeignKey("ReporterId")]
         public User Reporter { get; set; }
+
+        public virtual ICollection<ReportImage> Images { get; set; }
     }
 }
