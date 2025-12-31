@@ -21,7 +21,6 @@ namespace Service.CustomMiddleware
 
             if (statusClaim == ConstantEnum.Statuses.CLOSED)
             {
-                // Explicitly fail
                 context.Fail();
                 return Task.CompletedTask;
             }

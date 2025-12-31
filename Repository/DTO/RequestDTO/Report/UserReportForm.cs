@@ -17,6 +17,8 @@ namespace Repository.DTO.RequestDTO.Report
 
         public int deductedPoints { get; set; }
 
+        public List<IFormFile> images { get; set; }
+
         [Required]
         public Guid ReporterId { get; set; }
 

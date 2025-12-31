@@ -44,6 +44,7 @@ namespace Repository.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<ReportImage> ReportImages { get; set; }
         public DbSet<Schedules> Schedules { get; set; }
         public DbSet<ScheduleImage> ScheduleImages { get; set; }
         public DbSet<StaffLogAudit> StaffLogAudit { get; set; }

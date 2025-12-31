@@ -65,8 +65,10 @@ namespace Repository.Extension.AutoMapper
             CreateMap<EditFeedbackForm, Feedback>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<CarReportForm, Report>();
-            CreateMap<UserReportForm, Report>();
+            CreateMap<CarReportForm, Report>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<UserReportForm, Report>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
             CreateMap<Report, ReportView>();
             CreateMap<EditReportForm, Report>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
@@ -90,12 +92,12 @@ namespace Repository.Extension.AutoMapper
                 && !(srcMember is string s && string.IsNullOrWhiteSpace(s))));
 
             CreateMap<DriverLicense, DriverLicenseView>()
-.ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseNumber))
-.ForMember(dest => dest.LicenseName, opt => opt.MapFrom(src => src.LicenseName))
-.ForMember(dest => dest.LicenseDoB, opt => opt.MapFrom(src => src.LicenseDoB))
-.ForMember(dest => dest.LicenseClass, opt => opt.MapFrom(src => src.LicenseClass))
-.ForMember(dest => dest.LicenseIssue, opt => opt.MapFrom(src => src.LicenseIssue))
-.ForMember(dest => dest.LicenseExpiry, opt => opt.MapFrom(src => src.LicenseExpiry));
+                .ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseNumber))
+                .ForMember(dest => dest.LicenseName, opt => opt.MapFrom(src => src.LicenseName))
+                .ForMember(dest => dest.LicenseDoB, opt => opt.MapFrom(src => src.LicenseDoB))
+                .ForMember(dest => dest.LicenseClass, opt => opt.MapFrom(src => src.LicenseClass))
+                .ForMember(dest => dest.LicenseIssue, opt => opt.MapFrom(src => src.LicenseIssue))
+                .ForMember(dest => dest.LicenseExpiry, opt => opt.MapFrom(src => src.LicenseExpiry));
             CreateMap<DriverLicense, SingleLicenseData>();
             CreateMap<DriverLincenseInfo, DriverLicense>()
                 .ForMember(dest => dest.LicenseNumber, opt => opt.MapFrom(src => src.LicenseId))

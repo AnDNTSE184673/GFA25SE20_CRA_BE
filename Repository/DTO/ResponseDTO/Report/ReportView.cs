@@ -20,5 +20,7 @@ namespace Repository.DTO.ResponseDTO.Report
         public Guid? ReportedCarId { get; set; }
         public Guid? ReportedUserId { get; set; }
         public Guid ReporterId { get; set; }
+
+        public List<string> Urls { get; set; } = new List<string>();
     }
 }
