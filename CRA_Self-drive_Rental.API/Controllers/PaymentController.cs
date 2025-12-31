@@ -93,6 +93,45 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payments found for the specified booking ID.");
         }
 
+        [HttpGet("/Vendor/{vendorId}")]
+        public async Task<IActionResult> GetPaymentsByVendorId(Guid vendorId)
+        {
+            if (vendorId == Guid.Empty)
+            {
+                return BadRequest("Invalid vendor ID.");
+            }
+            var payments = await _paymentService.GetByVendor(vendorId);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified vendor ID.");
+        }
+
+        [HttpGet("/Car/{carId}/Payments")]
+        public async Task<IActionResult> GetPaymentsByCarId(Guid carId)
+        {
+            if (carId == Guid.Empty) return BadRequest("Invalid car ID.");
+            var payments = await _paymentService.GetPaymentsByCarId(carId);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified car ID.");
+        }
+
+        [HttpGet("/Parking/{parkingId}/Payments")]
+        public async Task<IActionResult> GetPaymentsByParkingId(Guid parkingId)
+        {
+            if (parkingId == Guid.Empty) return BadRequest("Invalid parking ID.");
+            var payments = await _paymentService.GetPaymentsByParkLot(parkingId);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified parking ID.");
+        }
+
         [HttpPost("/CreatePayOSPaymentRequest")]
         public async Task<IActionResult> CreatePayOSPaymentRequest([FromBody] CreatePaymentRequest request)
         {
