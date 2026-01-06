@@ -52,7 +52,7 @@ namespace CRA_Self_drive_Rental.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCarToll([FromForm] CarTollCreateRequest request)
         {
-            if ((request.BookingId == Guid.Empty && string.IsNullOrEmpty(request.BookingNum)) || request.CarId == Guid.Empty || request.Amount <= 0) return BadRequest();
+            if ((request.BookingId == Guid.Empty || request.CarId == Guid.Empty || request.Amount <= 0) return BadRequest();
             var result = await _carTollService.CreateNewCarToll(request);
             if (result == null) return BadRequest();
             return Ok(result);
