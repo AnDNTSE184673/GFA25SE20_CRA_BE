@@ -17,6 +17,7 @@ using Repository.DTO.ResponseDTO.Booking;
 using Repository.DTO.ResponseDTO.Car;
 using Repository.DTO.ResponseDTO.CarRegister;
 using Repository.DTO.ResponseDTO.CarRentalRate;
+using Repository.DTO.ResponseDTO.CarToll;
 using Repository.DTO.ResponseDTO.DriverLicense;
 using Repository.DTO.ResponseDTO.Feedbacks;
 using Repository.DTO.ResponseDTO.GPS;
@@ -163,6 +164,9 @@ namespace Repository.Extension.AutoMapper
             CreateMap<Schedules, ScheduleView>();
             CreateMap<PersistNotif, PersitNotifyReturn>();
             CreateMap<GPS, GPSView>();
+            CreateMap<CarToll, CarTollView>();
+            CreateMap<CarTollTransac, CarTollTransacView>();
+            CreateMap<CarWallet, CarWalletView>();
         }
     }
 }

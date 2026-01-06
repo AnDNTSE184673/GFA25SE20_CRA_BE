@@ -41,6 +41,8 @@ namespace Repository.Base
         public IReportRepository _reportRepo { get; }
         public IReportImageRepository _reportImageRepo { get; }
         public IGPSRepository _gpsRepo { get; }
+        public ICarTollRepository _carTollRepo { get; set; }
+        public ICarWalletRepository _carWalletRepo { get; set; }
 
         //no need to construct _transaction
 
@@ -67,7 +69,9 @@ namespace Repository.Base
             INotifyRepository notifyRepository,
             IReportRepository reportRepo,
             IReportImageRepository reportImageRepo,
-            IGPSRepository gpsRepo)
+            IGPSRepository gpsRepo,
+            ICarTollRepository carTollRepo,
+            ICarWalletRepository carWalletRepo)
         {
             _context = context;
             _userRepo = userRepo;
@@ -93,6 +97,8 @@ namespace Repository.Base
             _reportRepo = reportRepo;
             _reportImageRepo = reportImageRepo;
             _gpsRepo = gpsRepo;
+            _carTollRepo = carTollRepo;
+            _carWalletRepo = carWalletRepo;
         }
 
         //no need to construct _transaction
