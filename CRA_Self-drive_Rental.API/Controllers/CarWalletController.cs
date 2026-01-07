@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Repository.DTO.RequestDTO.CarToll;
 using Service.Services;
 using System.Threading.Tasks;
 
@@ -49,32 +50,42 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("/Car/{carId}")]
-        public async Task<IActionResult> UpdateWallet([FromForm]Guid carId, decimal amount)
+        [HttpPost("/PayOS/Add")]
+        public async Task<IActionResult> CreateNewWalletFromPayOS([FromForm]CarWalletRequest request)
         {
-            if (carId == Guid.Empty) return BadRequest();
-            if (amount <= 0) return BadRequest();
-            var result = await _walletService.UpdateCarWalletBalance(carId, amount);
+            if (request.CarId == Guid.Empty) return BadRequest();
+            if (request.Amount <= 0) return BadRequest();
+            var result = await _walletService.AddToWalletPayOS(request.CarId, request.Amount);
+            if (result.Item2 == null && string.IsNullOrEmpty(result.PaymentUrl)) return BadRequest();
+            return Ok(new { result.PaymentUrl, result.Item2});
+        }
+
+        [HttpPut("/Car/{carId}")]
+        public async Task<IActionResult> UpdateWallet([FromForm] CarWalletRequest request)
+        {
+            if (request.CarId == Guid.Empty) return BadRequest();
+            if (request.Amount <= 0) return BadRequest();
+            var result = await _walletService.UpdateCarWalletBalance(request.CarId, request.Amount);
             if (result == null) return BadRequest();
             return Ok(result);
         }
 
         [HttpPut("/Car/{carId}/AddWithAmount")]
-        public async Task<IActionResult> AddToWallet([FromForm] Guid carId, decimal amount)
+        public async Task<IActionResult> AddToWallet([FromForm]CarWalletRequest request)
         {
-            if (carId == Guid.Empty) return BadRequest();
-            if (amount <= 0) return BadRequest();
-            var result = await _walletService.AddToCarWallet(carId, amount);
+            if (request.CarId == Guid.Empty) return BadRequest();
+            if (request.Amount <= 0) return BadRequest();
+            var result = await _walletService.AddToCarWallet(request.CarId, request.Amount);
             if (result == null) return BadRequest();
             return Ok(result);
         }
 
         [HttpPut("/Car/{carId}/SubtractWithAmount")]
-        public async Task<IActionResult> SubtractFromWallet([FromForm] Guid carId, decimal amount)
+        public async Task<IActionResult> SubtractFromWallet([FromForm] CarWalletRequest request)
         {
-            if (carId == Guid.Empty) return BadRequest();
-            if (amount <= 0) return BadRequest();
-            var result = await _walletService.SubtractFromCarWallet(carId, amount);
+            if (request.CarId == Guid.Empty) return BadRequest();
+            if (request.Amount <= 0) return BadRequest();
+            var result = await _walletService.SubtractFromCarWallet(request.CarId, request.Amount);
             if (result == null) return BadRequest();
             return Ok(result);
         }

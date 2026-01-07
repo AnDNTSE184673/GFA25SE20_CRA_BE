@@ -16,6 +16,7 @@ namespace Service.Services
         Task<CarWalletView?> UpdateCarWalletBalance(Guid carId, decimal amount);
         Task<CarWalletView?> AddToCarWallet(Guid carId, decimal amount);
         Task<CarWalletView?> SubtractFromCarWallet(Guid carId, decimal amount);
+        Task<(string PaymentUrl, CarWalletView)> AddToWalletPayOS(Guid carId, decimal amount);
         Task<bool> DeleteCarWallet(Guid carId);
     }
 }
