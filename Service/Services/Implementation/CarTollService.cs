@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Repository.Base;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.CarToll;
@@ -14,11 +15,13 @@ namespace Service.Services.Implementation
     public class CarTollService : ICarTollService
     {
         private readonly UnitOfWork _unitOfWork;
+        private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        public CarTollService(UnitOfWork unitOfWork, IMapper mapper)
+        public CarTollService(UnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _config = config;
         }
         public async Task<CarTollView?> CreateNewCarToll(CarTollCreateRequest request)
         {
