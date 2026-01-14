@@ -20,6 +20,7 @@ namespace Repository.Data.Entities
         public string Transmission { get; set; }
         public string FuelType { get; set; }
         public double FuelConsumption { get; set; }
+        public string? CarType { get; set; }
         public string? Description { get; set; }
 
         public double Rating { get; set; }

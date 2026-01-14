@@ -116,6 +116,15 @@ namespace Repository.Repositories
             return await _context.PaymentHistories.FirstOrDefaultAsync(p => p.Id == newPayment.Id);
         }
 
+        public async Task<List<PaymentHistory?>> GetPaymentByCarTypeForUser(Guid vendorId, string carType)
+        {
+            var payment = await _context.PaymentHistories
+                .Where(p => p.Invoice.Booking.Car.UserId.Equals(vendorId))
+                .Where(p => p.Invoice.Booking.Car.CarType.Equals(carType)) //assume cartype is normalized to constant enum
+                .ToListAsync();
+            return payment;
+        }
+
         public async Task<PaymentHistory?> GetPaymentById(Guid paymentId)
         {
             var payment = await  _context.PaymentHistories.FirstOrDefaultAsync(p => p.Id == paymentId);

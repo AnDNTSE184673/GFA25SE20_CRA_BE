@@ -12,6 +12,7 @@ using Repository.DTO.ResponseDTO.Payment;
 using Repository.Data.Entities;
 using AutoMapper;
 using Repository.Constant;
+using static Repository.Constant.ConstantEnum;
 
 
 namespace Service.Services.Implementation
@@ -1165,6 +1166,18 @@ namespace Service.Services.Implementation
                     }
                 }
             }
+            if (payments.Count == 0) return null;
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentByCarTypeForUser(Guid vendorId, string carType)
+        {
+            var user = await _unitOfWork._userRepo.GetByIdAsync(vendorId);
+            if (user == null) return null;
+            //check for valid car type (contains() and then normalize to enum constant)
+            var payments = new List<PaymentHistory>();
+            payments = await _unitOfWork._paymentRepo.GetPaymentByCarTypeForUser(vendorId, carType);
             if (payments.Count == 0) return null;
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;

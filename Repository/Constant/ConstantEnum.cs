@@ -113,6 +113,33 @@ namespace Repository.Constant
             public const string REJECTED = "Rejected";
         }
 
+        public static class VehicleClassification
+        {
+            public static class Types
+            {
+                public const string Sedan = "Sedan";
+                public const string SUV = "SUV";
+                public const string Hatchback = "Hatchback";
+                public const string PickupTruck = "PickupTruck";
+                public const string Van = "Van";
+                public const string MPV = "MPV";
+                public const string Luxury = "Luxury";
+                public const string Electric = "Electric";
+            }
+
+            public static class Pricing
+            {
+                public const string Budget = "Budget";
+                public const string Standard = "Standard";
+                public const string Premium = "Premium";
+                public const string Luxury = "Luxury";
+                public const string Sports = "Sports";
+                public const string Family = "Family";
+                public const string Offroad = "Offroad";
+                public const string Eco = "Eco";
+            }
+        }
+
         public enum DriverLicenseSide
         {
             FrontSide = 1,

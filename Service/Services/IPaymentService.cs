@@ -39,5 +39,6 @@ namespace Service.Services
         Task<PaymentHistoryView?> UpdatePayment(UpdatePaymentRequest request);
         Task<PaymentHistoryView?> UpdatePaymentWithOrderCode(PaymentUpdateWithOrderCode request);
         Task<PaymentHistoryView?> UpdateBookingPaymentWithoutBookingConfirmed(PaymentUpdateWithOrderCode request);
+        Task<List<PaymentHistoryView>?> GetPaymentByCarTypeForUser(Guid vendorId, string carType);
     }
 }
