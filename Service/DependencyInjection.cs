@@ -85,6 +85,8 @@ namespace Service
             service.AddScoped<IFPTAIService, FPTAIService>();
             service.AddScoped<IPersitNotifService, PersitNotifService>();
             service.AddScoped<IGPSService, GPSService>();
+            service.AddScoped<ICarWalletService, CarWalletService>();
+            service.AddScoped<ICarTollService, CarTollService>();
             return service;
         }
     }

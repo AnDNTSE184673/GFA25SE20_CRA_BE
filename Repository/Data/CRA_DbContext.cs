@@ -50,6 +50,9 @@ namespace Repository.Data
         public DbSet<StaffLogAudit> StaffLogAudit { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<GPS> GPS { get; set; }
+        public DbSet<CarToll> CarTolls { get; set; }
+        public DbSet<CarTollTransac> CarTollTransacs { get; set; }
+        public DbSet<CarWallet> CarWallets { get; set; }    
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
