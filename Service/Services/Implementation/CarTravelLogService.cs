@@ -48,51 +48,108 @@ namespace Service.Services.Implementation
                 var carToll = await _unitOfWork._carTollRepo.GetCarTollDetailsByBookingId(bookingId);
                 if (carToll == null)
                 {
-                    throw new Exception("Car Toll details not found for the booking");
-                }
-                var newToll = new CarTollTransac
-                {
-                    Id = Guid.NewGuid(),
-                    OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    TransacDate = DateTime.UtcNow,
-                    Amount = toll.ChargeAmount,
-                    Status = "Completed"
-                };
-                wallet.Balance -= toll.ChargeAmount;
-                await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
-                await _unitOfWork._carTollRepo.InsertToCarToll(newToll, bookingId, carId);
-                if (existingLog != null )
-                {
-                    var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                    var newCarToll = new CarToll
                     {
-                        Id = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1,
-                        CarId = carId,
-                        BookingId = bookingId,
-                        TravelDate = DateTime.UtcNow,
-                        TollBoothId = tollBoothId,
-                        ChargeAmount = toll.ChargeAmount
+                        Id = Guid.NewGuid(),
+                        BookingId = booking.Id,
+                        BookingNum = booking.BookingNumber,
+                        CarId = car.Id,
+                        Total = 0,
+                        CreateDate = DateTime.UtcNow,
+                        UpdateDate = DateTime.UtcNow
                     };
-                    await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
-                    await _unitOfWork.CommitTransactionAsync();
-                    var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
-                    return _mapper.Map<List<CarTravelView>>(result);
+                    var reToll = await _unitOfWork._carTollRepo.CreateNew(newCarToll);
+                    var newToll = new CarTollTransac
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        TransacDate = DateTime.UtcNow,
+                        Amount = toll.ChargeAmount,
+                        Status = "Completed"
+                    };
+                    wallet.Balance -= toll.ChargeAmount;
+                    await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                    await _unitOfWork._carTollRepo.InsertToCarToll(newToll, bookingId, carId);
+                    if (existingLog != null)
+                    {
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow,
+                            TollBoothId = tollBoothId,
+                            ChargeAmount = toll.ChargeAmount
+                        };
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        await _unitOfWork.CommitTransactionAsync();
+                        var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+                        return _mapper.Map<List<CarTravelView>>(result);
+                    }
+                    else
+                    {
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = 1,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow,
+                            TollBoothId = tollBoothId,
+                            ChargeAmount = toll.ChargeAmount
+                        };
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        await _unitOfWork.CommitTransactionAsync();
+                        var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+                        return _mapper.Map<List<CarTravelView>>(result);
+                    }
                 }
                 else
                 {
-                    var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                    var newToll = new CarTollTransac
                     {
-                        Id = 1,
-                        CarId = carId,
-                        BookingId = bookingId,
-                        TravelDate = DateTime.UtcNow,
-                        TollBoothId = tollBoothId,
-                        ChargeAmount = toll.ChargeAmount
+                        Id = Guid.NewGuid(),
+                        OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        TransacDate = DateTime.UtcNow,
+                        Amount = toll.ChargeAmount,
+                        Status = "Completed"
                     };
-                    await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
-                    await _unitOfWork.CommitTransactionAsync();
-                    var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
-                    return _mapper.Map<List<CarTravelView>>(result);
+                    wallet.Balance -= toll.ChargeAmount;
+                    await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                    await _unitOfWork._carTollRepo.InsertToCarToll(newToll, bookingId, carId);
+                    if (existingLog != null)
+                    {
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow,
+                            TollBoothId = tollBoothId,
+                            ChargeAmount = toll.ChargeAmount
+                        };
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        await _unitOfWork.CommitTransactionAsync();
+                        var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+                        return _mapper.Map<List<CarTravelView>>(result);
+                    }
+                    else
+                    {
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = 1,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow,
+                            TollBoothId = tollBoothId,
+                            ChargeAmount = toll.ChargeAmount
+                        };
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        await _unitOfWork.CommitTransactionAsync();
+                        var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+                        return _mapper.Map<List<CarTravelView>>(result);
+                    }
                 }
+                
                 
             }
             catch (Exception ex)
@@ -122,69 +179,144 @@ namespace Service.Services.Implementation
             var carToll = await _unitOfWork._carTollRepo.GetCarTollDetailsByBookingId(bookingId);
             if (carToll == null)
             {
-                throw new Exception("Car Toll details not found for the booking");
-            }
-            List<TollBooth> tolls = (List<TollBooth>)await _unitOfWork._tollRepo.GetAllAsync();
-            var existingLog = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
-            if (existingLog == null)
-            {
-                for (int i = 0; i < numOfToll; i++)
+                var newCarToll = new CarToll
                 {
-                    var random = new Random();
-                    var randomToll = tolls[random.Next(tolls.Count)];
-                    var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                    Id = Guid.NewGuid(),
+                    BookingId = booking.Id,
+                    BookingNum = booking.BookingNumber,
+                    CarId = car.Id,
+                    Total = 0,
+                    CreateDate = DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow
+                };
+                var reToll = await _unitOfWork._carTollRepo.CreateNew(newCarToll);
+                List<TollBooth> tolls = (List<TollBooth>)await _unitOfWork._tollRepo.GetAllAsync();
+                var existingLog = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+                if (existingLog == null)
+                {
+                    for (int i = 0; i < numOfToll; i++)
                     {
-                        Id = i + 1,
-                        CarId = carId,
-                        BookingId = bookingId,
-                        TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
-                        TollBoothId = randomToll.Id,
-                        ChargeAmount = randomToll.ChargeAmount
-                    };
-                    var carTollTransac = new CarTollTransac
+                        var random = new Random();
+                        var randomToll = tolls[random.Next(tolls.Count)];
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = i + 1,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
+                            TollBoothId = randomToll.Id,
+                            ChargeAmount = randomToll.ChargeAmount
+                        };
+                        var carTollTransac = new CarTollTransac
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            TransacDate = DateTime.UtcNow,
+                            Amount = randomToll.ChargeAmount,
+                            Status = "Completed"
+                        };
+                        wallet.Balance -= randomToll.ChargeAmount;
+                        await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                        await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                    }
+                }
+                else
+                {
+                    int startId = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1;
+                    for (int i = 0; i < numOfToll; i++)
                     {
-                        Id = Guid.NewGuid(),
-                        OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                        TransacDate = DateTime.UtcNow,
-                        Amount = randomToll.ChargeAmount,
-                        Status = "Completed"
-                    };
-                    wallet.Balance -= randomToll.ChargeAmount;
-                    await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
-                    await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
-                    await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        var random = new Random();
+                        var randomToll = tolls[random.Next(tolls.Count)];
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = startId + i,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
+                            TollBoothId = randomToll.Id,
+                            ChargeAmount = randomToll.ChargeAmount
+                        };
+                        var carTollTransac = new CarTollTransac
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            TransacDate = DateTime.UtcNow,
+                            Amount = randomToll.ChargeAmount,
+                            Status = "Completed"
+                        };
+                        wallet.Balance -= randomToll.ChargeAmount;
+                        await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                        await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                    }
                 }
             }
             else
             {
-                int startId = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1;
-                for (int i = 0; i < numOfToll; i++)
+                List<TollBooth> tolls = (List<TollBooth>)await _unitOfWork._tollRepo.GetAllAsync();
+                var existingLog = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+                if (existingLog == null)
                 {
-                    var random = new Random();
-                    var randomToll = tolls[random.Next(tolls.Count)];
-                    var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                    for (int i = 0; i < numOfToll; i++)
                     {
-                        Id = startId + i,
-                        CarId = carId,
-                        BookingId = bookingId,
-                        TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
-                        TollBoothId = randomToll.Id,
-                        ChargeAmount = randomToll.ChargeAmount
-                    };
-                    var carTollTransac = new CarTollTransac
+                        var random = new Random();
+                        var randomToll = tolls[random.Next(tolls.Count)];
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = i + 1,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
+                            TollBoothId = randomToll.Id,
+                            ChargeAmount = randomToll.ChargeAmount
+                        };
+                        var carTollTransac = new CarTollTransac
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            TransacDate = DateTime.UtcNow,
+                            Amount = randomToll.ChargeAmount,
+                            Status = "Completed"
+                        };
+                        wallet.Balance -= randomToll.ChargeAmount;
+                        await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                        await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                    }
+                }
+                else
+                {
+                    int startId = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1;
+                    for (int i = 0; i < numOfToll; i++)
                     {
-                        Id = Guid.NewGuid(),
-                        OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                        TransacDate = DateTime.UtcNow,
-                        Amount = randomToll.ChargeAmount,
-                        Status = "Completed"
-                    };
-                    wallet.Balance -= randomToll.ChargeAmount;
-                    await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
-                    await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
-                    await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        var random = new Random();
+                        var randomToll = tolls[random.Next(tolls.Count)];
+                        var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                        {
+                            Id = startId + i,
+                            CarId = carId,
+                            BookingId = bookingId,
+                            TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
+                            TollBoothId = randomToll.Id,
+                            ChargeAmount = randomToll.ChargeAmount
+                        };
+                        var carTollTransac = new CarTollTransac
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                            TransacDate = DateTime.UtcNow,
+                            Amount = randomToll.ChargeAmount,
+                            Status = "Completed"
+                        };
+                        wallet.Balance -= randomToll.ChargeAmount;
+                        await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                        await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
+                        await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                    }
                 }
             }
+
             var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
             return _mapper.Map<List<CarTravelView>>(result);
         }
