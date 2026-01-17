@@ -69,6 +69,8 @@ namespace Repository.Base
             service.AddScoped<IGPSRepository, GPSRepository>();
             service.AddScoped<ICarTollRepository, CarTollRepository>();
             service.AddScoped<ICarWalletRepository, CarWalletRepository>();
+            service.AddScoped<ITollRepository, TollBoothRepository>();
+            service.AddScoped<ICarTravelLogRepository, CarTravelLogRepository>();
             return service;
         }
     }

@@ -53,40 +53,42 @@ namespace Repository.Repositories
 
         public async Task<List<CarToll>?> GetAllCarTolls()
         {
-            return await _context.CarTolls.ToListAsync();
+            return await _context.CarTolls.Include(x => x.CarTollTransacs).ToListAsync();
         }
 
         public async Task<CarToll?> GetCarTollByBookingNum(string bookingNum)
         {
             return await _context.CarTolls
                 .Where(ct => ct.BookingNum == bookingNum)
+                .Include(ct => ct.CarTollTransacs)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<CarToll?> GetCarTollDetailsByBookingAndCar(Guid bookingId, Guid carId)
         {
             return await _context.CarTolls
+                .Include(ct => ct.CarTollTransacs)
                 .Where(ct => ct.BookingId == bookingId && ct.CarId == carId)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<CarToll?> GetCarTollDetailsByBookingId(Guid bookingId)
         {
-            return await _context.CarTolls
+            return await _context.CarTolls.Include(ct => ct.CarTollTransacs)
                 .Where(ct => ct.BookingId == bookingId)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<List<CarToll>?> GetCarTollsByCarId(Guid carId)
         {
-            return await _context.CarTolls
+            return await _context.CarTolls.Include(ct => ct.CarTollTransacs)
                 .Where(ct => ct.CarId == carId)
                 .ToListAsync();
         }
 
         public async Task<CarToll?> InsertToCarToll(CarTollTransac callTollTransac, Guid bookingId, Guid carId)
         {
-            var carToll = await _context.CarTolls
+            var carToll = await _context.CarTolls.Include(ct => ct.CarTollTransacs)
                 .Where(ct => ct.BookingId == bookingId && ct.CarId == carId)
                 .FirstOrDefaultAsync();
             if (carToll != null)
