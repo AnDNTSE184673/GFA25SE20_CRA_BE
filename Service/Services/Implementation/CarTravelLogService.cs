@@ -40,7 +40,7 @@ namespace Service.Services.Implementation
                     throw new Exception("Toll Booth not found");
                 }
                 var existingLog = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
-                var wallet = await _unitOfWork._carWalletRepo.GetByIdAsync(carId);
+                var wallet = await _unitOfWork._carWalletRepo.GetCarWalletByCarId(carId);
                 if (wallet == null)
                 {
                     throw new Exception("Car Wallet not found");
@@ -100,6 +100,93 @@ namespace Service.Services.Implementation
                 await _unitOfWork.RollbackTransactionAsync();
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<CarTravelView>?> CreateRandomLog(Guid carId, Guid bookingId, int numOfToll)
+        {
+            var car = await _unitOfWork._carRepo.GetByIdAsync(carId);
+            if (car == null)
+            {
+                throw new Exception("Car not found");
+            }
+            var booking = await _unitOfWork._bookingRepo.GetByIdAsync(bookingId);
+            if (booking == null)
+            {
+                throw new Exception("Booking not found");
+            }
+            var wallet = await _unitOfWork._carWalletRepo.GetCarWalletByCarId(carId);
+            if (wallet == null)
+            {
+                throw new Exception("Car Wallet not found");
+            }
+            var carToll = await _unitOfWork._carTollRepo.GetCarTollDetailsByBookingId(bookingId);
+            if (carToll == null)
+            {
+                throw new Exception("Car Toll details not found for the booking");
+            }
+            List<TollBooth> tolls = (List<TollBooth>)await _unitOfWork._tollRepo.GetAllAsync();
+            var existingLog = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+            if (existingLog == null)
+            {
+                for (int i = 0; i < numOfToll; i++)
+                {
+                    var random = new Random();
+                    var randomToll = tolls[random.Next(tolls.Count)];
+                    var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                    {
+                        Id = i + 1,
+                        CarId = carId,
+                        BookingId = bookingId,
+                        TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
+                        TollBoothId = randomToll.Id,
+                        ChargeAmount = randomToll.ChargeAmount
+                    };
+                    var carTollTransac = new CarTollTransac
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        TransacDate = DateTime.UtcNow,
+                        Amount = randomToll.ChargeAmount,
+                        Status = "Completed"
+                    };
+                    wallet.Balance -= randomToll.ChargeAmount;
+                    await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                    await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
+                    await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                }
+            }
+            else
+            {
+                int startId = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1;
+                for (int i = 0; i < numOfToll; i++)
+                {
+                    var random = new Random();
+                    var randomToll = tolls[random.Next(tolls.Count)];
+                    var carTravelLog = new Repository.Data.Entities.CarTravelLog
+                    {
+                        Id = startId + i,
+                        CarId = carId,
+                        BookingId = bookingId,
+                        TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
+                        TollBoothId = randomToll.Id,
+                        ChargeAmount = randomToll.ChargeAmount
+                    };
+                    var carTollTransac = new CarTollTransac
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                        TransacDate = DateTime.UtcNow,
+                        Amount = randomToll.ChargeAmount,
+                        Status = "Completed"
+                    };
+                    wallet.Balance -= randomToll.ChargeAmount;
+                    await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
+                    await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
+                    await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                }
+            }
+            var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
+            return _mapper.Map<List<CarTravelView>>(result);
         }
 
         public async Task<List<CarTravelView>?> GetAll()

@@ -10,6 +10,7 @@ namespace Repository.DTO.ResponseDTO.CarToll
     {
         public Guid Id { get; set; }
         public Guid BookingId { get; set; }
+        public string BookingNum { get; set; }
         public Guid CarId { get; set; }
         public decimal Total { get; set; }
         public DateTime CreateDate { get; set; }

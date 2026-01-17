@@ -14,5 +14,6 @@ namespace Service.Services
         Task<List<CarTravelView>?> GetByBookingId(Guid bookingId);
         Task<List<CarTravelView>?> GetByCarAndBooking(Guid carId, Guid bookingId);
         Task<List<CarTravelView>?> CreateCarTravelLog(Guid carId, Guid bookingId, int tollBoothId);
+        Task<List<CarTravelView>?> CreateRandomLog(Guid carId, Guid bookingId, int numOfToll);
     }
 }
