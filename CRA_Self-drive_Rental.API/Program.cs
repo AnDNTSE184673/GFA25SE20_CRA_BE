@@ -44,6 +44,8 @@ namespace CRA_Self_drive_Rental.API
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -196,6 +198,7 @@ namespace CRA_Self_drive_Rental.API
             builder.Services.AddHostedService<InvoiceStatusBackgroundService>();
             builder.Services.AddHostedService<InvoiceRecalculationBackgroundService>();
             builder.Services.AddHostedService<SupabaseInitializationService>();
+            builder.Services.AddHostedService<CarWalletCheckerBackgroundService>();
             builder.Services.AddSingleton<Service.Infranstructure.IGpsStore, Service.Infranstructure.GpsStore>();
             builder.Services.AddDbContext<CRA_DbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
