@@ -79,6 +79,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
                             TollBoothId = tollBoothId,
+                            TollBoothName = toll.Name,
                             ChargeAmount = toll.ChargeAmount
                         };
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
@@ -95,6 +96,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
                             TollBoothId = tollBoothId,
+                            TollBoothName = toll.Name,
                             ChargeAmount = toll.ChargeAmount
                         };
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
@@ -125,6 +127,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
                             TollBoothId = tollBoothId,
+                            TollBoothName = toll.Name,
                             ChargeAmount = toll.ChargeAmount
                         };
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
@@ -141,6 +144,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
                             TollBoothId = tollBoothId,
+                            TollBoothName = toll.Name,
                             ChargeAmount = toll.ChargeAmount
                         };
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
@@ -205,6 +209,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
                             TollBoothId = randomToll.Id,
+                            TollBoothName = randomToll.Name,
                             ChargeAmount = randomToll.ChargeAmount
                         };
                         var carTollTransac = new CarTollTransac
@@ -235,6 +240,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
                             TollBoothId = randomToll.Id,
+                            TollBoothName = randomToll.Name,
                             ChargeAmount = randomToll.ChargeAmount
                         };
                         var carTollTransac = new CarTollTransac
@@ -269,6 +275,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
                             TollBoothId = randomToll.Id,
+                            TollBoothName = randomToll.Name,
                             ChargeAmount = randomToll.ChargeAmount
                         };
                         var carTollTransac = new CarTollTransac
@@ -299,6 +306,7 @@ namespace Service.Services.Implementation
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
                             TollBoothId = randomToll.Id,
+                            TollBoothName = randomToll.Name,
                             ChargeAmount = randomToll.ChargeAmount
                         };
                         var carTollTransac = new CarTollTransac

@@ -12,6 +12,7 @@ namespace Repository.DTO.ResponseDTO.Car
         public Guid BookingId { get; set; }
         public DateTime TravelDate { get; set; }
         public int TollBoothId { get; set; }
+        public string TollBoothName { get; set; }
         public decimal ChargeAmount { get; set; }
     }
 }

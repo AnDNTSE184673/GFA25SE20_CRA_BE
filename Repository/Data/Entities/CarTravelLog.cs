@@ -14,6 +14,7 @@ namespace Repository.Data.Entities
         public Guid BookingId { get; set; }
         public DateTime TravelDate { get; set; }
         public int TollBoothId { get; set; }
+        public string TollBoothName { get; set; }
         public decimal ChargeAmount { get; set; }
         [ForeignKey("CarId")]
         public virtual Car Car { get; set; }
