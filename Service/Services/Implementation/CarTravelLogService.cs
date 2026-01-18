@@ -74,7 +74,6 @@ namespace Service.Services.Implementation
                     {
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
@@ -91,7 +90,6 @@ namespace Service.Services.Implementation
                     {
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = 1,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
@@ -122,7 +120,6 @@ namespace Service.Services.Implementation
                     {
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = existingLog.Count > 0 ? existingLog.Max(x => x.Id) + 1 : 1,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
@@ -139,7 +136,6 @@ namespace Service.Services.Implementation
                     {
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = 1,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow,
@@ -204,7 +200,6 @@ namespace Service.Services.Implementation
                         var randomToll = tolls[random.Next(tolls.Count)];
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = i + 1,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
@@ -235,7 +230,6 @@ namespace Service.Services.Implementation
                         var randomToll = tolls[random.Next(tolls.Count)];
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = startId + i,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
@@ -270,7 +264,6 @@ namespace Service.Services.Implementation
                         var randomToll = tolls[random.Next(tolls.Count)];
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = i + 1,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),
@@ -301,7 +294,6 @@ namespace Service.Services.Implementation
                         var randomToll = tolls[random.Next(tolls.Count)];
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
                         {
-                            Id = startId + i,
                             CarId = carId,
                             BookingId = bookingId,
                             TravelDate = DateTime.UtcNow.AddMinutes(-random.Next(1, 1000)),

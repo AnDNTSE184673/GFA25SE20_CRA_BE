@@ -145,6 +145,13 @@ namespace Repository.Data
                 .HasForeignKey<Booking>(c => c.InvoiceId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CarTravelLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .UseIdentityColumn();   // PostgreSQL identity
+            });
         }
     }
 }
