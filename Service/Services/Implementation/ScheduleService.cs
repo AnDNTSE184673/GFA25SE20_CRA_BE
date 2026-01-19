@@ -219,8 +219,8 @@ namespace Service.Services.Implementation
                 car.Status = ConstantEnum.Statuses.ACTIVE;
                 await _unitOfWork._carRepo.UpdateCarAsync(car);
 
-                int randomtolls = new Random().Next(1, 4);
-                var tollLogs = await _carTravelLogService.CreateRandomLog(car.Id, booking.Id, randomtolls);
+                //int randomtolls = new Random().Next(1, 4);
+                //var tollLogs = await _carTravelLogService.CreateRandomLog(car.Id, booking.Id, randomtolls);
 
                 await _unitOfWork.CommitTransactionAsync();
 

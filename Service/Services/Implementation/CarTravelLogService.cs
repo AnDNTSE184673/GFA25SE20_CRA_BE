@@ -70,6 +70,24 @@ namespace Service.Services.Implementation
                     wallet.Balance -= toll.ChargeAmount;
                     await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
                     await _unitOfWork._carTollRepo.InsertToCarToll(newToll, bookingId, carId);
+                    var ownerNoti = new PersistNotif
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = $"Your car with license plate {car.LicensePlate} has passed through toll booth {toll.Name} and been charged {toll.ChargeAmount:C}.",
+                        IsViewed = false,
+                        CreateDate = DateTime.UtcNow,
+                        UserId = car.UserId
+                    };
+                    var customerNoti = new PersistNotif
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = $"Your booking {booking.BookingNumber} of car with license plate {car.LicensePlate} has passed through toll booth {toll.Name} and been charged {toll.ChargeAmount:C}.",
+                        IsViewed = false,
+                        CreateDate = DateTime.UtcNow,
+                        UserId = booking.UserId
+                    };
+                    await _unitOfWork._notifyRepository.CreateAsync(ownerNoti);
+                    await _unitOfWork._notifyRepository.CreateAsync(customerNoti);
                     if (existingLog != null)
                     {
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
@@ -116,6 +134,24 @@ namespace Service.Services.Implementation
                     wallet.Balance -= toll.ChargeAmount;
                     await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
                     await _unitOfWork._carTollRepo.InsertToCarToll(newToll, bookingId, carId);
+                    var ownerNoti = new PersistNotif
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = $"Your car with license plate {car.LicensePlate} has passed through toll booth {toll.Name} and been charged {toll.ChargeAmount:C}.",
+                        IsViewed = false,
+                        CreateDate = DateTime.UtcNow,
+                        UserId = car.UserId
+                    };
+                    var customerNoti = new PersistNotif
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = $"Your booking {booking.BookingNumber} of car with license plate {car.LicensePlate} has passed through toll booth {toll.Name} and been charged {toll.ChargeAmount:C}.",
+                        IsViewed = false,
+                        CreateDate = DateTime.UtcNow,
+                        UserId = booking.UserId
+                    };
+                    await _unitOfWork._notifyRepository.CreateAsync(ownerNoti);
+                    await _unitOfWork._notifyRepository.CreateAsync(customerNoti);
                     if (existingLog != null)
                     {
                         var carTravelLog = new Repository.Data.Entities.CarTravelLog
@@ -148,6 +184,7 @@ namespace Service.Services.Implementation
                         var result = await _unitOfWork._carTravelLogRepo.GetByCarAndBookingAsync(carId, bookingId);
                         return _mapper.Map<List<CarTravelView>>(result);
                     }
+                    
                 }
                 
                 
@@ -219,6 +256,24 @@ namespace Service.Services.Implementation
                         await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
                         await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        var ownerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = car.UserId
+                        };
+                        var customerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your booking {booking.BookingNumber} of car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = booking.UserId
+                        };
+                        await _unitOfWork._notifyRepository.CreateAsync(ownerNoti);
+                        await _unitOfWork._notifyRepository.CreateAsync(customerNoti);
                     }
                 }
                 else
@@ -249,6 +304,24 @@ namespace Service.Services.Implementation
                         await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
                         await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        var ownerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = car.UserId
+                        };
+                        var customerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your booking {booking.BookingNumber} of car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = booking.UserId
+                        };
+                        await _unitOfWork._notifyRepository.CreateAsync(ownerNoti);
+                        await _unitOfWork._notifyRepository.CreateAsync(customerNoti);
                     }
                 }
             }
@@ -283,6 +356,24 @@ namespace Service.Services.Implementation
                         await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
                         await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        var ownerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = car.UserId
+                        };
+                        var customerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your booking {booking.BookingNumber} of car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = booking.UserId
+                        };
+                        await _unitOfWork._notifyRepository.CreateAsync(ownerNoti);
+                        await _unitOfWork._notifyRepository.CreateAsync(customerNoti);
                     }
                 }
                 else
@@ -313,6 +404,24 @@ namespace Service.Services.Implementation
                         await _unitOfWork._carWalletRepo.UpdateAsync(wallet);
                         await _unitOfWork._carTollRepo.InsertToCarToll(carTollTransac, bookingId, carId);
                         await _unitOfWork._carTravelLogRepo.CreateAsync(carTravelLog);
+                        var ownerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = car.UserId
+                        };
+                        var customerNoti = new PersistNotif
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"Your booking {booking.BookingNumber} of car with license plate {car.LicensePlate} has passed through toll booth {randomToll.Name} and been charged {randomToll.ChargeAmount:C}.",
+                            IsViewed = false,
+                            CreateDate = DateTime.UtcNow,
+                            UserId = booking.UserId
+                        };
+                        await _unitOfWork._notifyRepository.CreateAsync(ownerNoti);
+                        await _unitOfWork._notifyRepository.CreateAsync(customerNoti);
                     }
                 }
             }
