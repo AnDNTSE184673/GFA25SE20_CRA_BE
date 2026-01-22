@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    partial class CRA_DbContextModelSnapshot : ModelSnapshot
+    [Migration("20260122074503_CarTypeInCarModel")]
+    partial class CarTypeInCarModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -437,44 +440,6 @@ namespace Repository.Migrations
                     b.HasIndex("CarTollId");
 
                     b.ToTable("CarTollTransacs");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarTravelLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CarId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("ChargeAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("TollBoothId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TollBoothName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("TravelDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("TollBoothId");
-
-                    b.ToTable("CarTravelLogs");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.CarWallet", b =>
@@ -1407,60 +1372,6 @@ namespace Repository.Migrations
                     b.ToTable("StaffLogAudit");
                 });
 
-            modelBuilder.Entity("Repository.Data.Entities.TollBooth", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("ChargeAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TollBooths");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ChargeAmount = 100000m,
-                            Location = "249 Võ Nguyên Giáp, Phước Long A, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
-                            Name = "Trạm thu phí xa lộ Hà Nội"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ChargeAmount = 150000m,
-                            Location = "Trạm thu phí Long Phước, Long Phước, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
-                            Name = "Trạm Thu phí Long Phước"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ChargeAmount = 120000m,
-                            Location = "WP27+8P6, ĐT743B, Binh Hoà, Thuận An, Bình Dương, Vietnam",
-                            Name = "Trạm Thu Phí Cầu Ông Bố"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ChargeAmount = 200000m,
-                            Location = "702 Đường Nguyễn Văn Linh, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Vietnam",
-                            Name = "Trạm Thu phí Nguyễn Văn Linh"
-                        });
-                });
-
             modelBuilder.Entity("Repository.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1670,33 +1581,6 @@ namespace Repository.Migrations
                     b.HasOne("Repository.Data.Entities.CarToll", null)
                         .WithMany("CarTollTransacs")
                         .HasForeignKey("CarTollId");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarTravelLog", b =>
-                {
-                    b.HasOne("Repository.Data.Entities.Booking", "Booking")
-                        .WithMany()
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Repository.Data.Entities.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Repository.Data.Entities.TollBooth", "TollBooth")
-                        .WithMany()
-                        .HasForeignKey("TollBoothId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Car");
-
-                    b.Navigation("TollBooth");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.CarWallet", b =>

@@ -9,6 +9,7 @@ using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Car;
+using Repository.DTO.ResponseDTO.CarRentalRate;
 using Repository.DTO.ResponseDTO.Feedbacks;
 using Repository.Extension.SupabaseFileUploader;
 using System;
@@ -308,7 +309,7 @@ namespace Service.Services.Implementation
 
         public async Task<List<CarDetailsManufacturer>> GetManufacturerLookup()
         {
-            return await _unitOfWork._lookupRepo.GetCarDetailsManufacturer();
+            return await _unitOfWork._lookupRepo.GetCarDetailsManufacturer(); 
         }
 
         public async Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId)
@@ -377,6 +378,56 @@ namespace Service.Services.Implementation
                 await _unitOfWork.RollbackTransactionAsync();
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<CarRecommendedRental> GetModelRecommendedPrice(CarInfoForRecc form)
+        {
+            try
+            {
+                var manuList = await _unitOfWork._lookupRepo.GetCarDetailsManufacturer();
+
+                var manufacturer = manuList
+                    .FirstOrDefault(manu => string.Equals(manu.Manufacturer, form.Manufacturer, StringComparison.OrdinalIgnoreCase));
+
+                if (manufacturer == null)
+                    throw new KeyNotFoundException("Manufacturer doesn't exist or isn't registered in the database, contact admin!");
+
+                var modelList = await _unitOfWork._lookupRepo.GetCarDetailsModelByManufacturer(manufacturer.Id);
+
+                var model = modelList
+                    .FirstOrDefault(mod => string.Equals(mod.Model, form.Model, StringComparison.OrdinalIgnoreCase));
+
+                if (model == null)
+                    throw new KeyNotFoundException("Model doesn't exist or isn't registered in the database, contact admin!");
+                
+                if (form.YearOfManufacture < model.YearOfManufacture)
+                    throw new KeyNotFoundException("A car cannot exist before it was first manufactured, choose another year!");
+
+                int age = DateTime.Now.Year - form.YearOfManufacture;
+                decimal ageFactor = Math.Max(0.75m, 1 - 0.04m * age);
+                decimal baseRent = model.MSRP.Value * 0.001m * ageFactor;
+                decimal roundedRent = RoundUpToNearest(baseRent, 1000);
+                decimal minRent = roundedRent * 0.8m;
+                decimal maxRent = roundedRent * 1.1m;
+
+                var reccRent = new CarRecommendedRental
+                {
+                    RecommendedPrice = roundedRent,
+                    RecommendedMaxPrice= maxRent,
+                    RecommendedMinPrice= minRent
+                };
+
+                return reccRent;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        decimal RoundUpToNearest(decimal value, int factor)
+        {
+            return Math.Ceiling(value / factor) * factor;
         }
     }
 }

@@ -21,7 +21,9 @@ namespace Repository.Data.Entities
         public string Description { get; set; } = string.Empty;
         public string VerificationMethod { get; set; } = "OTP"; //or MFA, etc
 
-        public Guid ScheduleId { get; set; }
+        public string Location { get; set; }
+
+        public Guid? ScheduleId { get; set; }
         public Guid ResponsibleStaffId { get; set; }
 
         [ForeignKey("ScheduleId")]

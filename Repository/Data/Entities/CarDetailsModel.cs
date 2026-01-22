@@ -25,6 +25,8 @@ namespace Repository.Data.Entities
 
         public int ManufacturerId { get; set; }
 
+        public string CarType { get; set; }
+
         [ForeignKey("ManufacturerId")]
         public virtual CarDetailsManufacturer Manufacturer { get; set; }
 

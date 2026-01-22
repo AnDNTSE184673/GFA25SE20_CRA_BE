@@ -3,6 +3,7 @@ using Repository.Data.Entities;
 using Repository.DTO.RequestDTO.Car;
 using Repository.DTO.RequestDTO.CarRegister;
 using Repository.DTO.ResponseDTO.Car;
+using Repository.DTO.ResponseDTO.CarRentalRate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,6 @@ namespace Service.Services
         Task<CarView> UpdateCarAsync(Guid carId, UpdateCarForm form);
         Task<List<CarDetailsManufacturer>> GetManufacturerLookup();
         Task<List<CarDetailsModel>> GetModelLookupOfManufacturer(int manufacturerId);
+        Task<CarRecommendedRental> GetModelRecommendedPrice(CarInfoForRecc form);
     }
 }

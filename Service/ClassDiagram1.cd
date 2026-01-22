@@ -1,0 +1,541 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Service.Services.Implementation.BookingService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAIAAAAAAAAgARFAAAAAQAAAAQAAQAEAYAAAA=</HashCode>
+      <FileName>Services\Implementation\BookingService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.CarHandoverService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAkABAQAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Services\Implementation\CarHandoverService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.CarRegService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAECAAACAAAACAAAgABAAAAAIAAAAAhAAAAAACAAAQ=</HashCode>
+      <FileName>Services\Implementation\CarRegService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.CarRentalService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAgABABAAAAABAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Services\Implementation\CarRentalService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.CarService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABCgIUAAJAAmABAAAAAAAAAAAgIhQAAAAAAAA=</HashCode>
+      <FileName>Services\Implementation\CarService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.DriverLicenseService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAQCiAAAAEAB4ABAAAAAAEAAAAgAAAAAAAAAAE=</HashCode>
+      <FileName>Services\Implementation\DriverLicenseService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.EmailService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAIAAAAAAAAAAAAgAgAAAAAIAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Services\Implementation\EmailService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.FeedbackService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAACgAAAAAAAgABAAAAAiAAAACgIAAAAAAAAAA=</HashCode>
+      <FileName>Services\Implementation\FeedbackService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.FPTAIService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Services\Implementation\FPTAIService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.GPSService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAgAEAAgAxAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Implementation\GPSService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.InquiryService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAACgAQAAEAAgABAAAAIAAAAAAhAAAAIAgAAAA=</HashCode>
+      <FileName>Services\Implementation\InquiryService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.InvoiceService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAABAAAAIAgABAACAAAEAAAEAAAAIgAAAAAA=</HashCode>
+      <FileName>Services\Implementation\InvoiceService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.JWTService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Services\Implementation\JWTService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.OTPService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAgABAAAEEAAAAAAAAAAAAgAAAAM=</HashCode>
+      <FileName>Services\Implementation\OTPService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.ParkingLotService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgABAAAAAAAAAAAAAQAAAAIAAAA=</HashCode>
+      <FileName>Services\Implementation\ParkingLotService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.PaymentService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAIEQgAAAAIAAgCghFBAAHCAgBAEAAAgMAMJFAAAIA=</HashCode>
+      <FileName>Services\Implementation\PaymentService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.PersitNotifService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAEAAAEgAlAAAAECAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\Implementation\PersitNotifService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.ReportService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BABIAgAACgAAAEAAAhABAAAAACAIAAAwAAAAAAACAAg=</HashCode>
+      <FileName>Services\Implementation\ReportService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.ScheduleService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>sAAAgBAACIAAAEGAAgCRAAAAAIAAAAAkAAAAAAAEAAA=</HashCode>
+      <FileName>Services\Implementation\ScheduleService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.StaffLogService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAgABAAAAAAAAAAAAAAABCAAAAAA=</HashCode>
+      <FileName>Services\Implementation\StaffLogService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="Service.Services.Implementation.TrackAsiaService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAABAAAAAAAIAAAAAAAAAAYAAAAAA=</HashCode>
+      <FileName>Services\Implementation\TrackAsiaService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Service.Services.Implementation.UserService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAgIEABYCAAABgAwGggBAAAAIJgAAAAgIAJAAANAABM=</HashCode>
+      <FileName>Services\Implementation\UserService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.BookingRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.CarHandoverRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.CarImageRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.CarRegRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="16" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.CarRentalRateRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.CarRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.DriverLicenseRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.FeedbackImageRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.FeedbackRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="16" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.GPSRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.InquiryImageRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.InquiryRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.InvoiceRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.LookupRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="16" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.OtpRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.ParkingLotRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.PaymentRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.PersitNotifRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.ReportImageRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="16" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.ReportRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.ScheduleRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.StaffLogRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Repository.Repositories.UserRepository" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="Service.Services.IBookingService" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAQBAAAAAQAAAAQAAQAEAYAAAA=</HashCode>
+      <FileName>Services\IBookingService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.ICarHandoverService" Collapsed="true">
+    <Position X="2.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAQAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Services\ICarHandoverService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.ICarRegService" Collapsed="true">
+    <Position X="4" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAECAAAAAAAACAAAgAAAAAAAAAAAAAAAAAAAACAAAQ=</HashCode>
+      <FileName>Services\ICarRegService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.ICarRentalService" Collapsed="true">
+    <Position X="5.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAABAAAAABAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Services\ICarRentalService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.ICarService" Collapsed="true">
+    <Position X="7.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAIQAAJAACAAAAAAAAAAAAAAIhQAAAAAAAA=</HashCode>
+      <FileName>Services\ICarService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IDriverLicenseService" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAQAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IDriverLicenseService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IEmailService" Collapsed="true">
+    <Position X="2.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Services\IEmailService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IFeedbackService" Collapsed="true">
+    <Position X="4" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAiAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IFeedbackService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IFPTAIService" Collapsed="true">
+    <Position X="5.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Services\IFPTAIService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IGPSService" Collapsed="true">
+    <Position X="7.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAgAEAAAAwAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IGPSService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IInquiryService" Collapsed="true">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAQAAEAAAAAAAAAAAAAAAABAAAAIAgAAAA=</HashCode>
+      <FileName>Services\IInquiryService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IInvoiceService" Collapsed="true">
+    <Position X="2.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAABAAAAIAAAAAACAAAEAAAEAAAAIgAAAAAA=</HashCode>
+      <FileName>Services\IInvoiceService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IJWTService" Collapsed="true">
+    <Position X="4" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IJWTService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IOTPService" Collapsed="true">
+    <Position X="5.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAAAEAAAAAAAAAAAAgAAAAI=</HashCode>
+      <FileName>Services\IOTPService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IParkingLotService" Collapsed="true">
+    <Position X="7.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAIAAAA=</HashCode>
+      <FileName>Services\IParkingLotService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IPaymentService" Collapsed="true">
+    <Position X="0.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAEQgAAAAIAAgCgBFAAAGCAgBAEAAAgMAMJFAAAIA=</HashCode>
+      <FileName>Services\IPaymentService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IPersitNotifService" Collapsed="true">
+    <Position X="2.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAEAAAEAAkAAAAECAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IPersitNotifService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IReportService" Collapsed="true">
+    <Position X="4" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BABAAgAAAAAAAAAAABAAAAAAACAIAAAQAAAAAAACAAg=</HashCode>
+      <FileName>Services\IReportService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IScheduleService" Collapsed="true">
+    <Position X="5.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>sAAAgAAAAIAAAAGAAACQAAAAAIAAAAAEAAAAAAAEAAA=</HashCode>
+      <FileName>Services\IScheduleService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IStaffLogService" Collapsed="true">
+    <Position X="7.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABCAAAAAA=</HashCode>
+      <FileName>Services\IStaffLogService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.ITrackAsiaService" Collapsed="true">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAYAAAAAA=</HashCode>
+      <FileName>Services\ITrackAsiaService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Service.Services.IUserService" Collapsed="true">
+    <Position X="2.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgIEABYAAAABAAQGAAAAAAAAJgAAAAAIAIAAANAAAI=</HashCode>
+      <FileName>Services\IUserService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IBookingRepository" Collapsed="true">
+    <Position X="10.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.ICarHandoverRepository" Collapsed="true">
+    <Position X="12.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.ICarImageRepository" Collapsed="true">
+    <Position X="14.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.ICarRegRepository" Collapsed="true">
+    <Position X="16" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.ICarRentalRateRepository" Collapsed="true">
+    <Position X="17.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.ICarRepository" Collapsed="true">
+    <Position X="10.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IDriverLicenseRepository" Collapsed="true">
+    <Position X="12.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IFeedbackImageRepository" Collapsed="true">
+    <Position X="14.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IFeedbackRepository" Collapsed="true">
+    <Position X="16" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IGPSRepository" Collapsed="true">
+    <Position X="17.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IInquiryImageRepository" Collapsed="true">
+    <Position X="10.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IInquiryRepository" Collapsed="true">
+    <Position X="12.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IInvoiceRepository" Collapsed="true">
+    <Position X="14.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.ILookupRepository" Collapsed="true">
+    <Position X="16" Y="7.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.INotifyRepository" Collapsed="true">
+    <Position X="17.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IOtpRepository" Collapsed="true">
+    <Position X="10.75" Y="8" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IParkingLotRepository" Collapsed="true">
+    <Position X="12.5" Y="8" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IPaymentRepository" Collapsed="true">
+    <Position X="14.25" Y="8" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IReportImageRepository" Collapsed="true">
+    <Position X="16" Y="8" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IReportRepository" Collapsed="true">
+    <Position X="17.75" Y="8" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IScheduleRepository" Collapsed="true">
+    <Position X="10.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IStaffLogRepository" Collapsed="true">
+    <Position X="12.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Repository.Repositories.Interfaces.IUserRepository" Collapsed="true">
+    <Position X="14.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -331,6 +331,8 @@ namespace Service.Services.Implementation
                 var AICheck = await _fptAI.ExtractDriverLicenseInfo(frontImage);
                 int aiCheckResult = AICheck.CheckValidation();
 
+                //check ai for null
+
                 var license = new DriverLicense();
 
                 if(aiCheckResult == 1)

@@ -464,5 +464,24 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 });
             }
         }
+
+        [HttpGet("recommendedPrice")]
+        public async Task<IActionResult> GetModelRecommendedPrice([FromQuery]CarInfoForRecc form)
+        {
+            try
+            {
+                var result = await _carServ.GetModelRecommendedPrice(form);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        //Need a function to create and delete rows in Lookup tables
     }
 }

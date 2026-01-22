@@ -12,6 +12,8 @@ using Repository.DTO.ResponseDTO.Payment;
 using Repository.Data.Entities;
 using AutoMapper;
 using Repository.Constant;
+using static Repository.Constant.ConstantEnum;
+using System.Reflection;
 
 
 namespace Service.Services.Implementation
@@ -1165,6 +1167,26 @@ namespace Service.Services.Implementation
                     }
                 }
             }
+            if (payments.Count == 0) return null;
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentByCarTypeForUser(Guid vendorId, string carType)
+        {
+            var user = await _unitOfWork._userRepo.GetByIdAsync(vendorId);
+            if (user == null) return null;
+
+            var type = typeof(ConstantEnum.VehicleClassification.Types);
+            var carTypeList = new HashSet<string>(type
+                .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
+                .Select(fi => (string)fi.GetRawConstantValue()),
+                StringComparer.OrdinalIgnoreCase); // Makes the check case-insensitive
+
+            if (!carTypeList.Contains(carType)) throw new Exception("Car type is not a valid or registered type, contact admin!");
+            var payments = new List<PaymentHistory>();
+            payments = await _unitOfWork._paymentRepo.GetPaymentByCarTypeForUser(vendorId, carType);
             if (payments.Count == 0) return null;
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;

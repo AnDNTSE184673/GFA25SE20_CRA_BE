@@ -13,6 +13,9 @@ namespace Repository.DTO.RequestDTO.Schedule
         public Guid BookingId { get; set; }
         public Guid ResponsibleStaffId { get; set; }
         public string Description { get; set; }
+
+        public string Location { get; set; }
+
         [MaxFileCount(10)]
         public List<IFormFile> images { get; set; } = new List<IFormFile>();
     }

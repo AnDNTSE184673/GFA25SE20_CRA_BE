@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Repository.Data;
@@ -11,9 +12,11 @@ using Repository.Data;
 namespace Repository.Migrations
 {
     [DbContext(typeof(CRA_DbContext))]
-    partial class CRA_DbContextModelSnapshot : ModelSnapshot
+    [Migration("20260107111622_AddCarType")]
+    partial class AddCarType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,10 +175,6 @@ namespace Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CarType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<decimal?>("MSRP")
                         .HasColumnType("numeric");
 
@@ -214,14 +213,10 @@ namespace Repository.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("ResponsibleStaffId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ScheduleId")
+                    b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Timestamp")
@@ -374,126 +369,6 @@ namespace Repository.Migrations
                         .IsUnique();
 
                     b.ToTable("CarRentalRates");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarToll", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("BookingNum")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("CarId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("CarId");
-
-                    b.ToTable("CarTolls");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarTollTransac", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid?>("CarTollId")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("OrderCode")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("TransacDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CarTollId");
-
-                    b.ToTable("CarTollTransacs");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarTravelLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CarId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("ChargeAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("TollBoothId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TollBoothName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("TravelDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("TollBoothId");
-
-                    b.ToTable("CarTravelLogs");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarWallet", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("CarId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CarId");
-
-                    b.ToTable("CarWallets");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Contract", b =>
@@ -1407,60 +1282,6 @@ namespace Repository.Migrations
                     b.ToTable("StaffLogAudit");
                 });
 
-            modelBuilder.Entity("Repository.Data.Entities.TollBooth", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("ChargeAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TollBooths");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ChargeAmount = 100000m,
-                            Location = "249 Võ Nguyên Giáp, Phước Long A, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
-                            Name = "Trạm thu phí xa lộ Hà Nội"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ChargeAmount = 150000m,
-                            Location = "Trạm thu phí Long Phước, Long Phước, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam",
-                            Name = "Trạm Thu phí Long Phước"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ChargeAmount = 120000m,
-                            Location = "WP27+8P6, ĐT743B, Binh Hoà, Thuận An, Bình Dương, Vietnam",
-                            Name = "Trạm Thu Phí Cầu Ông Bố"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ChargeAmount = 200000m,
-                            Location = "702 Đường Nguyễn Văn Linh, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Vietnam",
-                            Name = "Trạm Thu phí Nguyễn Văn Linh"
-                        });
-                });
-
             modelBuilder.Entity("Repository.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1598,7 +1419,9 @@ namespace Repository.Migrations
 
                     b.HasOne("Repository.Data.Entities.Schedules", "Schedule")
                         .WithMany()
-                        .HasForeignKey("ScheduleId");
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Schedule");
 
@@ -1640,70 +1463,6 @@ namespace Repository.Migrations
                     b.HasOne("Repository.Data.Entities.Car", "Car")
                         .WithOne("RentalRate")
                         .HasForeignKey("Repository.Data.Entities.CarRentalRate", "CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarToll", b =>
-                {
-                    b.HasOne("Repository.Data.Entities.Booking", "Booking")
-                        .WithMany()
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Repository.Data.Entities.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Car");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarTollTransac", b =>
-                {
-                    b.HasOne("Repository.Data.Entities.CarToll", null)
-                        .WithMany("CarTollTransacs")
-                        .HasForeignKey("CarTollId");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarTravelLog", b =>
-                {
-                    b.HasOne("Repository.Data.Entities.Booking", "Booking")
-                        .WithMany()
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Repository.Data.Entities.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Repository.Data.Entities.TollBooth", "TollBooth")
-                        .WithMany()
-                        .HasForeignKey("TollBoothId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Car");
-
-                    b.Navigation("TollBooth");
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarWallet", b =>
-                {
-                    b.HasOne("Repository.Data.Entities.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2031,11 +1790,6 @@ namespace Repository.Migrations
 
                     b.Navigation("RentalRate")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Repository.Data.Entities.CarToll", b =>
-                {
-                    b.Navigation("CarTollTransacs");
                 });
 
             modelBuilder.Entity("Repository.Data.Entities.Feedback", b =>
