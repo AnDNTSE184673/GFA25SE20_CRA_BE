@@ -97,6 +97,7 @@ namespace Service.Services.Implementation
             }
         }
 
+        //COnsider giving this carHandover too and another method to clear car out of maintenance and track location
         public async Task<(string status, ScheduleView view)> SetMaintenanceAsync(MaintenanceSchedule form)
         {
             try
@@ -176,7 +177,8 @@ namespace Service.Services.Implementation
                     Type = ConstantEnum.ScheduleTypeConstants.Pickup,
                     Description = form.Description,
                     ScheduleId = oldSchedules.Id,
-                    ResponsibleStaffId = form.ResponsibleStaffId
+                    ResponsibleStaffId = form.ResponsibleStaffId,
+                    Location = form.Location
                 };
 
                 var handoverResult = await _unitOfWork._carHandoverRepo.CreateCarHandoverAsync(newCarHandover);
@@ -263,7 +265,8 @@ namespace Service.Services.Implementation
                     Type = ConstantEnum.ScheduleTypeConstants.Return,
                     Description = form.Description,
                     ScheduleId = oldSchedules.Id,
-                    ResponsibleStaffId = form.ResponsibleStaffId
+                    ResponsibleStaffId = form.ResponsibleStaffId,
+                    Location = form.Location
                 };
 
                 var handoverResult = await _unitOfWork._carHandoverRepo.CreateCarHandoverAsync(newCarHandover);

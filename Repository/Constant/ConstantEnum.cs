@@ -119,12 +119,15 @@ namespace Repository.Constant
             {
                 public const string Sedan = "Sedan";
                 public const string SUV = "SUV";
-                public const string Hatchback = "Hatchback";
-                public const string PickupTruck = "PickupTruck";
-                public const string Van = "Van";
+                public const string Mini = "Mini";
+                public const string Compact = "Compact";
+                public const string CUV = "CUV";
                 public const string MPV = "MPV";
                 public const string Luxury = "Luxury";
                 public const string Electric = "Electric";
+                public const string Hatchback = "Hatchback";
+                public const string PickupTruck = "PickupTruck";
+                public const string Van = "Van";
             }
 
             public static class Pricing
