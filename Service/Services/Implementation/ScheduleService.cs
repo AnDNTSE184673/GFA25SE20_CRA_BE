@@ -180,7 +180,7 @@ namespace Service.Services.Implementation
                     Description = form.Description,
                     ScheduleId = oldSchedules.Id,
                     ResponsibleStaffId = form.ResponsibleStaffId,
-                    Location = form.Location
+                    Location = oldSchedules.Location               
                 };
 
                 var handoverResult = await _unitOfWork._carHandoverRepo.CreateCarHandoverAsync(newCarHandover);
@@ -271,7 +271,7 @@ namespace Service.Services.Implementation
                     Description = form.Description,
                     ScheduleId = oldSchedules.Id,
                     ResponsibleStaffId = form.ResponsibleStaffId,
-                    Location = form.Location
+                    Location = oldSchedules.Location
                 };
 
                 var handoverResult = await _unitOfWork._carHandoverRepo.CreateCarHandoverAsync(newCarHandover);
