@@ -167,6 +167,8 @@ namespace Repository.Extension.AutoMapper
             CreateMap<CarToll, CarTollView>();
             CreateMap<CarTollTransac, CarTollTransacView>();
             CreateMap<CarWallet, CarWalletView>();
+            CreateMap<CarTravelLog, CarTravelView>();
+            CreateMap<TollBooth, TollBoothView>();
         }
     }
 }

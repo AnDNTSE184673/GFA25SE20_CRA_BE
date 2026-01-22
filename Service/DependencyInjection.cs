@@ -87,6 +87,8 @@ namespace Service
             service.AddScoped<IGPSService, GPSService>();
             service.AddScoped<ICarWalletService, CarWalletService>();
             service.AddScoped<ICarTollService, CarTollService>();
+            service.AddScoped<ICarTravelLogService, CarTravelLogService>();
+            service.AddScoped<ITollBoothService, TollBoothService>();
             return service;
         }
     }

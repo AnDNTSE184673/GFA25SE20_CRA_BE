@@ -53,6 +53,8 @@ namespace Repository.Data
         public DbSet<CarToll> CarTolls { get; set; }
         public DbSet<CarTollTransac> CarTollTransacs { get; set; }
         public DbSet<CarWallet> CarWallets { get; set; }    
+        public DbSet<CarTravelLog> CarTravelLogs { get; set; }
+        public DbSet<TollBooth> TollBooths { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,6 +66,14 @@ namespace Repository.Data
                 new Role { Id = 1002, Title = "Staff" },
                 new Role { Id = 1, Title = "Customer" },
                 new Role { Id = 2, Title = "Car Owner" }
+            );
+
+            // Seeding TollBooths - Example data
+            modelBuilder.Entity<TollBooth>().HasData(
+                new TollBooth { Id = 1, Name = "Trạm thu phí xa lộ Hà Nội", Location = "249 Võ Nguyên Giáp, Phước Long A, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam", ChargeAmount = 100000 },
+                new TollBooth { Id = 2, Name = "Trạm Thu phí Long Phước", Location = "Trạm thu phí Long Phước, Long Phước, Thủ Đức, Thành phố Hồ Chí Minh, Vietnam", ChargeAmount = 150000 },
+                new TollBooth { Id = 3, Name = "Trạm Thu Phí Cầu Ông Bố", Location = "WP27+8P6, ĐT743B, Binh Hoà, Thuận An, Bình Dương, Vietnam", ChargeAmount = 120000 },
+                new TollBooth { Id = 4, Name = "Trạm Thu phí Nguyễn Văn Linh", Location = "702 Đường Nguyễn Văn Linh, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Vietnam", ChargeAmount = 200000 }
             );
 
             //New relationships here
@@ -135,6 +145,13 @@ namespace Repository.Data
                 .HasForeignKey<Booking>(c => c.InvoiceId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CarTravelLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .UseIdentityColumn();   // PostgreSQL identity
+            });
         }
     }
 }
