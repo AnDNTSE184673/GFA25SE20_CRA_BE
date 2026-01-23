@@ -14,6 +14,7 @@ namespace Service.Services
         Task<List<InvoiceView>?> GetInvoicesByCusId(Guid userId);
         Task<List<InvoiceView>?> GetInvoicesByVendorId(Guid vendorId);
         Task<List<InvoiceView>?> GetInvoices();
+        Task<List<InvoiceView>?> GetInvoicesByCarTypeOfVendorId(Guid vendorId, string carType);
         Task<InvoiceView?> GetInvoiceById(Guid id);
         Task<InvoiceView?> CreateInvoice(InvoiceCreateRequest request);
         Task<InvoiceView?> UpdateInvoiceToCompleted(Guid id);
