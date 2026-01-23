@@ -14,6 +14,7 @@ namespace Repository.Repositories.Interfaces
         Task<Invoice?> GetInvoiceById(Guid invoiceId);
         Task<List<Invoice>?> GetInvoiceByCusId(Guid userId);
         Task<List<Invoice>?> GetInvoiceByVendorId(Guid userId);
+        Task<List<Invoice>?> GetInvoicesByCarTypeOfVendorId(Guid userId, string carType);
         Task<List<Invoice>?> GetAllInvoices();
         Task<Invoice> CreateInvoice(InvoiceCreateRequest request);
         Task<Invoice> UpdateInvoice(InvoiceUpdateRequest request);

@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Repository.Base;
+using Repository.Constant;
 using Repository.Data.Entities;
 using Repository.DTO.RequestDTO;
 using Repository.DTO.ResponseDTO.Invoice;
+using Supabase.Gotrue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static Repository.Constant.ConstantEnum;
@@ -77,6 +80,28 @@ namespace Service.Services.Implementation
         public async Task<List<InvoiceView>?> GetInvoicesByVendorId(Guid vendorId)
         {
             var invoices = await _unitOfWork._invoiceRepo.GetInvoiceByVendorId(vendorId);
+            if (invoices != null && invoices.Any())
+            {
+                return _mapper.Map<List<InvoiceView>>(invoices);
+            }
+            return null;
+        }
+
+        public async Task<List<InvoiceView>?> GetInvoicesByCarTypeOfVendorId(Guid vendorId, string carType)
+        {
+            var user = await _unitOfWork._userRepo.GetByIdAsync(vendorId);
+            if (user == null) throw new KeyNotFoundException("User with this Id doesn't exist!");
+
+            var type = typeof(ConstantEnum.VehicleClassification.Types);
+            var carTypeList = new HashSet<string>(type
+                .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
+                .Select(fi => (string)fi.GetRawConstantValue()),
+                StringComparer.OrdinalIgnoreCase); // Makes the check case-insensitive
+
+            if (!carTypeList.Contains(carType)) throw new Exception("Car type is not a valid or registered type, contact admin!");
+
+            var invoices = await _unitOfWork._invoiceRepo.GetInvoicesByCarTypeOfVendorId(vendorId, carType);
             if (invoices != null && invoices.Any())
             {
                 return _mapper.Map<List<InvoiceView>>(invoices);

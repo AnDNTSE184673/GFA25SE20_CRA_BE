@@ -38,6 +38,13 @@ namespace CRA_Self_drive_Rental.API.Controllers
             if (invoices != null && invoices.Count() > 0) return Ok(invoices);
             return NoContent();
         }
+        [HttpGet("AllInvoicesToVendor/carTypes/{vendorId}")]
+        public async Task<IActionResult> GetInvoicesByCarTypesToVendor(Guid vendorId, string carType)
+        {
+            var invoices = await _invoiceService.GetInvoicesByCarTypeOfVendorId(vendorId, carType);
+            if (invoices != null && invoices.Count() > 0) return Ok(invoices);
+            return NoContent();
+        }
 
         [HttpGet("/{InvoiceId}")]
         public async Task<IActionResult> GetAnInvoice(Guid InvoiceId)

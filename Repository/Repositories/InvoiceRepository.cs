@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Repository.Constant.ConstantEnum;
 
 namespace Repository.Repositories
 {
@@ -46,6 +47,18 @@ namespace Repository.Repositories
             .Include(i => i.Customer)
             .Include(i => i.Vendor)
             .Where(i => i.VendorId == userId).ToListAsync();
+        }
+
+        public async Task<List<Invoice>?> GetInvoicesByCarTypeOfVendorId(Guid userId, string carType)
+        {
+            return await _context.Invoices
+            .Include(i => i.InvoiceItems)
+            .Include(i => i.Customer)
+            .Include(i => i.Vendor)
+            .Where(p => p.Booking.Car.UserId.Equals(userId))
+            .Where(p => p.Booking.Car.CarType.Equals(carType)) 
+            .Where(p => p.Status.Equals(ConstantEnum.Statuses.COMPLETED)) 
+            .ToListAsync();
         }
 
         public async Task<Invoice> CreateInvoice(InvoiceCreateRequest request)

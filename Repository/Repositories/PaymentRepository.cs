@@ -120,6 +120,7 @@ namespace Repository.Repositories
         {
             var payment = await _context.PaymentHistories
                 .Where(p => p.Invoice.Booking.Car.UserId.Equals(vendorId))
+                .Where(p => p.Invoice.VendorId.Equals(vendorId))
                 .Where(p => p.Invoice.Booking.Car.CarType.Equals(carType)) //assume cartype is normalized to constant enum
                 .ToListAsync();
             return payment;
