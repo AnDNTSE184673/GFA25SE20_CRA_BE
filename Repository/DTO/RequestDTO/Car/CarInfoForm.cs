@@ -14,10 +14,10 @@ namespace Repository.DTO.RequestDTO.Car
         [Required]
         public string LicensePlate { get; set; }
         [Required]
-        [StringLength(100)]
+        [StringLength(200)]
         public string Model { get; set; }
         [Required]
-        [StringLength(100)]
+        [StringLength(200)]
         public string Manufacturer { get; set; }
         [Range(2, 20, ErrorMessage = "Seats must be between 2 and 20.")]
         public int Seats { get; set; }
@@ -34,6 +34,8 @@ namespace Repository.DTO.RequestDTO.Car
         public double FuelConsumption { get; set; }
         [StringLength(1000, ErrorMessage = "Description must be 1000 characters or less.")]
         public string? Description { get; set; }
+        [StringLength(200)]
+        public string? CarType { get; set; }
 
 
         [MaxFileCount(5)]
