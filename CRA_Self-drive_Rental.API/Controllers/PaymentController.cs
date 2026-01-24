@@ -132,10 +132,20 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payments found for the specified parking ID.");
         }
 
-        [HttpGet("/CarType/{vendorId}")]
+        [HttpGet("Vendor/CarType/{vendorId}")]
         public async Task<IActionResult> GetPaymentsByUserCarType(Guid vendorId, string carType)
         {
             var payments = await _paymentService.GetPaymentByCarTypeForUser(vendorId, carType);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified user.");
+        }
+        [HttpGet("/CarType")]
+        public async Task<IActionResult> GetPaymentsByCarType(string carType)
+        {
+            var payments = await _paymentService.GetPaymentByCarType(carType);
             if (payments != null && payments.Any())
             {
                 return Ok(payments);
