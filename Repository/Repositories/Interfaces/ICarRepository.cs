@@ -17,5 +17,6 @@ namespace Repository.Repositories.Interfaces
         Task<List<Car?>> GetAllCars();
         Task<List<Car>> GetAllActiveCars();
         Task<Car> GetCarByLicensePlate(string licensePlate);
+        Task<List<Car>> GetCarsByType(string carType);
     }
 }

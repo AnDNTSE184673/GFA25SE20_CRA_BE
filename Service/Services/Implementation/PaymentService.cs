@@ -1209,5 +1209,35 @@ namespace Service.Services.Implementation
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
         }
+
+        public async Task<List<PaymentHistoryView>?> GetPaymentsByCarType(string carType)
+        {
+            var type = typeof(ConstantEnum.VehicleClassification.Types);
+            var carTypeList = new HashSet<string>(type
+                .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(fi => fi.IsLiteral && !fi.IsInitOnly && fi.FieldType == typeof(string))
+                .Select(fi => (string)fi.GetRawConstantValue()),
+                StringComparer.OrdinalIgnoreCase); // Makes the check case-insensitive
+            if (!carTypeList.Contains(carType)) throw new Exception("Car type is not a valid or registered type, contact admin!");
+            var payments = new List<PaymentHistory>();
+            var cars = await _unitOfWork._carRepo.GetCarsByType(carType);
+            if (cars == null || !cars.Any()) throw new Exception("No cars found for the specified type.");
+            foreach (var car in cars)
+            {
+                var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCar(car.Id);
+                if (bookings == null || !bookings.Any()) continue;
+                foreach (var booking in bookings)
+                {
+                    var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
+                    if (pays != null && pays.Any())
+                    {
+                        payments.AddRange(pays);
+                    }
+                }
+            }
+            if (payments.Count == 0) return null;
+            var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
+            return paymentViews;
+        }
     }
 }

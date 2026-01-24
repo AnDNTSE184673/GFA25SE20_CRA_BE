@@ -8,6 +8,7 @@ using Repository.Data.Entities;
 using Repository.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -88,6 +89,14 @@ namespace Repository.Repositories
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<Car>> GetCarsByType(string carType)
+        {
+            return await _dbContext.Cars
+                .Where(x => x.CarType.Equals(carType.Trim()))
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }
