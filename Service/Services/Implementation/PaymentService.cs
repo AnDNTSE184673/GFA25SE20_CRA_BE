@@ -1190,10 +1190,10 @@ namespace Service.Services.Implementation
             if (payments.Count == 0) return null;
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
+        }
 
-            /*
-            var user = await _unitOfWork._userRepo.GetByIdAsync(vendorId);
-            if (user == null) throw new KeyNotFoundException("User with this Id doesn't exist!");
+        public async Task<List<PaymentHistoryView>?> GetPaymentByCarType(string carType)
+        {
 
             var type = typeof(ConstantEnum.VehicleClassification.Types);
             var carTypeList = new HashSet<string>(type
@@ -1203,21 +1203,11 @@ namespace Service.Services.Implementation
                 StringComparer.OrdinalIgnoreCase); // Makes the check case-insensitive
 
             if (!carTypeList.Contains(carType)) throw new Exception("Car type is not a valid or registered type, contact admin!");
-            var bookings = await _unitOfWork._bookingRepo.GetBookingsFromCar(carId);
-            if (bookings == null || !bookings.Any()) return null;
             var payments = new List<PaymentHistory>();
-            foreach (var booking in bookings)
-            {
-                var pays = await _unitOfWork._paymentRepo.GetPaymentsByInvoiceId(booking.InvoiceId);
-                if (pays != null && pays.Any())
-                {
-                    payments.AddRange(pays);
-                }
-            }
+            payments = await _unitOfWork._paymentRepo.GetPaymentByCarType(carType);
             if (payments.Count == 0) return null;
             var paymentViews = _mapper.Map<List<PaymentHistoryView>>(payments);
             return paymentViews;
-            */
         }
 
         public async Task<List<PaymentHistoryView>?> GetPaymentsByCarType(string carType)

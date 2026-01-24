@@ -40,6 +40,6 @@ namespace Service.Services
         Task<PaymentHistoryView?> UpdatePaymentWithOrderCode(PaymentUpdateWithOrderCode request);
         Task<PaymentHistoryView?> UpdateBookingPaymentWithoutBookingConfirmed(PaymentUpdateWithOrderCode request);
         Task<List<PaymentHistoryView>?> GetPaymentByCarTypeForUser(Guid vendorId, string carType);
-        Task<List<PaymentHistoryView>?> GetPaymentsByCarType(string carType);
+        Task<List<PaymentHistoryView>?> GetPaymentByCarType(string carType);
     }
 }
