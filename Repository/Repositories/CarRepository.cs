@@ -94,12 +94,7 @@ namespace Repository.Repositories
         public async Task<List<Car>> GetCarsByType(string carType)
         {
             return await _dbContext.Cars
-                .Include(x => x.Owner)
-                .Include(x => x.PreferredLot)
-                .Include(x => x.Images.Where(i => i.Status.Equals(ConstantEnum.Statuses.ACTIVE)))
-                .Include(x => x.RentalRate)
-                .Where(x => x.Status.Equals(ConstantEnum.Statuses.ACTIVE)
-                && x.CarType.Equals(carType.Trim()))
+                .Where(x => x.CarType.Equals(carType.Trim()))
                 .AsNoTracking()
                 .ToListAsync();
         }
