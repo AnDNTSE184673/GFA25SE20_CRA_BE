@@ -121,6 +121,7 @@ namespace Repository.Constant
                 public const string SUV = "SUV";
                 public const string Mini = "Mini";
                 public const string Compact = "Compact";
+                public const string Crossover = "Crossover";
                 public const string CUV = "CUV";
                 public const string MPV = "MPV";
                 public const string Luxury = "Luxury";

@@ -119,8 +119,7 @@ namespace Repository.Repositories
         public async Task<List<PaymentHistory?>> GetPaymentByCarTypeForUser(Guid vendorId, string carType)
         {
             var payment = await _context.PaymentHistories
-                .Where(p => p.Invoice.Booking.Car.UserId.Equals(vendorId))
-                .Where(p => p.Invoice.VendorId.Equals(vendorId))
+                .Where(p => p.Invoice.Booking.Car.UserId.Equals(vendorId) && p.Invoice.VendorId.Equals(vendorId))
                 .Where(p => p.Invoice.Booking.Car.CarType.Equals(carType)) //assume cartype is normalized to constant enum
                 .ToListAsync();
             return payment;
