@@ -143,6 +143,18 @@ namespace CRA_Self_drive_Rental.API.Controllers
             return NotFound("No payments found for the specified user.");
         }
 
+        [HttpGet("/CarType/")]
+        public async Task<IActionResult> GetPaymentsByCarType([FromQuery]string carType)
+        {
+            if (string.IsNullOrWhiteSpace(carType)) return BadRequest("Invalid car type.");
+            var payments = await _paymentService.GetPaymentsByCarType(carType);
+            if (payments != null && payments.Any())
+            {
+                return Ok(payments);
+            }
+            return NotFound("No payments found for the specified car type.");
+        }
+
         [HttpPost("/CreatePayOSPaymentRequest")]
         public async Task<IActionResult> CreatePayOSPaymentRequest([FromBody] CreatePaymentRequest request)
         {
