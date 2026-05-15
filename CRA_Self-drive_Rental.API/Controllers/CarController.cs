@@ -118,6 +118,26 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 {
                     throw new ArgumentException("No image was given!");
                 }
+                var allowedExtensions = new HashSet<string>
+                {
+                    ".jpg", ".jpeg", ".png"
+                };
+
+                var maxFileSizeInMBs = 50;
+
+                var imageValidationOptions = FileValidationPolicyFactory
+                    .CreateFromExtensions(
+                        allowedExtensions,
+                        maxFileSizeInMBs
+                );
+
+                foreach(var i in form.images)
+                {
+                    var frontResult = FileValidationHelper.Validate(i, imageValidationOptions);
+                    if (!frontResult.IsValid)
+                        return BadRequest(frontResult.Error);
+                }
+                
                 var result = await _carServ.UpdateCarImageAsync(form.images, form.carId);
                 return result == null
                     ? StatusCode(StatusCodes.Status400BadRequest, new
@@ -146,6 +166,27 @@ namespace CRA_Self_drive_Rental.API.Controllers
                 {
                     throw new ArgumentException("No image was given!");
                 }
+
+                var allowedExtensions = new HashSet<string>
+                {
+                    ".jpg", ".jpeg", ".png"
+                };
+
+                var maxFileSizeInMBs = 50;
+
+                var imageValidationOptions = FileValidationPolicyFactory
+                    .CreateFromExtensions(
+                        allowedExtensions,
+                        maxFileSizeInMBs
+                );
+
+                foreach (var i in form.images)
+                {
+                    var frontResult = FileValidationHelper.Validate(i, imageValidationOptions);
+                    if (!frontResult.IsValid)
+                        return BadRequest(frontResult.Error);
+                }
+
                 var result = await _carRegServ.SubmitRegisterDocument(form);
                 return result.status.Contains(ConstantEnum.RepoStatus.FAILURE)
                     ? StatusCode(500, new

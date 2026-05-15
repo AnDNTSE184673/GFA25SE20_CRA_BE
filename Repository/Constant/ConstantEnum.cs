@@ -64,6 +64,7 @@ namespace Repository.Constant
             public const string DriverLicense = "DriverLicenseDocs";
             public const string FeedbackImages = "FeedbackImages";
             public const string CarImages = "CarImages";
+            public const string Contracts = "Contracts";
             public const string UserAvatars = "UserAvatars";
             public const string CheckInOutImages = "CheckInOutImages";
             public const string InquiryImages = "InquiryImages";
@@ -119,15 +120,17 @@ namespace Repository.Constant
             {
                 public const string Sedan = "Sedan";
                 public const string SUV = "SUV";
-                public const string Mini = "Mini";
-                public const string Compact = "Compact";
-                public const string Crossover = "Crossover";
                 public const string CUV = "CUV";
                 public const string MPV = "MPV";
+                public const string Mini = "Mini";
+                public const string Coupe = "Coupe";
+                public const string Pickup = "Pickup";
+
+                public const string Compact = "Compact";
+                public const string Crossover = "Crossover";
                 public const string Luxury = "Luxury";
                 public const string Electric = "Electric";
                 public const string Hatchback = "Hatchback";
-                public const string PickupTruck = "PickupTruck";
                 public const string Van = "Van";
             }
 

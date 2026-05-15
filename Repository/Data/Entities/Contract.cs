@@ -13,7 +13,14 @@ namespace Repository.Data.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string DocUrl { get; set; }
+
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public string Bucket { get; set; }
+
+        public long? FileSize { get; set; }
+        public string? MimeType { get; set; }
+
         public DateTime CreateDate { get; set; }
         public DateTime ValidUntil { get; set; }
 
@@ -23,13 +30,13 @@ namespace Repository.Data.Entities
 
         public Guid PartyAId { get; set; }
         public Guid PartyBId { get; set; }
-        public Guid InvoiceId { get; set; }
+        public Guid BookingId { get; set; }
 
         [ForeignKey("PartyAId")]
         public virtual User PartyA { get; set; }
         [ForeignKey("PartyBId")]
         public virtual User PartyB { get; set; }
-        [ForeignKey("InvoiceId")]
-        public virtual Invoice Invoice { get; set; }
+        [ForeignKey("BookingId")]
+        public virtual Booking Booking { get; set; }
     }
 }

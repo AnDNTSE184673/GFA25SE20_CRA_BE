@@ -37,14 +37,15 @@ namespace Repository.Base
         public ICarHandoverRepository _carHandoverRepo { get; }
         public IOtpRepository _OtpRepo { get; }
         public ILookupRepository _lookupRepo { get; }
-        public INotifyRepository _notifyRepository { get; set; }
+        public INotifyRepository _notifyRepository { get; }
         public IReportRepository _reportRepo { get; }
         public IReportImageRepository _reportImageRepo { get; }
         public IGPSRepository _gpsRepo { get; }
-        public ICarTollRepository _carTollRepo { get; set; }
-        public ICarWalletRepository _carWalletRepo { get; set; }
-        public ITollRepository _tollRepo { get; set; }
-        public ICarTravelLogRepository _carTravelLogRepo { get; set; }
+        public ICarTollRepository _carTollRepo { get; }
+        public ICarWalletRepository _carWalletRepo { get; }
+        public ITollRepository _tollRepo { get; }
+        public ICarTravelLogRepository _carTravelLogRepo { get; }
+        public IContractRepository _contractRepo { get; }
 
         //no need to construct _transaction
 
@@ -75,7 +76,8 @@ namespace Repository.Base
             ICarTollRepository carTollRepo,
             ICarWalletRepository carWalletRepo,
             ITollRepository tollRepo,
-            ICarTravelLogRepository carTravelLogRepo)
+            ICarTravelLogRepository carTravelLogRepo,
+            IContractRepository contractRepo)
         {
             _context = context;
             _userRepo = userRepo;
@@ -105,6 +107,7 @@ namespace Repository.Base
             _carWalletRepo = carWalletRepo;
             _tollRepo = tollRepo;
             _carTravelLogRepo = carTravelLogRepo;
+            _contractRepo = contractRepo;
         }
 
         //no need to construct _transaction

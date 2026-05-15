@@ -43,7 +43,6 @@ namespace Service.Services.Implementation
         int expirationTimeinSeconds = 1800;
         bool isPublic = true;
 
-
         public async Task<string> DeleteCarReport(Guid id)
         {
             try

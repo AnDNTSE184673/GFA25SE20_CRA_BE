@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Repository.Extension.SupabaseFileUploader
 {
-    //NOTE: This class is a pair with another helper class named FileValidationToMimeType
+    //NOTE: This class is a pair with another helper class named FileValidationHelper
 
     public static class MimeTypeHelper
     {
